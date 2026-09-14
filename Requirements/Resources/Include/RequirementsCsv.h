@@ -475,6 +475,32 @@ double RequirementsCsv_getReal(void* obj, int column, double t, double tNext, do
     return v[i0] + (v[i0 + 1] - v[i0]) * (t - f->time[i0]) / (f->time[i0 + 1] - f->time[i0]);
 }
 
+/* Time derivative of the i-th Real column at t times der_t: the slope of the
+   linear segment t lies in (the segment to the right of a row, the segment to
+   the left of an event's first row when evaluated on the left side), zero
+   outside the file's range and at its last row. The derivative annotation of
+   Requirements.Internal.CSV.getReal, so der(reader.x) is available to a
+   SignalAnalysis.ExactDerivative in a check model reading a file. */
+double RequirementsCsv_getRealDer(void* obj, int column, double t, double tNext, double tPre, double der_t)
+{
+    RequirementsCsv_File* f = (RequirementsCsv_File*)obj;
+    size_t i, i0;
+    int before, outside;
+    const double* v;
+    if (f == NULL) ModelicaError("RequirementsCsv: getRealDer on a closed file\n");
+    if (column < 1 || (size_t)column > f->nReal) ModelicaFormatError("RequirementsCsv: Real column index %d is out of range 1..%lu\n", column, (unsigned long)f->nReal);
+    v = f->real + (size_t)(column - 1) * f->nRows;
+    RequirementsCsv_locate(f, t, tNext, tPre, &i, &before, &outside);
+    if (outside != 0) return 0.0;
+    if (before) {
+        i0 = RequirementsCsv_groupFirst(f, i);
+        if (i0 == 0) return 0.0;
+        return (v[i0] - v[i0 - 1]) / (f->time[i0] - f->time[i0 - 1]) * der_t;
+    }
+    if (i + 1 >= f->nRows) return 0.0;
+    return (v[i + 1] - v[i]) / (f->time[i + 1] - f->time[i]) * der_t;
+}
+
 static size_t RequirementsCsv_discreteRow(RequirementsCsv_File* f, double t, double tNext, double tPre)
 {
     size_t i;

@@ -22,7 +22,9 @@ What is asserted, per corpus file:
   * identical event lists and nextTimeEvent() at every row time and between;
   * identical value(t, tNext, tPre) at a grid of instants including every
     event time on both sides of the bracket, between rows, and outside the
-    range (hold), and the same refusal outside the range without hold.
+    range (hold), and the same refusal outside the range without hold;
+  * identical slope(t, tNext, tPre) -- the derivative annotation of getReal --
+    at the same grid.
 """
 from __future__ import annotations
 
@@ -108,6 +110,9 @@ class CReader:
             fn.restype = rt
             fn.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_double, ctypes.c_double,
                            ctypes.c_double, ctypes.POINTER(ctypes.c_int)]
+        L.test_getRealDer.restype = ctypes.c_double
+        L.test_getRealDer.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_double, ctypes.c_double,
+                                      ctypes.c_double, ctypes.c_double, ctypes.POINTER(ctypes.c_int)]
         L.test_timeRange.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_double),
                                      ctypes.POINTER(ctypes.c_double)]
 
@@ -137,6 +142,13 @@ class CReader:
         if err.value:
             raise ValueError(self.error())
         return bool(v) if kind == mahscsv.BOOLEAN else v
+
+    def slope(self, h, column, t, tNext, tPre):
+        err = ctypes.c_int(0)
+        v = self.lib.test_getRealDer(h, column, t, tNext, tPre, 1.0, ctypes.byref(err))
+        if err.value:
+            raise ValueError(self.error())
+        return v
 
 
 # --------------------------------------------------------------- corpus
@@ -294,6 +306,11 @@ def check_item(c: CReader, item) -> list[str]:
                         same = (pv == cv) or (kind == mahscsv.REAL and np.isnan(pv) and np.isnan(cv))
                         if not same:
                             failures.append(f"{name}: {sname}@{t!r} bracket ({tNext},{tPre}): python {pv!r} vs C {cv!r}")
+                    # the derivative (slope) with the same bracket
+                    if kind == mahscsv.REAL and pe is None:
+                        ps, cs = sig.slope(sname, t, tNext, tPre), c.slope(h, col, t, tNext, tPre)
+                        if not (ps == cs or (np.isnan(ps) and np.isnan(cs))):
+                            failures.append(f"{name}: slope of {sname}@{t!r} bracket ({tNext},{tPre}): python {ps!r} vs C {cs!r}")
     # nextTimeEvent
     for t in sorted(probes):
         pn = sig.next_time_event(t)

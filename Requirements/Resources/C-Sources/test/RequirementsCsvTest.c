@@ -77,6 +77,14 @@ EXPORT double test_getReal(void* f, int column, double t, double tNext, double t
     return RequirementsCsv_getReal(f, column, t, tNext, tPre);
 }
 
+EXPORT double test_getRealDer(void* f, int column, double t, double tNext, double tPre, double der_t, int* err)
+{
+    message[0] = 0;
+    if (TEST_SETJMP(env)) { *err = 1; return 0.0; }
+    *err = 0;
+    return RequirementsCsv_getRealDer(f, column, t, tNext, tPre, der_t);
+}
+
 EXPORT int test_getBoolean(void* f, int column, double t, double tNext, double tPre, int* err)
 {
     message[0] = 0;

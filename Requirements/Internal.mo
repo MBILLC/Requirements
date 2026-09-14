@@ -901,7 +901,29 @@ package Internal "Library of internal components (should not be directly used)"
       output Real y;
       external "C" y = RequirementsCsv_getReal(file, column, t, nextTimeEvent, preNextTimeEvent)
         annotation(Include="#include \"RequirementsCsv.h\"", IncludeDirectory="modelica://Requirements/Resources/Include");
+      annotation(derivative(noDerivative=nextTimeEvent, noDerivative=preNextTimeEvent) = getRealDer,
+        Documentation(info="<html>
+<p>The <code>derivative</code> annotation names <a href=\"modelica://Requirements.Internal.CSV.getRealDer\">getRealDer</a>
+(the slope of the linear segment), as <code>Modelica.Blocks.Sources.CombiTimeTable</code> does for its table
+function, so <code>der(reader.x)</code> &mdash; a <code>SignalAnalysis.ExactDerivative</code> on a reader output &mdash; translates.</p>
+</html>"));
     end getReal;
+
+    pure function getRealDer "Time derivative of the i-th Real column at time t (the slope of the linear segment; zero outside the file's range)"
+      input File file;
+      input Integer column "Index into the realNames the file was opened with";
+      input Real t "Current time";
+      input Real nextTimeEvent "The block's nextTimeEvent";
+      input Real preNextTimeEvent "pre(nextTimeEvent)";
+      input Real der_t "der(t)";
+      output Real der_y;
+      external "C" der_y = RequirementsCsv_getRealDer(file, column, t, nextTimeEvent, preNextTimeEvent, der_t)
+        annotation(Include="#include \"RequirementsCsv.h\"", IncludeDirectory="modelica://Requirements/Resources/Include");
+      annotation(Documentation(info="<html>
+<p>On the left side of an event (the bracket as in <code>getReal</code>) the slope of the segment ending at the event's first row;
+otherwise the slope of the segment starting at the last row at or before <code>t</code>; zero outside the file's range and at its last row.</p>
+</html>"));
+    end getRealDer;
 
     pure function getBoolean "Value of the i-th Boolean column at time t (piecewise constant)"
       input File file;
