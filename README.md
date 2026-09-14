@@ -1,10 +1,21 @@
-# Modelica_Requirements
+# Requirements
 
 Defining requirements formally and checking them when simulating
 
+**Origin.** This library is Model Based Innovation LLC's derivative of
+[Modelica_Requirements](https://github.com/modelica-3rdparty/Modelica_Requirements)
+version 0.7.1 (BSD 3-Clause; LICENSE and the original authors' copyright
+notices unchanged), renamed `Requirements` on 2026-09-14 and developed in this
+private repository as the base for the requirements-verification tooling of
+[ModCheck](https://github.com/MBILLC/ModCheck) (see its
+`ModCheck/Resources/Planning/REQUIREMENTS_REDESIGN_PLAN.md`). The changes
+that are meant for upstream are kept, under the original name, on the
+`upstream-pr` branch of `MBILLC/Modelica_Requirements`; additions made here
+are not.
+
 ## Library description
 
-Library Modelica_Requirements is a Modelica package to formally define requirements and checking them automatically when a model is simulated. An overview of this library is given in the publication [Formal  Requirements Modeling for Simulation-Based Verification](http://www.ep.liu.se/ecp/118/067/ecp15118625.pdf) 
+Library Requirements is a Modelica package to formally define requirements and checking them automatically when a model is simulated. An overview of this library is given in the publication [Formal  Requirements Modeling for Simulation-Based Verification](http://www.ep.liu.se/ecp/118/067/ecp15118625.pdf) 
 
 In order to define properties and requirements mostly a 2-valued logic is used. There are some functions and blocks based on 3-valued logic using type Property, especially block Requirement. Furthermore, there are cast-operators to map 2-valued to 3-valued logic and vice versa. 3-valued logic is used to define (a) if a property is not tested (because only relevant in a certain situation) and (b) if a requirement was not tested in a simulation run. 
 
