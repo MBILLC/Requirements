@@ -7,7 +7,7 @@ package AirCircuitSystem
     extends Components.AirCircuitSystem_B;
     inner Verify.PrintViolations printViolations
       annotation (Placement(transformation(extent={{40,80},{60,100}})));
-    Components.Requirements.PipeRequirements pipe2Requirements(
+    Components.Checks.PipeRequirements pipe2Requirements(
       observationName="pipe2",
       observation=Components.Bindings.PipeObservation_from_DynamicPipe(pipe2),
       pMax=200000)
@@ -59,7 +59,7 @@ package AirCircuitSystem
                 -100},{100,100}})));
     end AirCircuitSystem_B;
 
-    package Requirements "Observation records"
+    package Checks "Requirement blocks and their observation records"
        extends Modelica.Icons.Package;
 
       package Records
@@ -189,7 +189,7 @@ of a pipe shall be between
                 fillColor={0,0,0},
                 fillPattern=FillPattern.Solid)}));
       end PipeNodeRequirements;
-    end Requirements;
+    end Checks;
 
     package Bindings
       "Functions to map variables from the target to the requirement component"
@@ -199,9 +199,9 @@ of a pipe shall be between
         "Map DynamicPipe variables to Pipe observations record"
         extends Modelica.Icons.Function;
         import  Requirements.Examples.AirCircuitSystem.Components.*;
-        input Requirements.Records.MediumVector dynamicPipe
+        input Checks.Records.MediumVector dynamicPipe
           "Observation variables from a DynamicPipe";
-        output Requirements.Records.MediumVector pipeObservation=dynamicPipe
+        output Checks.Records.MediumVector pipeObservation=dynamicPipe
           "Pipe observation variables in requirements model";
       algorithm
 

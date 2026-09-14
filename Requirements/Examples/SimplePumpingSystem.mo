@@ -10,13 +10,13 @@ package SimplePumpingSystem
     inner Verify.PrintViolations printViolations(printSatisfied=true, evaluationTime=2000)
       annotation (Placement(transformation(extent={{120,80},{140,100}})));
 
-    SimplePumpingSystem.Components.Requirements.TankRequirements tankRequirements(
+    SimplePumpingSystem.Components.Checks.TankRequirements tankRequirements(
         observationName="reservoir",
         observation=Bindings.TankObservation_from_OpenTank(
-          Components.Requirements.Records.Tank(level=reservoir.level)))
+          Components.Checks.Records.Tank(level=reservoir.level)))
       annotation (Placement(transformation(extent={{120,40},{140,60}})));
 
-    SimplePumpingSystem.Components.Requirements.PumpRequirements pumpRequirements(
+    SimplePumpingSystem.Components.Checks.PumpRequirements pumpRequirements(
         observationName="pumps",
         observation=Bindings.PumpObservation_from_PrescribedPump(
           Bindings.Records.PrescribedPump(
@@ -24,14 +24,14 @@ package SimplePumpingSystem
             port_a=Bindings.Records.FluidPort_p(p=pumps.port_a.p),
             port_b=Bindings.Records.FluidPort_p(p=pumps.port_b.p))))
       annotation (Placement(transformation(extent={{120,0},{140,20}})));
-    Components.Requirements.SourceRequirements sourceRequirements1(
+    Components.Checks.SourceRequirements sourceRequirements1(
         observationName="source",
-        observation=Components.Requirements.Records.Source(
+        observation=Components.Checks.Records.Source(
           p={source.ports[i].p for i in 1:source.nPorts}))
       annotation (Placement(transformation(extent={{120,-40},{140,-20}})));
-    Components.Requirements.SourceRequirements sourceRequirements2(
+    Components.Checks.SourceRequirements sourceRequirements2(
         observationName="sink",
-        observation=Components.Requirements.Records.Source(
+        observation=Components.Checks.Records.Source(
           p={sink.ports[i].p for i in 1:sink.nPorts}))
       annotation (Placement(transformation(extent={{120,-82},{140,-62}})));
     annotation(experiment(StopTime=2000, Tolerance=1e-006),
@@ -88,7 +88,7 @@ Simulate for 2000 s. When the valve is opened at time t=200, the pump starts tur
         experiment(StopTime=2000, Interval=0.4, Tolerance=1e-006));
     end PumpingSystem;
 
-    package Requirements "Observation records"
+    package Checks "Requirement blocks and their observation records"
       package Records
         "Records containing observation variables needed by the Requirement models"
            extends Modelica.Icons.Package;
@@ -247,7 +247,7 @@ Simulate for 2000 s. When the valve is opened at time t=200, the pump starts tur
                 fillPattern=FillPattern.Sphere,
                 fillColor={0,127,255})}));
       end SourceRequirements;
-    end Requirements;
+    end Checks;
 
     package Bindings
       "Functions to map variables from the target to the requirement component"
@@ -280,7 +280,7 @@ OpenModelica 1.27 and Modelon Impact (OCT) do not, nor do they accept passing
 the instance itself. The explicit constructor is what all three run
 (measured 2026-09-14).</p>
 <p>The source and sink observations are built directly as
-<code>Requirements.Records.Source(p={source.ports[i].p for i in 1:source.nPorts})</code>,
+<code>Checks.Records.Source(p={source.ports[i].p for i in 1:source.nPorts})</code>,
 without a binding function: OpenModelica 1.27 silently returns zeros from a
 function whose result is a record with an array component when the call has
 parameter variability, which a fixed boundary's pressures have.</p>
@@ -290,9 +290,9 @@ parameter variability, which a fixed boundary's pressures have.</p>
 
       function TankObservation_from_OpenTank
         "Map OpenTank variables to Tank observations record"
-        input Requirements.Records.Tank openTank
+        input Checks.Records.Tank openTank
           "Observation variables from an OpenTank";
-        output Requirements.Records.Tank tankObservation=openTank
+        output Checks.Records.Tank tankObservation=openTank
           "OpenTank observation variables in requirements model";
       algorithm
 
@@ -303,7 +303,7 @@ parameter variability, which a fixed boundary's pressures have.</p>
         "Map PrescribedPump variables to pump observations record"
         input Bindings.Records.PrescribedPump prescribedPump
           "Observation variables from a PrescribedPump";
-        output Requirements.Records.Pump pumpObservation=Requirements.Records.Pump(
+        output Checks.Records.Pump pumpObservation=Checks.Records.Pump(
             speed=prescribedPump.N_in,
             p_port_a=prescribedPump.port_a.p,
             p_port_b=prescribedPump.port_b.p)
@@ -317,7 +317,7 @@ parameter variability, which a fixed boundary's pressures have.</p>
 <tr><th>Date</th> <th align=\"left\">Description</th></tr>
 
 <tr><td valign=\"top\"> Sept. 14, 2026 </td>
-    <td valign=\"top\"> <code>SourceObservation_from_PartialSource</code> and <code>Records.PartialSource</code> removed; <code>CheckPumpingSystem</code> builds the source observations with the <code>Requirements.Records.Source</code> constructor (see there) (H. Tummescheit, Model Based Innovation LLC)</td></tr>
+    <td valign=\"top\"> <code>SourceObservation_from_PartialSource</code> and <code>Records.PartialSource</code> removed; <code>CheckPumpingSystem</code> builds the source observations with the <code>Checks.Records.Source</code> constructor (see there) (H. Tummescheit, Model Based Innovation LLC)</td></tr>
 </table>
 </html>"));
     end Bindings;
