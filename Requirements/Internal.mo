@@ -851,4 +851,101 @@ package Internal "Library of internal components (should not be directly used)"
     annotation(__iti_Impure = true);
     end testAccumulatedDuration;
   end TestSlidingWindow;
+
+  package CSV "MA-HS-CSV file reader: the external object and its access functions (used by Sources.PartialSignalsFromFile)"
+    extends Modelica.Icons.InternalPackage;
+
+    class File "MA-HS-CSV file read into memory once; the requested columns by name and type"
+      extends ExternalObject;
+
+      function constructor "Open the file, resolve the requested column names against its header, convert the columns"
+        input String fileName "Absolute path of the MA-HS-CSV file";
+        input String realNames[:] "Header names of the columns read as Real";
+        input String booleanNames[:] "Header names of the columns read as Boolean";
+        input String integerNames[:] "Header names of the columns read as Integer";
+        input Boolean extrapolateHold "= true: hold the first/last row outside the file's time range; = false: error";
+        output File file;
+        external "C" file = RequirementsCsv_open(fileName, realNames, size(realNames, 1), booleanNames, size(booleanNames, 1), integerNames, size(integerNames, 1), extrapolateHold)
+          annotation(Include="#include \"RequirementsCsv.h\"", IncludeDirectory="modelica://Requirements/Resources/Include");
+      end constructor;
+
+      function destructor "Release the file's memory"
+        input File file;
+        external "C" RequirementsCsv_close(file)
+          annotation(Include="#include \"RequirementsCsv.h\"", IncludeDirectory="modelica://Requirements/Resources/Include");
+      end destructor;
+      annotation(Documentation(info="<html>
+<p>External object holding one MA-HS-CSV file: read completely in the constructor, columns not requested are skipped. See
+<a href=\"modelica://Requirements.Sources.PartialSignalsFromFile\">Sources.PartialSignalsFromFile</a> for the format and the value semantics.</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+    end File;
+
+    pure function nextTimeEvent "Smallest event time of the file strictly after t (a huge value when there is none)"
+      input File file;
+      input Real t "Current time";
+      output Real tEvent "Next event time > t";
+      external "C" tEvent = RequirementsCsv_nextTimeEvent(file, t)
+        annotation(Include="#include \"RequirementsCsv.h\"", IncludeDirectory="modelica://Requirements/Resources/Include");
+      annotation(Documentation(info="<html>
+<p>An event of the file is an instant at which a requested Boolean or Integer column changes, or at which any requested column changes inside a group of rows with the same time.</p>
+</html>"));
+    end nextTimeEvent;
+
+    pure function getReal "Value of the i-th Real column at time t (linear between rows; the event bracket picks the side of an event)"
+      input File file;
+      input Integer column "Index into the realNames the file was opened with";
+      input Real t "Current time";
+      input Real nextTimeEvent "The block's nextTimeEvent";
+      input Real preNextTimeEvent "pre(nextTimeEvent)";
+      output Real y;
+      external "C" y = RequirementsCsv_getReal(file, column, t, nextTimeEvent, preNextTimeEvent)
+        annotation(Include="#include \"RequirementsCsv.h\"", IncludeDirectory="modelica://Requirements/Resources/Include");
+    end getReal;
+
+    pure function getBoolean "Value of the i-th Boolean column at time t (piecewise constant)"
+      input File file;
+      input Integer column "Index into the booleanNames the file was opened with";
+      input Real t "Current time";
+      input Real nextTimeEvent "The block's nextTimeEvent";
+      input Real preNextTimeEvent "pre(nextTimeEvent)";
+      output Boolean y;
+      external "C" y = RequirementsCsv_getBoolean(file, column, t, nextTimeEvent, preNextTimeEvent)
+        annotation(Include="#include \"RequirementsCsv.h\"", IncludeDirectory="modelica://Requirements/Resources/Include");
+    end getBoolean;
+
+    pure function getInteger "Value of the i-th Integer column at time t (piecewise constant)"
+      input File file;
+      input Integer column "Index into the integerNames the file was opened with";
+      input Real t "Current time";
+      input Real nextTimeEvent "The block's nextTimeEvent";
+      input Real preNextTimeEvent "pre(nextTimeEvent)";
+      output Integer y;
+      external "C" y = RequirementsCsv_getInteger(file, column, t, nextTimeEvent, preNextTimeEvent)
+        annotation(Include="#include \"RequirementsCsv.h\"", IncludeDirectory="modelica://Requirements/Resources/Include");
+    end getInteger;
+
+    pure function getRows "Number of data rows in the file"
+      input File file;
+      output Integer n;
+      external "C" n = RequirementsCsv_getRows(file)
+        annotation(Include="#include \"RequirementsCsv.h\"", IncludeDirectory="modelica://Requirements/Resources/Include");
+    end getRows;
+
+    pure function getTimeRange "First and last time of the file"
+      input File file;
+      output Real tMin;
+      output Real tMax;
+      external "C" RequirementsCsv_getTimeRange(file, tMin, tMax)
+        annotation(Include="#include \"RequirementsCsv.h\"", IncludeDirectory="modelica://Requirements/Resources/Include");
+    end getTimeRange;
+    annotation(Documentation(info="<html>
+<p>The external object <code>File</code> and the functions
+<a href=\"modelica://Requirements.Sources.PartialSignalsFromFile\">Sources.PartialSignalsFromFile</a> and the blocks extending it call.
+The C implementation is header-only, <code>Resources/Include/RequirementsCsv.h</code> (C89, external linkage, no dependency beyond libc and
+<code>ModelicaUtilities.h</code>), pulled in through the <code>Include</code> annotation of every function; <code>Resources/C-Sources/RequirementsCsv.c</code>
+is the same code as a compilation unit for a <code>Library=</code> build. <code>Resources/C-Sources/test/</code> tests the C reader against ModCheck's Python reader.</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+  end CSV;
 end Internal;

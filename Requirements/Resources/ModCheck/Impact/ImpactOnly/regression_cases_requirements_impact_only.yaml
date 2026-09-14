@@ -9,14 +9,14 @@
 # list (the library's experiment() annotations); references in this folder's
 # ReferenceResults/, stored 2026-09-14 from Modelon Impact (Sept. 2026), cvode.
 library: Requirements
-workspace: modelica-requirements-fork
+workspace: requirements-redesign
 custom_function: dynamic
 tolerance: 0.001
 
 sources:
   default:
     backend: impact
-    workspace: modelica-requirements-fork
+    workspace: requirements-redesign
 
 cases:
   - name: MR_Examples_BackupPowerSupply_MainPowerSupplyRequirements

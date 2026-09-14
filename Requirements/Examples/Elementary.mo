@@ -2942,6 +2942,68 @@ results in
         annotation (Placement(transformation(extent={{-60,20},{-40,40}})));
       annotation (experiment(StopTime=8));
     end PropertyTable;
+
+    model SignalsFromFile "Example for PartialSignalsFromFile (a hand-written MA-HS-CSV reader with named outputs)"
+      extends Modelica.Icons.Example;
+
+      block CabinReader "Reads T_cabin, p_cabin, packOn and flightPhase from a MA-HS-CSV file"
+        extends Requirements.Sources.PartialSignalsFromFile(
+          final realNames = {"T_cabin", "p_cabin"},
+          final booleanNames = {"packOn"},
+          final integerNames = {"flightPhase"});
+        Modelica.Blocks.Interfaces.RealOutput T_cabin = Requirements.Internal.CSV.getReal(file, 1, time, nextTimeEvent, pre(nextTimeEvent))
+          annotation (Placement(transformation(extent={{100,50},{120,70}})));
+        Modelica.Blocks.Interfaces.RealOutput p_cabin = Requirements.Internal.CSV.getReal(file, 2, time, nextTimeEvent, pre(nextTimeEvent))
+          annotation (Placement(transformation(extent={{100,10},{120,30}})));
+        Modelica.Blocks.Interfaces.BooleanOutput packOn
+          annotation (Placement(transformation(extent={{100,-30},{120,-10}})));
+        Modelica.Blocks.Interfaces.IntegerOutput flightPhase
+          annotation (Placement(transformation(extent={{100,-70},{120,-50}})));
+      equation
+        // Boolean and Integer columns change only at the file's events, so they
+        // are read in the when-clause that fires there (as BooleanTable does)
+        when {time >= pre(nextTimeEvent), initial()} then
+          packOn = Requirements.Internal.CSV.getBoolean(file, 1, time, nextTimeEvent, pre(nextTimeEvent));
+          flightPhase = Requirements.Internal.CSV.getInteger(file, 1, time, nextTimeEvent, pre(nextTimeEvent));
+        end when;
+        annotation(Documentation(info="<html>
+<p>The documented pattern for reading a MA-HS-CSV file without the generator: the three name lists fix the column types, one output per column, the column index passed to the C reader fixed at authoring time; Real outputs as declaration equations, Boolean and Integer outputs assigned in the when-clause that fires at the file's events.</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+      end CabinReader;
+
+      CabinReader reader(fileName="modelica://Requirements/Resources/Data/SignalsFromFile.csv")
+        annotation (Placement(transformation(extent={{-80,0},{-60,20}})));
+      Requirements.LogicalBlocks.WithinBand band1(u_min=18, u_max=27)
+        annotation (Placement(transformation(extent={{-40,20},{0,40}})));
+      Requirements.ChecksInFixedWindow.During during1(check=band1.y)
+        "While the pack is on, the cabin temperature shall remain within 18 and 27 degC"
+        annotation (Placement(transformation(extent={{20,20},{60,40}})));
+      Requirements.ChecksInFixedWindow.WhenRising whenRising1(check=reader.p_cabin > 0.9e5)
+        "When the pack is switched on, the cabin pressure shall be above 0.9 bar"
+        annotation (Placement(transformation(extent={{20,-20},{60,0}})));
+      Requirements.ChecksInFixedWindow.During during2(check=reader.packOn)
+        "While in cruise (flight phase 2), the pack shall be on"
+        annotation (Placement(transformation(extent={{20,-60},{60,-40}})));
+      Requirements.Sources.BooleanExpression inCruise(y=reader.flightPhase == 2)
+        annotation (Placement(transformation(extent={{-40,-60},{0,-40}})));
+    equation
+      connect(reader.T_cabin, band1.u) annotation (Line(points={{-59,16},{-50,16},{-50,30},{-42,30}}, color={0,0,127}));
+      connect(reader.packOn, during1.condition) annotation (Line(points={{-59,8},{-10,8},{-10,30.1},{18,30.1}}, color={255,0,255}));
+      connect(reader.packOn, whenRising1.condition) annotation (Line(points={{-59,8},{-10,8},{-10,-9.9},{18,-9.9}}, color={255,0,255}));
+      connect(inCruise.y, during2.condition) annotation (Line(points={{1,-50},{10,-50},{10,-49.9},{18,-49.9}}, color={255,0,255}));
+      annotation (experiment(StopTime=300), Documentation(info="<html>
+<p>
+<a href=\"modelica://Requirements.Sources.PartialSignalsFromFile\">PartialSignalsFromFile</a> extended by a block with four named outputs
+reading <code>Resources/Data/SignalsFromFile.csv</code> &mdash; a 300 s cabin run with the pack switched on at 20 s and off at 200 s
+(stored as same-time event rows), a temperature excursion above 27 degC between 120 s and 150 s, and a flight phase that steps
+0 &rarr; 1 &rarr; 2. Three checks read the outputs: <code>during1</code> is Violated during the excursion; <code>whenRising1</code> is
+Satisfied because the cabin pressure is 1.013 bar when the pack rises at 20 s; <code>during2</code> is Violated from 200 s,
+when the pack is switched off while the flight phase is still 2 (until 250 s).
+</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+    end SignalsFromFile;
   end Sources;
   annotation (Documentation(info="<html>
 <p>

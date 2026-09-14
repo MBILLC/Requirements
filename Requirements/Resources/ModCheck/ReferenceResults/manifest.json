@@ -3190,6 +3190,43 @@
     "descriptor": "openmodelica v1.27.1 (64-bit), MSL 4.1.0, cvode"
   },
   {
+    "name": "MR_OM_Examples_Elementary_Sources_SignalsFromFile",
+    "model": "Requirements.Examples.Elementary.Sources.SignalsFromFile",
+    "variables": [
+      "band1.y",
+      "during1.y",
+      "during2.y",
+      "inCruise.y",
+      "reader.T_cabin",
+      "reader.flightPhase",
+      "reader.p_cabin",
+      "reader.packOn",
+      "time",
+      "whenRising1.y"
+    ],
+    "bytes": 4428,
+    "metrics": {
+      "state_events": 9,
+      "time_events": 0,
+      "steps": 2588,
+      "function_evaluations": 2588,
+      "jacobian_evaluations": 0,
+      "error_test_failures": 0,
+      "convergence_failures": 0,
+      "cpu_time": 0.0024346,
+      "simulation_time": 8.75e-05,
+      "kind": "dynamic",
+      "solver": "cvode",
+      "wall_time": 0.06784300005529076,
+      "samples": 520,
+      "omc_version": "OpenModelica v1.27.1 (64-bit)",
+      "msl_version": "4.1.0",
+      "spread_applied": true,
+      "rtol": 1e-06
+    },
+    "descriptor": "openmodelica v1.27.1 (64-bit), MSL 4.1.0, cvode"
+  },
+  {
     "name": "MR_OM_Examples_Elementary_TimeLocators_After",
     "model": "Requirements.Examples.Elementary.TimeLocators.After",
     "variables": [

@@ -155,6 +155,20 @@ match, recursively and vectorized. Of the three tools compared here, only Dymola
 this library relied on until this release. The explicit record constructor,
 <code>R(a=m.a, sub=S(w=m.sub.w))</code>, is what all three run, and it is what the examples now use.
 </p>
+
+<h4>New: reading signals from a MA-HS-CSV file</h4>
+<p>
+<a href=\"modelica://Requirements.Sources.PartialSignalsFromFile\">Sources.PartialSignalsFromFile</a> reads a file in the
+Modelica Association's MA-HS-CSV format &mdash; Real, Boolean and Integer columns by name, same-time rows as events,
+a time event scheduled at every instant a discrete column changes &mdash; through the external object and functions of
+<a href=\"modelica://Requirements.Internal.CSV\">Internal.CSV</a> and a header-only C reader
+(<code>Resources/Include/RequirementsCsv.h</code>, C89, tested against a Python reader in
+<code>Resources/C-Sources/test/</code>). The block is the seam of a two-run verification: the plant is simulated alone,
+its outputs are stored, and the requirement checks run on the stored signals in a second run.
+Example: <a href=\"modelica://Requirements.Examples.Elementary.Sources.SignalsFromFile\">Examples.Elementary.Sources.SignalsFromFile</a>,
+simulated in OpenModelica 1.27.1 and Modelon Impact with identical results. Dymola 2026x's current license refuses any user-defined
+<code>ExternalObject</code> (\"too complex for the current license\", measured 2026-09-14), so the example is skipped there until the license changes.
+</p>
 </html>"));
   end Version_0_7_1;
 

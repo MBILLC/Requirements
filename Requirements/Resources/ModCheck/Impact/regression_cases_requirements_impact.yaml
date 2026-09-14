@@ -13,14 +13,14 @@
 # enabling: an annotation says how its author simulated, not what is
 # worth checking.
 library: Requirements
-workspace: modelica-requirements-fork
+workspace: requirements-redesign
 custom_function: dynamic
 tolerance: 0.001
 
 sources:
   default:
     backend: impact
-    workspace: modelica-requirements-fork
+    workspace: requirements-redesign
 
 cases:
   - name: MR_Examples_AircraftRequirements_LimitedCabinAltitudeRateOfChange
@@ -880,6 +880,21 @@ cases:
     rtol: 1.0e-06
     modifiers: {}
     variables: [time, "*.y"]
+
+  - name: MR_Examples_Elementary_Sources_SignalsFromFile
+    # Added 2026-09-14: the MA-HS-CSV reader example (Sources.PartialSignalsFromFile,
+    # Internal.CSV, header-only external C). Its outputs are the file's four
+    # columns and the three checks' Property signals; the file's events are at
+    # 20, 40, 100, 200 and 250 s.
+    # Reference from OpenModelica (Dymola's license refuses the ExternalObject).
+    enabled: true
+    model: Requirements.Examples.Elementary.Sources.SignalsFromFile
+    start_time: 0.0
+    final_time: 300.0
+    ncp: 500
+    rtol: 1.0e-06
+    modifiers: {}
+    variables: [time, "*.y", "reader.T_cabin", "reader.p_cabin", "reader.packOn", "reader.flightPhase"]
 
   - name: MR_Examples_MotorsWithLosses_CheckMotorWithLosses
     # Generated 2026-09-14 from Requirements.Examples.MotorsWithLosses.CheckMotorWithLosses's experiment annotation.

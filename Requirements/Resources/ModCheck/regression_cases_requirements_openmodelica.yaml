@@ -921,6 +921,23 @@ cases:
     modifiers: {}
     variables: [time, "*.y"]
 
+  - name: MR_OM_Examples_Elementary_Sources_SignalsFromFile
+    # Added 2026-09-14: the MA-HS-CSV reader example (Sources.PartialSignalsFromFile,
+    # Internal.CSV, header-only external C). Its outputs are the file's four
+    # columns and the three checks' Property signals; the file's events are at
+    # 20, 40, 100, 200 and 250 s.
+    # omc locates the reader's `time >= pre(nextTimeEvent)` as a STATE event
+    # (so does the MSL's BooleanTable there): switch instants land ~1e-10
+    # relative after the file's times, not exactly on them.
+    enabled: true
+    model: Requirements.Examples.Elementary.Sources.SignalsFromFile
+    start_time: 0.0
+    final_time: 300.0
+    ncp: 500
+    rtol: 1.0e-06
+    modifiers: {}
+    variables: [time, "*.y", "reader.T_cabin", "reader.p_cabin", "reader.packOn", "reader.flightPhase"]
+
   - name: MR_OM_Examples_MotorsWithLosses_CheckMotorWithLosses
     # Generated 2026-09-13 from Requirements.Examples.MotorsWithLosses.CheckMotorWithLosses's experiment annotation.
     # No Tolerance in the annotation: rtol defaults to 1e-6 here, not Dymola's 1e-4.

@@ -248,6 +248,108 @@ in the parameter menu.
               color={0,0,0})}));
   end PropertyTable;
 
+  partial block PartialSignalsFromFile
+    "Base of a reader of a MA-HS-CSV file: the extending block names the columns and declares one output per column"
+    parameter String fileName "MA-HS-CSV file: an absolute path, or a modelica:// URI"
+      annotation(Dialog(loadSelector(filter="MA-HS-CSV files (*.csv)", caption="Open MA-HS-CSV file")));
+    parameter Boolean extrapolateHold = true
+      "= true: hold the first/last row outside the file's time range; = false: error";
+  protected
+    parameter String realNames[:] = fill("", 0) "Header names of the columns read as Real, set by the extending block";
+    parameter String booleanNames[:] = fill("", 0) "Header names of the columns read as Boolean, set by the extending block";
+    parameter String integerNames[:] = fill("", 0) "Header names of the columns read as Integer, set by the extending block";
+    parameter String fileNameResolved = Modelica.Utilities.Files.loadResource(fileName) "fileName with a modelica:// URI resolved";
+    parameter Requirements.Internal.CSV.File file = Requirements.Internal.CSV.File(
+      fileNameResolved, realNames, booleanNames, integerNames, extrapolateHold) "The file, read once";
+    discrete Real nextTimeEvent(start=0, fixed=true) "Next instant at which a column of the file changes";
+  equation
+    when {time >= pre(nextTimeEvent), initial()} then
+      nextTimeEvent = Requirements.Internal.CSV.nextTimeEvent(file, time);
+    end when;
+    annotation (
+      Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}), graphics={
+          Rectangle(extent={{-100,100},{100,-100}}, lineColor={0,0,127}, fillColor={255,255,255}, fillPattern=FillPattern.Solid),
+          Text(extent={{-150,150},{150,110}}, textString="%name", lineColor={0,0,255}),
+          Line(points={{-80,68},{-80,-80}}, color={192,192,192}),
+          Polygon(points={{-80,90},{-88,68},{-72,68},{-80,90}}, lineColor={192,192,192}, fillColor={192,192,192}, fillPattern=FillPattern.Solid),
+          Line(points={{-90,-70},{82,-70}}, color={192,192,192}),
+          Polygon(points={{90,-70},{68,-62},{68,-78},{90,-70}}, lineColor={192,192,192}, fillColor={192,192,192}, fillPattern=FillPattern.Solid),
+          Line(points={{-80,-20},{-40,-20},{-40,40},{0,40},{0,-10},{40,-10},{40,20},{70,20}}, color={0,0,127}),
+          Line(points={{-80,-50},{-50,-50},{-50,-50},{-10,10},{30,-40},{70,-40}}, color={0,127,0}),
+          Text(extent={{-96,-72},{96,-96}}, lineColor={0,0,0}, textString="%fileName")}),
+      Documentation(info="<html>
+<h4>Syntax</h4>
+<blockquote><pre>
+<b>block</b> MyReader
+  <b>extends</b> Requirements.Sources.PartialSignalsFromFile(
+    <b>final</b> realNames    = {\"T_cabin\", \"p_cabin\"},
+    <b>final</b> booleanNames = {\"packOn\"},
+    <b>final</b> integerNames = {\"flightPhase\"});
+  Modelica.Blocks.Interfaces.RealOutput    T_cabin = Requirements.Internal.CSV.getReal(file, 1, time, nextTimeEvent, <b>pre</b>(nextTimeEvent));
+  Modelica.Blocks.Interfaces.RealOutput    p_cabin = Requirements.Internal.CSV.getReal(file, 2, time, nextTimeEvent, <b>pre</b>(nextTimeEvent));
+  Modelica.Blocks.Interfaces.BooleanOutput packOn;
+  Modelica.Blocks.Interfaces.IntegerOutput flightPhase;
+<b>equation</b>
+  <b>when</b> {time >= <b>pre</b>(nextTimeEvent), <b>initial</b>()} <b>then</b>
+    packOn      = Requirements.Internal.CSV.getBoolean(file, 1, time, nextTimeEvent, <b>pre</b>(nextTimeEvent));
+    flightPhase = Requirements.Internal.CSV.getInteger(file, 1, time, nextTimeEvent, <b>pre</b>(nextTimeEvent));
+  <b>end when</b>;
+<b>end</b> MyReader;
+
+MyReader reader(fileName=\"modelica://MyLibrary/Resources/Data/run1.csv\");
+</pre></blockquote>
+
+<h4>Description</h4>
+<p>
+Reads a file in the Modelica Association's
+<a href=\"https://github.com/modelica/ma-hs-csv\">MA-HS-CSV</a> format (beta, 2026): RFC 4180 records,
+a header row of unique column names, the first column the independent variable (time) with non-decreasing values,
+<b>consecutive rows with the same time representing an event</b> (the rows carry the values before and after it),
+fields containing a space, a comma, a double quote or a line break enclosed in double quotes (<code>\"\"</code> for a quote),
+values in XML-Schema lexical form: <code>Float64</code> as decimal or scientific notation, <code>NaN</code>, <code>INF</code>, <code>-INF</code>;
+<code>Boolean</code> as <code>true</code>/<code>false</code>/<code>1</code>/<code>0</code>; integers as decimals. LF or CR&nbsp;LF line breaks, UTF-8 (a byte-order mark is skipped).
+The file carries no type row: <b>the extending block decides the type of every column it reads</b> through the three name lists,
+and declares one output per column, so the reader reads in a diagram like any block with named outputs:
+Real outputs as declaration equations (they are continuous-time), Boolean and Integer outputs assigned in a when-clause with the
+same trigger as the block's own, <code>when {time &gt;= pre(nextTimeEvent), initial()}</code>, because a discrete signal may only change
+at an event and this is the event at which the file's Boolean and Integer columns change (the pattern of
+<a href=\"modelica://Modelica.Blocks.Sources.BooleanTable\">BooleanTable</a>).
+Columns not named are skipped. A name that is not in the header, or a header name that appears twice, is an error when the file is opened
+(at initialization), not a silent zero. Arrays (space-separated fields) are not supported; a numeric field containing a space is an error.
+</p>
+
+<h4>Value semantics</h4>
+<ul>
+<li><b>Real</b> columns are linear between rows; at a group of rows with the same time the value jumps at that instant
+    from the group's first row to its last row.</li>
+<li><b>Boolean</b> and <b>Integer</b> columns are piecewise constant: the value of the last row whose time is &le; <code>time</code>,
+    stepping at the row's time.</li>
+<li><b>Events</b>: the block schedules a time event at every instant at which a Boolean or Integer column changes, or at which
+    any read column changes inside a same-time group, so <code>edge()</code> and <code>change()</code> downstream fire at the file's
+    event instants. The value functions take the event bracket <code>(nextTimeEvent, pre(nextTimeEvent))</code>, as
+    <a href=\"modelica://Modelica.Blocks.Sources.CombiTimeTable\">CombiTimeTable</a> does, so the value on either side of an event is
+    unambiguous during event iteration: before the when-clause has fired at the event instant the left value applies
+    (a Real: the group's first row; a Boolean/Integer: the last row before the group), afterwards the right value.</li>
+<li>Outside the file's time range the first/last row is held (<code>extrapolateHold=true</code>, the default), or an error is raised.</li>
+</ul>
+
+<p>
+<code>fileName</code> may be a <code>modelica://</code> URI (resolved with
+<a href=\"modelica://Modelica.Utilities.Files.loadResource\">loadResource</a>) or an absolute path. The C reader
+(<code>Resources/Include/RequirementsCsv.h</code>, header-only) is compiled with the model; see
+<a href=\"modelica://Requirements.Internal.CSV\">Internal.CSV</a>. For an example see
+<a href=\"modelica://Requirements.Examples.Elementary.Sources.SignalsFromFile\">Examples.Elementary.Sources.SignalsFromFile</a>.
+</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>", revisions="<html>
+<table border=1 cellspacing=0 cellpadding=2>
+<tr><th>Date</th> <th align=\"left\">Description</th></tr>
+<tr><td valign=\"top\"> Sept. 14, 2026 </td>
+    <td valign=\"top\"> First version (H. Tummescheit, Model Based Innovation LLC)</td></tr>
+</table>
+</html>"));
+  end PartialSignalsFromFile;
+
   annotation (Icon(graphics={Line(
           points={{-76,0},{82,0}},
           color={135,135,135},
