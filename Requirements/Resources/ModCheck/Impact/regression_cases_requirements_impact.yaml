@@ -896,6 +896,20 @@ cases:
     modifiers: {}
     variables: [time, "*.y", "reader.T_cabin", "reader.p_cabin", "reader.packOn", "reader.flightPhase"]
 
+  - name: MR_Examples_Elementary_Units_Conversions
+    # Added 2026-09-15: Requirements.Units (NonSI types and conversion functions
+    # for the units Modelica.Units lacks: ms, mm, cm, km, ft, kft, g, kg/min,
+    # ft/s, ft/min, kPa, mbar, kW, kJ). The example asserts every factor and
+    # round trip in equations; its two variables are constant.
+    enabled: true
+    model: Requirements.Examples.Elementary.Units.Conversions
+    start_time: 0.0
+    final_time: 1.0
+    ncp: 10
+    rtol: 1.0e-06
+    modifiers: {}
+    variables: [time, m_kft, kgps]
+
   - name: MR_Examples_MotorsWithLosses_CheckMotorWithLosses
     # Generated 2026-09-14 from Requirements.Examples.MotorsWithLosses.CheckMotorWithLosses's experiment annotation.
     # No Tolerance in the annotation: rtol defaults to 1e-6 here, not Dymola's 1e-4.

@@ -1,30 +1,23 @@
 {
  "run": {
-  "utc": "2026-09-14T21:29:54+00:00",
+  "utc": "2026-09-15T14:31:40+00:00",
   "rtol_factor": 100.0,
   "descriptor": "impact workspace 'requirements-redesign'",
-  "reference_descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode / openmodelica v1.27.1 (64-bit), MSL 4.1.0, cvode",
+  "reference_descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode / impact workspace 'requirements-redesign' / openmodelica v1.27.1 (64-bit), MSL 4.1.0, cvode",
   "cases": 1,
   "failed_cases": 0,
-  "bytes": 4914
+  "bytes": 641
  },
  "cases": [
   {
-   "name": "MR_Examples_Elementary_Sources_SignalsFromFile",
-   "model": "Requirements.Examples.Elementary.Sources.SignalsFromFile",
+   "name": "MR_Examples_Elementary_Units_Conversions",
+   "model": "Requirements.Examples.Elementary.Units.Conversions",
    "variables": [
-    "band1.y",
-    "during1.y",
-    "during2.y",
-    "inCruise.y",
-    "reader.T_cabin",
-    "reader.flightPhase",
-    "reader.p_cabin",
-    "reader.packOn",
-    "time",
-    "whenRising1.y"
+    "kgps",
+    "m_kft",
+    "time"
    ],
-   "bytes": 4914,
+   "bytes": 641,
    "metrics": {
     "solver": "CVode",
     "linear_multistep_method": "BDF",
@@ -32,11 +25,10 @@
     "linear_solver_type": "DENSE",
     "atol": 9.999999999999999e-05,
     "rtol": 9.999999999999999e-05,
-    "cpu_time": 0.042925171030219644,
-    "steps": 515,
+    "cpu_time": 0.0007488099981856067,
+    "steps": 11,
     "error_test_failures": 0,
     "convergence_failures": 0,
-    "state_events": 4,
     "kind": "dynamic"
    }
   }

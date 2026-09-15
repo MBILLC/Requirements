@@ -3005,6 +3005,51 @@ when the pack is switched off while the flight phase is still 2 (until 250 s).
 </html>"));
     end SignalsFromFile;
   end Sources;
+
+  package Units "Library of examples using the Units package"
+    extends Modelica.Icons.ExamplesPackage;
+    model Conversions "Every conversion of Requirements.Units.Conversions asserted against its factor, and its round trip"
+      extends Modelica.Icons.Example;
+      import C = Requirements.Units.Conversions;
+      constant Real eps = 1e-12 "Relative tolerance of the assertions";
+      Real m_kft = C.from_kft(4.65) "4.65 kft in metres";
+      Real kgps = C.from_kgpmin(8.1) "8.1 kg/min in kg/s";
+    equation
+      assert(abs(C.from_ms(1500) - 1.5) < eps, "from_ms");
+      assert(abs(C.from_mm(2540) - 2.54) < eps, "from_mm");
+      assert(abs(C.from_cm(254) - 2.54) < eps, "from_cm");
+      assert(abs(C.from_km(1.852) - 1852) < eps*1852, "from_km");
+      assert(abs(C.from_ft(1000) - 304.8) < eps*304.8, "from_ft");
+      assert(abs(C.from_kft(1) - 304.8) < eps*304.8, "from_kft");
+      assert(abs(C.from_g(250) - 0.25) < eps, "from_g");
+      assert(abs(C.from_kgpmin(60) - 1) < eps, "from_kgpmin");
+      assert(abs(C.from_ftps(100) - 30.48) < eps*30.48, "from_ftps");
+      assert(abs(C.from_ftpmin(6000) - 30.48) < eps*30.48, "from_ftpmin");
+      assert(abs(C.from_kPa(101.325) - 101325) < eps*101325, "from_kPa");
+      assert(abs(C.from_mbar(1013.25) - 101325) < eps*101325, "from_mbar");
+      assert(abs(C.from_kW(2.5) - 2500) < eps*2500, "from_kW");
+      assert(abs(C.from_kJ(3.6) - 3600) < eps*3600, "from_kJ");
+      // round trips
+      assert(abs(C.to_ms(C.from_ms(7)) - 7) < eps*7, "ms round trip");
+      assert(abs(C.to_mm(C.from_mm(7)) - 7) < eps*7, "mm round trip");
+      assert(abs(C.to_cm(C.from_cm(7)) - 7) < eps*7, "cm round trip");
+      assert(abs(C.to_km(C.from_km(7)) - 7) < eps*7, "km round trip");
+      assert(abs(C.to_ft(C.from_ft(7)) - 7) < eps*7, "ft round trip");
+      assert(abs(C.to_kft(C.from_kft(7)) - 7) < eps*7, "kft round trip");
+      assert(abs(C.to_g(C.from_g(7)) - 7) < eps*7, "g round trip");
+      assert(abs(C.to_kgpmin(C.from_kgpmin(7)) - 7) < eps*7, "kg/min round trip");
+      assert(abs(C.to_ftps(C.from_ftps(7)) - 7) < eps*7, "ft/s round trip");
+      assert(abs(C.to_ftpmin(C.from_ftpmin(7)) - 7) < eps*7, "ft/min round trip");
+      assert(abs(C.to_kPa(C.from_kPa(7)) - 7) < eps*7, "kPa round trip");
+      assert(abs(C.to_mbar(C.from_mbar(7)) - 7) < eps*7, "mbar round trip");
+      assert(abs(C.to_kW(C.from_kW(7)) - 7) < eps*7, "kW round trip");
+      assert(abs(C.to_kJ(C.from_kJ(7)) - 7) < eps*7, "kJ round trip");
+      annotation (experiment(StopTime=1), Documentation(info="<html>
+<p>Asserts every factor of <a href=\"modelica://Requirements.Units.Conversions\">Requirements.Units.Conversions</a> (the international foot is 0.3048 m exactly, 1 kft = 304.8 m, 1 kg/min = 1/60 kg/s, ...) and every round trip; a model that translates and runs is the test. The two variables are what ModCheck's generated check models emit for a quantity written in a non-SI unit: <code>from_kft(4.65)</code>, not 1417.32.</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+    end Conversions;
+  end Units;
   annotation (Documentation(info="<html>
 <p>
 This package contains example models to demonstrate all components of library

@@ -3382,6 +3382,36 @@
     "descriptor": "openmodelica v1.27.1 (64-bit), MSL 4.1.0, cvode"
   },
   {
+    "name": "MR_OM_Examples_Elementary_Units_Conversions",
+    "model": "Requirements.Examples.Elementary.Units.Conversions",
+    "variables": [
+      "kgps",
+      "m_kft",
+      "time"
+    ],
+    "bytes": 640,
+    "metrics": {
+      "state_events": 0,
+      "time_events": 0,
+      "steps": 10,
+      "function_evaluations": 10,
+      "jacobian_evaluations": 0,
+      "error_test_failures": 0,
+      "convergence_failures": 0,
+      "cpu_time": 0.0008946,
+      "simulation_time": 0.0002156,
+      "kind": "dynamic",
+      "solver": "cvode",
+      "wall_time": 0.026080299998284318,
+      "samples": 12,
+      "omc_version": "OpenModelica v1.27.1 (64-bit)",
+      "msl_version": "4.1.0",
+      "spread_applied": true,
+      "rtol": 1e-06
+    },
+    "descriptor": "openmodelica v1.27.1 (64-bit), MSL 4.1.0, cvode"
+  },
+  {
     "name": "MR_OM_Examples_Elementary_Verify_Requirement",
     "model": "Requirements.Examples.Elementary.Verify.Requirement",
     "variables": [
