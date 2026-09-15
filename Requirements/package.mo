@@ -1,5 +1,5 @@
 within ;
-package Requirements "Requirements (Version 0.8.0) - Defining requirements formally and checking them when simulating"
+package Requirements "Requirements (Version 0.9.0) - Defining requirements formally and checking them when simulating"
   extends Modelica.Icons.Package;
 
 
@@ -8,6 +8,71 @@ package UsersGuide "User's Guide"
 
 package ReleaseNotes "Release notes"
   extends Modelica.Icons.ReleaseNotes;
+
+  class Version_0_9_0 "Version 0.9.0 (Sept. 15, 2026)"
+  extends Modelica.Icons.ReleaseNotes;
+
+    annotation (Documentation(info="<html>
+<p>
+<b>Margins.</b> Every check block exposes how far the check is from its limit: output <b>margin</b> =
+<em>robustness</em>/<b>scale</b>, with <em>robustness</em> the signed distance of the check to its limit in the
+quantity's unit (&ge; 0 exactly when the check holds) and <b>scale</b> a new parameter, the requirement's
+tolerance (default 1: the raw robustness). A margin of 1 is one tolerance of headroom, &lt; 0 a violation by that
+many tolerances; margins of different requirements compare only when their scales are set. The block emits the
+instantaneous value; the worst value over a run and its instant are taken from the stored trajectory (ModCheck's
+plan, section 18.5, rule R2) -- there are no accumulators in the library, by design. Phase 12 of ModCheck's
+requirements plan.
+</p>
+
+<h4>Changes</h4>
+<ul>
+<li> <a href=\"modelica://Requirements.Interfaces.MarginOutput\">Interfaces.MarginOutput</a>, an
+     <code>output Real(unit=\"1\")</code> connector of its own type, so a margin cannot be connected to a
+     physical-unit signal by mistake and every margin of a model is found by type.</li>
+
+<li> <a href=\"modelica://Requirements.Interfaces.PartialCheck\">PartialCheck</a> and the two sliding-window
+     partials gain <code>parameter Real scale(min = eps) = 1</code>, <code>parameter Boolean computeMargin = true</code>
+     and the conditional output <code>MarginOutput margin = robustness/scale if computeMargin</code> over a
+     protected <code>robustness</code> that each block defines:
+     <ul>
+     <li><code>During</code> and <code>WhenRising</code> / <code>WhenFalling</code> / <code>WhenChanging</code> take
+         the robustness as a new input <code>rho</code> (default <code>if check then 1 else -1</code>, the
+         uninformative sign; a caller writes <code>u - limit</code> for <code>check = u &gt; limit</code>);
+         the <code>When*</code> blocks sample it at the edge that decides the property and hold it with the
+         verdict.</li>
+     <li><code>MinDuration</code> / <code>MaxDuration</code> / <code>BandDuration</code> gain the output
+         <code>duration</code>, the running accumulated duration of the current (or last) phase, and the
+         robustness <code>duration - durationMin</code>, <code>durationMax - duration</code>, the band's minimum.</li>
+     <li><code>FixedRising</code> / <code>MinRising</code> / <code>MaxRising</code> / <code>BandRising</code> /
+         <code>NoRising</code>: <code>countRising</code> is an output (NoRising gains the counter); the robustness
+         is the count difference (<code>-abs(count - nRising)</code> for the exact count, 0 when satisfied).</li>
+     <li><code>MaxRisingFrequency</code>: <code>freqHzMax - freqHz</code>; <code>WithinDomain</code>:
+         <code>distance</code>; the sliding-window blocks: the limit minus their window quantity
+         (<code>maxDuration</code>, <code>accumulatedDuration</code>, <code>nRising</code>, <code>freqHzMean</code>,
+         <code>increase</code>, <code>percentageIncrease</code>), the band blocks the minimum of both sides; the
+         FFT blocks <code>scaledDistance/scale</code>.</li>
+     </ul>
+     A block that is still Undecided (a duration not yet reached, a sliding window not yet full) has a
+     provisional margin; a consumer takes the worst value over the decided points.</li>
+
+<li> <a href=\"modelica://Requirements.LogicalFunctions.marginAnd\">LogicalFunctions.marginAnd</a> /
+     <a href=\"modelica://Requirements.LogicalFunctions.marginOr\">marginOr</a>: the minimum / maximum of the
+     margins over the elements whose property is not Undefined -- the margin of <code>and4All</code> /
+     <code>or4All</code>, an inapplicable element dropping out as it does there; 0 (no NaN) when nothing is
+     applicable.</li>
+
+<li> <a href=\"modelica://Requirements.Examples.Elementary.Margin\">Examples.Elementary.Margin</a>: eight examples,
+     one per block family, asserting the margins against closed-form values at every instant and the sign
+     invariant (satisfied &hArr; margin &ge; 0) continuously -- a ramp against a threshold, a sine against a band,
+     the three duration blocks on one phase, the five count blocks on one edge train, a 2 Hz train against
+     <code>MaxRisingFrequency</code>, a point crossing a square, a ramp against <code>MaxIncrease</code>, and the
+     FFT example with a scale. Each is a case in the regression lists beside the library, with the margins stored.</li>
+
+<li> <code>conversion(noneFromVersion=\"0.8.0\")</code>: no model needs conversion; every existing output is
+     unchanged (the regression references of version 0.8.0 stand), the new outputs and parameters have defaults.</li>
+</ul>
+</html>"));
+  end Version_0_9_0;
 
   class Version_0_8_0 "Version 0.8.0 (Sept. 15, 2026)"
   extends Modelica.Icons.ReleaseNotes;
@@ -370,15 +435,29 @@ see the <a href=\"modelica://Requirements.UsersGuide.Contact\">Contact</a> page 
 LICENSE file. Additions made here (a MA-HS-CSV signal reader and what builds on it)
 are not part of the upstream library.
 </p>
+<p>
+<b>Two runs, one file.</b> The additions serve a signal-based, two-run verification
+(ModCheck's requirements plan, rule R1): the plant is simulated <em>alone</em>, with no
+requirement block in it, its glossary signals are stored in one MA-HS-CSV file, and the
+check blocks of this library run on that file in a second run through
+<a href=\"modelica://Requirements.Sources.PartialSignalsFromFile\">Sources.PartialSignalsFromFile</a>.
+Because the only thing that crosses from the simulation to the checks is a file of named
+signals, the design transfers to <b>any FMI- or SSP-based tool</b>: whatever simulates the
+plant -- a Modelica tool, an FMU in any master, an SSP system in a co-simulation platform --
+produces the signals, and the checking engine (these blocks, or a monitor FMU built from them,
+or a Python evaluation of the stored trajectories) is a separate tool that never alters the
+simulation it judges. Separating the simulation from the checking engine is what opens the
+library to tools it was never written for.
+</p>
 </html>"));
 end UsersGuide;
 
   annotation (preferredView="info",
   uses(Modelica(version="4.1.0")),
-version="0.8.0",
+version="0.9.0",
 versionDate="2026-09-15",
 dateModified = "2026-09-15",
-conversion(noneFromVersion="0.7.1"),
+conversion(noneFromVersion="0.7.1", noneFromVersion="0.8.0"),
 revisionId="$Id:: package.mo 9390 2016-06-21 06:35:11Z #$",
 Documentation(info="<html>
 <p>

@@ -6,10 +6,14 @@ package ChecksInFixedWindow
   block During "In every true condition phase, check must be true"
     extends Requirements.Interfaces.PartialCheck;
     import Requirements.Types.Property;
+    input Real rho = if check then 1 else -1
+      "Signed distance of check to its limit in the quantity's unit, >= 0 exactly when check is true (u - limit for check = u > limit); the default +-1 is uninformative"
+      annotation(Dialog(tab="Margin"));
 
   equation
      y = if condition then
           (if check then Property.Satisfied else Property.Violated) else Property.Undefined;
+     robustness = rho;
     annotation (defaultComponentName="during1",
           Icon(coordinateSystem(preserveAspectRatio=false, extent={{-200,-100},
               {200,100}}), graphics={
@@ -71,6 +75,15 @@ results in
     <td align=\"center\">simulation result</td>
    </tr>
 </table>
+<h4>Margin</h4>
+<p>
+Output <b>margin</b> (present if <b>computeMargin</b> = true, the default) is the signed distance of the check
+to its limit, <em>the input <b>rho</b> (the caller writes it from the check's expression, u &minus; limit for check = u &gt; limit; the default &plusmn;1 carries the sign only)</em>, divided by parameter <b>scale</b>: margin &ge; 0 exactly when the check holds,
+margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
+requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
+is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
+over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+</p>
 </html>"));
   end During;
 
@@ -81,6 +94,9 @@ results in
 
     parameter Modelica.Units.SI.Time durationMin(start=1, min=0)
       "Minimum duration in true condition phase";
+    Modelica.Blocks.Interfaces.RealOutput duration(final unit="s")
+      "Accumulated time in the current (or last) true condition phase in which check was true"
+      annotation (Placement(transformation(extent={{200,-70},{220,-50}})));
   protected
     discrete Real actualDuration;
     discrete Real startTime;
@@ -91,6 +107,10 @@ results in
     startCheck = condition and check;
     y = if not condition then Property.Undefined elseif actualDuration >= durationMin then
            Property.Satisfied else Property.Undecided;
+
+  equation
+    duration = actualDuration + (if condition and startCheck then time - startTime else 0);
+    robustness = duration - durationMin;
 
   algorithm
     when condition then
@@ -203,6 +223,15 @@ results in
     <td align=\"center\">simulation result</td>
    </tr>
 </table>
+<h4>Margin</h4>
+<p>
+Output <b>margin</b> (present if <b>computeMargin</b> = true, the default) is the signed distance of the check
+to its limit, <em><code>duration - durationMin</code> with output <b>duration</b> the running accumulated duration of the phase</em>, divided by parameter <b>scale</b>: margin &ge; 0 exactly when the check holds,
+margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
+requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
+is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
+over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+During a phase in which the property is still Undecided the margin is provisional (the duration is still accumulating); a consumer takes the worst value over the decided points only.</p>
 </html>"));
   end MinDuration;
 
@@ -213,6 +242,9 @@ results in
 
     parameter Modelica.Units.SI.Time durationMax(start=1, min=0)
       "Maximum duration in true condition phase";
+    Modelica.Blocks.Interfaces.RealOutput duration(final unit="s")
+      "Accumulated time in the current (or last) true condition phase in which check was true"
+      annotation (Placement(transformation(extent={{200,-70},{220,-50}})));
   protected
     discrete Real actualDuration;
     discrete Real startTime;
@@ -222,6 +254,10 @@ results in
     startTime = time;
     startCheck = condition and check;
     y = if condition then Property.Satisfied else Property.Undefined;
+
+  equation
+    duration = actualDuration + (if condition and startCheck then time - startTime else 0);
+    robustness = durationMax - duration;
 
   algorithm
     when condition then
@@ -337,6 +373,15 @@ results in
     <td align=\"center\">simulation result</td>
    </tr>
 </table>
+<h4>Margin</h4>
+<p>
+Output <b>margin</b> (present if <b>computeMargin</b> = true, the default) is the signed distance of the check
+to its limit, <em><code>durationMax - duration</code> with output <b>duration</b> the running accumulated duration of the phase</em>, divided by parameter <b>scale</b>: margin &ge; 0 exactly when the check holds,
+margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
+requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
+is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
+over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+During a phase in which the property is still Undecided the margin is provisional (the duration is still accumulating); a consumer takes the worst value over the decided points only.</p>
 </html>"));
   end MaxDuration;
 
@@ -346,6 +391,9 @@ results in
     import Requirements.Types.Property;
     parameter Modelica.Units.SI.Time durationMin(start=1) "Minimum duration";
     parameter Modelica.Units.SI.Time durationMax(start=2) "Maximum duration";
+    Modelica.Blocks.Interfaces.RealOutput duration(final unit="s")
+      "Accumulated time in the current (or last) true condition phase in which check was true"
+      annotation (Placement(transformation(extent={{200,-70},{220,-50}})));
   protected
     discrete Real actualDuration;
     discrete Real startTime;
@@ -358,6 +406,8 @@ results in
            Property.Satisfied else Property.Undecided;
 
   equation
+    duration = actualDuration + (if condition and startCheck then time - startTime else 0);
+    robustness = min(duration - durationMin, durationMax - duration);
     assert(durationMax >= durationMin, "durationMax >= durationMin required");
 
   algorithm
@@ -495,6 +545,15 @@ results in
     <td align=\"center\">simulation result</td>
    </tr>
 </table>
+<h4>Margin</h4>
+<p>
+Output <b>margin</b> (present if <b>computeMargin</b> = true, the default) is the signed distance of the check
+to its limit, <em><code>min(duration - durationMin, durationMax - duration)</code> with output <b>duration</b> the running accumulated duration of the phase</em>, divided by parameter <b>scale</b>: margin &ge; 0 exactly when the check holds,
+margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
+requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
+is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
+over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+During a phase in which the property is still Undecided the margin is provisional (the duration is still accumulating); a consumer takes the worst value over the decided points only.</p>
 </html>"));
   end BandDuration;
 
@@ -503,16 +562,24 @@ results in
     extends Requirements.Interfaces.PartialCheck;
     import Requirements.Types.Property;
 
+    Modelica.Blocks.Interfaces.IntegerOutput countRising
+      "Number of check rising edges in the current (or last) true condition phase"
+      annotation (Placement(transformation(extent={{200,-70},{220,-50}})));
   initial equation
+    countRising = 0;
     y = if condition then Property.Undecided else Property.Undefined;
   equation
     when condition then
+       countRising = 0;
        y = Property.Undecided;
     elsewhen condition and check then
+       countRising = pre(countRising) + 1;
        y = Property.Violated;
     elsewhen not condition then
+       countRising = pre(countRising);
        y = if pre(y) == Property.Violated then Property.Violated else Property.Satisfied;
     end when;
+    robustness = -countRising;
 
     annotation (defaultComponentName="noRising1",
          Icon(coordinateSystem(preserveAspectRatio=false, extent={{-200,-100},
@@ -581,6 +648,15 @@ results in
     <td align=\"center\">simulation result</td>
    </tr>
 </table>
+<h4>Margin</h4>
+<p>
+Output <b>margin</b> (present if <b>computeMargin</b> = true, the default) is the signed distance of the check
+to its limit, <em><code>-countRising</code> with output <b>countRising</b> the number of rising edges of the phase so far</em>, divided by parameter <b>scale</b>: margin &ge; 0 exactly when the check holds,
+margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
+requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
+is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
+over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+</p>
 </html>"));
   end NoRising;
 
@@ -590,8 +666,9 @@ results in
     import Requirements.Types.Property;
 
     parameter Integer nRising(min=0)=1 "Number of required check rising edges";
-  protected
-    discrete Integer countRising;
+    Modelica.Blocks.Interfaces.IntegerOutput countRising
+      "Number of check rising edges in the current (or last) true condition phase"
+      annotation (Placement(transformation(extent={{200,-70},{220,-50}})));
   initial equation
     countRising = 0;
     y = if not condition then Property.Undefined elseif nRising == 0 then Property.Satisfied else Property.Undecided;
@@ -608,6 +685,7 @@ results in
        countRising = pre(countRising);
        y = if countRising == nRising then Property.Satisfied else Property.Violated;
     end when;
+    robustness = -abs(countRising - nRising);
 
     annotation (defaultComponentName="fixedRising1",
          Icon(coordinateSystem(preserveAspectRatio=false, extent={{-200,-100},
@@ -691,6 +769,15 @@ results in
     <td align=\"center\">simulation result</td>
    </tr>
 </table>
+<h4>Margin</h4>
+<p>
+Output <b>margin</b> (present if <b>computeMargin</b> = true, the default) is the signed distance of the check
+to its limit, <em><code>-abs(countRising - nRising)</code> with output <b>countRising</b> the number of rising edges of the phase so far</em>, divided by parameter <b>scale</b>: margin &ge; 0 exactly when the check holds,
+margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
+requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
+is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
+over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+The margin of an exact count is 0 when satisfied and negative otherwise: it carries the sign, not headroom.</p>
 </html>"));
   end FixedRising;
 
@@ -701,8 +788,9 @@ results in
 
     parameter Integer nRisingMin(min=0)=1
       "Minimum number of check rising edges";
-  protected
-    discrete Integer countRising;
+    Modelica.Blocks.Interfaces.IntegerOutput countRising
+      "Number of check rising edges in the current (or last) true condition phase"
+      annotation (Placement(transformation(extent={{200,-70},{220,-50}})));
   initial equation
     countRising = 0;
     y = if not condition then Property.Undefined elseif nRisingMin == 0 then Property.Satisfied else Property.Undecided;
@@ -717,6 +805,7 @@ results in
        countRising = pre(countRising);
        y = if countRising >= nRisingMin then Property.Satisfied else Property.Violated;
     end when;
+    robustness = countRising - nRisingMin;
 
     annotation (defaultComponentName="minRising1",
          Icon(coordinateSystem(preserveAspectRatio=false, extent={{-200,-100},
@@ -799,6 +888,15 @@ results in
     <td align=\"center\">simulation result</td>
    </tr>
 </table>
+<h4>Margin</h4>
+<p>
+Output <b>margin</b> (present if <b>computeMargin</b> = true, the default) is the signed distance of the check
+to its limit, <em><code>countRising - nRisingMin</code> with output <b>countRising</b> the number of rising edges of the phase so far</em>, divided by parameter <b>scale</b>: margin &ge; 0 exactly when the check holds,
+margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
+requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
+is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
+over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+</p>
 </html>"));
   end MinRising;
 
@@ -809,8 +907,9 @@ results in
 
     parameter Integer nRisingMax(min=0)=1
       "Maximum number of check rising edges";
-  protected
-    discrete Integer countRising;
+    Modelica.Blocks.Interfaces.IntegerOutput countRising
+      "Number of check rising edges in the current (or last) true condition phase"
+      annotation (Placement(transformation(extent={{200,-70},{220,-50}})));
   initial equation
     countRising = 0;
     y = if condition then Property.Satisfied else Property.Undefined;
@@ -825,6 +924,7 @@ results in
        countRising = 0;
        y = Property.Undefined;
     end when;
+    robustness = nRisingMax - countRising;
 
     annotation (defaultComponentName="maxRising1",
          Icon(coordinateSystem(preserveAspectRatio=false, extent={{-200,-100},
@@ -907,6 +1007,15 @@ results in
     <td align=\"center\">simulation result</td>
    </tr>
 </table>
+<h4>Margin</h4>
+<p>
+Output <b>margin</b> (present if <b>computeMargin</b> = true, the default) is the signed distance of the check
+to its limit, <em><code>nRisingMax - countRising</code> with output <b>countRising</b> the number of rising edges of the phase so far</em>, divided by parameter <b>scale</b>: margin &ge; 0 exactly when the check holds,
+margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
+requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
+is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
+over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+</p>
 </html>"));
   end MaxRising;
 
@@ -919,8 +1028,9 @@ results in
       "Minimum number of check rising edges";
     parameter Integer nRisingMax(min=0)=2
       "Maximum number of check rising edges";
-  protected
-    discrete Integer countRising;
+    Modelica.Blocks.Interfaces.IntegerOutput countRising
+      "Number of check rising edges in the current (or last) true condition phase"
+      annotation (Placement(transformation(extent={{200,-70},{220,-50}})));
   initial equation
     countRising = 0;
     y = if not condition then Property.Undefined elseif nRisingMin==0 and nRisingMax>=0 then Property.Satisfied else Property.Undecided;
@@ -936,6 +1046,7 @@ results in
        countRising = pre(countRising);
        y = if countRising >= nRisingMin and countRising <= nRisingMax then Property.Satisfied else Property.Violated;
     end when;
+    robustness = min(countRising - nRisingMin, nRisingMax - countRising);
 
     annotation (defaultComponentName="minRising1",
          Icon(coordinateSystem(preserveAspectRatio=false, extent={{-200,-100},{
@@ -1029,6 +1140,15 @@ results in
     <td align=\"center\">simulation result</td>
    </tr>
 </table>
+<h4>Margin</h4>
+<p>
+Output <b>margin</b> (present if <b>computeMargin</b> = true, the default) is the signed distance of the check
+to its limit, <em><code>min(countRising - nRisingMin, nRisingMax - countRising)</code> with output <b>countRising</b> the number of rising edges of the phase so far</em>, divided by parameter <b>scale</b>: margin &ge; 0 exactly when the check holds,
+margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
+requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
+is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
+over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+</p>
 </html>"),
       Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-200,-100},{
               200,100}}), graphics));
@@ -1088,6 +1208,7 @@ results in
        freqHz = 0;
        y = Property.Undefined;
     end when;
+    robustness = freqHzMax - freqHz;
 
     annotation (defaultComponentName="maxFrequency1",
          Icon(coordinateSystem(preserveAspectRatio=false, extent={{-200,-100},
@@ -1190,6 +1311,15 @@ results in
     <td align=\"center\">simulation result</td>
    </tr>
 </table>
+<h4>Margin</h4>
+<p>
+Output <b>margin</b> (present if <b>computeMargin</b> = true, the default) is the signed distance of the check
+to its limit, <em><code>freqHzMax - freqHz</code></em>, divided by parameter <b>scale</b>: margin &ge; 0 exactly when the check holds,
+margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
+requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
+is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
+over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+</p>
 </html>"));
   end MaxRisingFrequency;
 
@@ -1197,13 +1327,21 @@ results in
     extends Requirements.Interfaces.PartialCheck;
     import Requirements.LogicalFunctions.*;
     import Requirements.Types.Property;
+    input Real rho = if check then 1 else -1
+      "Signed distance of check to its limit in the quantity's unit, >= 0 exactly when check is true (u - limit for check = u > limit); the default +-1 is uninformative"
+      annotation(Dialog(tab="Margin"));
+  protected
+    discrete Real rhoHeld "rho sampled at the last decision";
 
   initial equation
     y=if condition then BooleanToProperty(check) else Property.Undefined;
+    rhoHeld = if condition then rho else 0;
   equation
     when condition then
        y = BooleanToProperty(check);
+       rhoHeld = rho;
     end when;
+    robustness = rhoHeld;
     annotation (defaultComponentName="whenRising1",
          Documentation(info="<html>
 <h4>Syntax</h4>
@@ -1251,6 +1389,15 @@ results in
     <td align=\"center\">simulation result</td>
    </tr>
 </table>
+<h4>Margin</h4>
+<p>
+Output <b>margin</b> (present if <b>computeMargin</b> = true, the default) is the signed distance of the check
+to its limit, <em>the input <b>rho</b> sampled at the edge that decides the property and held with it (the caller writes rho from the check's expression; the default &plusmn;1 carries the sign only)</em>, divided by parameter <b>scale</b>: margin &ge; 0 exactly when the check holds,
+margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
+requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
+is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
+over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+</p>
 </html>"),   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-200,-100},
               {200,100}}), graphics={
           Line(
@@ -1285,13 +1432,21 @@ results in
     extends Requirements.Interfaces.PartialCheck;
     import Requirements.LogicalFunctions.*;
     import Requirements.Types.Property;
+    input Real rho = if check then 1 else -1
+      "Signed distance of check to its limit in the quantity's unit, >= 0 exactly when check is true (u - limit for check = u > limit); the default +-1 is uninformative"
+      annotation(Dialog(tab="Margin"));
+  protected
+    discrete Real rhoHeld "rho sampled at the last decision";
 
   initial equation
     y=if not condition then BooleanToProperty(check) else Property.Undefined;
+    rhoHeld = if not condition then rho else 0;
   equation
     when not condition then
        y = BooleanToProperty(check);
+       rhoHeld = rho;
     end when;
+    robustness = rhoHeld;
     annotation (defaultComponentName="whenFalling1",
          Documentation(info="<html>
 <h4>Syntax</h4>
@@ -1338,6 +1493,15 @@ results in
 <tr><td></td>
     <td align=\"center\">simulation result</td></tr>
 </table>
+<h4>Margin</h4>
+<p>
+Output <b>margin</b> (present if <b>computeMargin</b> = true, the default) is the signed distance of the check
+to its limit, <em>the input <b>rho</b> sampled at the edge that decides the property and held with it (the caller writes rho from the check's expression; the default &plusmn;1 carries the sign only)</em>, divided by parameter <b>scale</b>: margin &ge; 0 exactly when the check holds,
+margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
+requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
+is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
+over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+</p>
 </html>
 </html>"),   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-200,-100},
               {200,100}}), graphics={
@@ -1373,13 +1537,21 @@ results in
     extends Requirements.Interfaces.PartialCheck;
     import Requirements.LogicalFunctions.*;
     import Requirements.Types.Property;
+    input Real rho = if check then 1 else -1
+      "Signed distance of check to its limit in the quantity's unit, >= 0 exactly when check is true (u - limit for check = u > limit); the default +-1 is uninformative"
+      annotation(Dialog(tab="Margin"));
+  protected
+    discrete Real rhoHeld "rho sampled at the last decision";
 
   initial equation
     y = Property.Undefined;
+    rhoHeld = 0;
   equation
     when {condition, not condition} then
        y = BooleanToProperty(check);
+       rhoHeld = rho;
     end when;
+    robustness = rhoHeld;
     annotation (defaultComponentName="whenChanging1",
          Documentation(info="<html>
 <h4>Syntax</h4>
@@ -1425,6 +1597,15 @@ results in
     <td align=\"center\">simulation result</td>
    </tr>
 </table>
+<h4>Margin</h4>
+<p>
+Output <b>margin</b> (present if <b>computeMargin</b> = true, the default) is the signed distance of the check
+to its limit, <em>the input <b>rho</b> sampled at the edge that decides the property and held with it (the caller writes rho from the check's expression; the default &plusmn;1 carries the sign only)</em>, divided by parameter <b>scale</b>: margin &ge; 0 exactly when the check holds,
+margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
+requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
+is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
+over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+</p>
 </html>"),   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-200,-100},
               {200,100}}), graphics={
           Line(
@@ -1496,6 +1677,15 @@ results in
        annotation (Placement(
           transformation(extent={{200,-110},{220,-90}}),  iconTransformation(
             extent={{200,-110},{220,-90}})));
+    parameter Real scale(min=Modelica.Constants.eps) = 1
+      "Scale of the margin: margin = distance/scale, with scale the requirement's tolerance (1 = the raw distance)"
+      annotation(Dialog(tab="Margin"));
+    parameter Boolean computeMargin = true "= true, if the normalized margin output is provided"
+      annotation(Dialog(tab="Margin"), choices(checkBox=true), Evaluate=true);
+    Requirements.Interfaces.MarginOutput margin = distance/scale if computeMargin
+      "Normalized margin of the check: >= 0 exactly when the point is inside, in units of scale (phase 12 of the ModCheck plan)"
+      annotation (Placement(transformation(extent={{200,-150},{220,-130}}),
+          iconTransformation(extent={{200,-150},{220,-130}})));
     output Real polygonPoint[2] "Point on polygon that is closest to point";
 
     parameter Real polygon[:,2]
@@ -1662,6 +1852,15 @@ Simulating this examples results in
 </table>
 <p>
 Note, that the point is outside of the domain defined by the polygon if distance &lt; 0.
+</p>
+<h4>Margin</h4>
+<p>
+Output <b>margin</b> (present if <b>computeMargin</b> = true, the default) is the signed distance of the check
+to its limit, <em>the output <b>distance</b></em>, divided by parameter <b>scale</b>: margin &ge; 0 exactly when the check holds,
+margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
+requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
+is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
+over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
 </p>
 </html>"));
   end WithinDomain;

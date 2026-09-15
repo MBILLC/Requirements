@@ -58,6 +58,39 @@ Connector with one output signal of type Requirements.Types.Property.
 </p>
 </html>"));
 
+  connector MarginOutput = output Real(unit="1")
+    "'output Real' connector for a normalized margin: robustness/scale, >= 0 exactly when the check holds"
+    annotation (
+    defaultComponentName="margin",
+    Icon(coordinateSystem(
+        preserveAspectRatio=true,
+        extent={{-100,-100},{100,100}}), graphics={Polygon(
+          points={{-100,100},{100,0},{-100,-100},{-100,100}},
+          lineColor={0,127,0},
+          fillColor={255,255,255},
+          fillPattern=FillPattern.Solid)}),
+    Diagram(coordinateSystem(
+        preserveAspectRatio=true,
+        extent={{-100,-100},{100,100}}), graphics={Polygon(
+          points={{-100,50},{0,0},{-100,-50},{-100,50}},
+          lineColor={0,127,0},
+          fillColor={255,255,255},
+          fillPattern=FillPattern.Solid), Text(
+          extent={{30,110},{30,60}},
+          lineColor={0,127,0},
+          textString="%name")}),
+    Documentation(info="<html>
+<p>
+Connector with one output signal of type Real and <code>unit=\"1\"</code>: the <b>normalized margin</b> of a
+check, the signed distance of the check to its limit divided by the check block's <code>scale</code>
+(the requirement's tolerance). The margin is &ge; 0 exactly when the check holds, 1 is one tolerance of
+headroom, &lt; 0 a violation by that many tolerances. Its own connector type keeps a margin from being
+connected to a physical-unit signal by mistake, and lets a report find every margin of a model by type.
+The extremum over a run is not the block's business (ModCheck plan section 18.5, rule R2): a block emits
+the instantaneous value, the worst value and its instant are taken from the stored trajectory.
+</p>
+</html>"));
+
   connector PropertyVectorInput =input Requirements.Types.Property
     "Property input connector used for vector of connectors" annotation (
     defaultComponentName="u",
@@ -455,6 +488,17 @@ as well as a 3D icon (e.g., used in Blocks.Logical library).
        annotation(Dialog);
     Requirements.Interfaces.PropertyOutput y "Property output signal"
       annotation (Placement(transformation(extent={{200,-10},{220,10}})));
+    parameter Real scale(min=Modelica.Constants.eps) = 1
+      "Scale of the margin: margin = robustness/scale, with scale the requirement's tolerance (1 = the raw robustness in the quantity's unit)"
+      annotation(Dialog(tab="Margin"));
+    parameter Boolean computeMargin = true "= true, if the normalized margin output is provided"
+      annotation(Dialog(tab="Margin"), choices(checkBox=true), Evaluate=true);
+    Requirements.Interfaces.MarginOutput margin = robustness/scale if computeMargin
+      "Normalized margin of the check: >= 0 exactly when the check holds, in units of scale (phase 12 of the ModCheck plan)"
+      annotation (Placement(transformation(extent={{200,-100},{220,-80}})));
+  protected
+    Real robustness
+      "Signed distance of the check to its limit, in the quantity's unit (>= 0 exactly when the check holds); each block defines it";
     annotation (Diagram(coordinateSystem(
           preserveAspectRatio=false,
           extent={{-200,-100},{200,100}},
@@ -501,6 +545,17 @@ as well as a 3D icon (e.g., used in Blocks.Logical library).
     Modelica.Blocks.Interfaces.BooleanOutput y
       "= true if property satisfied, otherwise false"
       annotation (Placement(transformation(extent={{200,-10},{220,10}})));
+    parameter Real scale(min=Modelica.Constants.eps) = 1
+      "Scale of the margin: margin = robustness/scale, with scale the requirement's tolerance (1 = the raw robustness in the quantity's unit)"
+      annotation(Dialog(tab="Margin"));
+    parameter Boolean computeMargin = true "= true, if the normalized margin output is provided"
+      annotation(Dialog(tab="Margin"), choices(checkBox=true), Evaluate=true);
+    Requirements.Interfaces.MarginOutput margin = robustness/scale if computeMargin
+      "Normalized margin of the check: >= 0 exactly when the check holds, in units of scale (phase 12 of the ModCheck plan)"
+      annotation (Placement(transformation(extent={{200,-100},{220,-80}})));
+  protected
+    Real robustness
+      "Signed distance of the check to its limit, in the quantity's unit (>= 0 exactly when the check holds); each block defines it";
     annotation (Diagram(coordinateSystem(
           preserveAspectRatio=false,
           extent={{-200,-100},{200,100}},
@@ -584,6 +639,17 @@ as well as a 3D icon (e.g., used in Blocks.Logical library).
       "Length of sliding time window (> 0)";
     Requirements.Interfaces.PropertyOutput y "Property output signal"
       annotation (Placement(transformation(extent={{200,-10},{220,10}})));
+    parameter Real scale(min=Modelica.Constants.eps) = 1
+      "Scale of the margin: margin = robustness/scale, with scale the requirement's tolerance (1 = the raw robustness in the quantity's unit)"
+      annotation(Dialog(tab="Margin"));
+    parameter Boolean computeMargin = true "= true, if the normalized margin output is provided"
+      annotation(Dialog(tab="Margin"), choices(checkBox=true), Evaluate=true);
+    Requirements.Interfaces.MarginOutput margin = robustness/scale if computeMargin
+      "Normalized margin of the check: >= 0 exactly when the check holds, in units of scale (phase 12 of the ModCheck plan)"
+      annotation (Placement(transformation(extent={{200,-100},{220,-80}})));
+  protected
+    Real robustness
+      "Signed distance of the check to its limit, in the quantity's unit (>= 0 exactly when the check holds); each block defines it";
     annotation (Diagram(coordinateSystem(
           preserveAspectRatio=false,
           extent={{-200,-100},{200,100}},

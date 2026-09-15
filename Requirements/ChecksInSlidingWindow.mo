@@ -54,6 +54,8 @@ package ChecksInSlidingWindow
     maxDuration = SlidingWindow.maxDuration(buffer, time, check);
     y = if maxDuration >= lowerLimit then Property.Satisfied else
         (if first then Property.Undecided else Property.Violated);
+    robustness = maxDuration - lowerLimit;
+
 
   annotation (defaultComponentName="minDuration1",Documentation(info="<html>
 <h4>Syntax</h4>
@@ -109,6 +111,15 @@ results in
     <td align=\"center\">simulation result</td>
    </tr>
 </table>
+<h4>Margin</h4>
+<p>
+Output <b>margin</b> (present if <b>computeMargin</b> = true, the default) is the signed distance of the check
+to its limit, <em><code>maxDuration - lowerLimit</code></em>, divided by parameter <b>scale</b>: margin &ge; 0 exactly when the check holds,
+margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
+requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
+is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
+over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+Before the end of the first window the margin is provisional; a consumer takes the worst value over the decided points only. The sliding buffer holds 20 elements, so a margin over a busier window is approximate, as the property is.</p>
 </html>"),   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-200,
               -100},{200,100}}),
                   graphics={
@@ -177,6 +188,8 @@ results in
     accumulatedDuration = SlidingWindow.accumulatedDuration(buffer, time, check);
     y = if accumulatedDuration >= lowerLimit then Property.Satisfied else
         (if first then Property.Undecided else Property.Violated);
+    robustness = accumulatedDuration - lowerLimit;
+
 
   annotation (defaultComponentName="minAccDuration1",Documentation(info="<html>
 <h4>Syntax</h4>
@@ -232,6 +245,15 @@ results in
     <td align=\"center\">simulation result</td>
    </tr>
 </table>
+<h4>Margin</h4>
+<p>
+Output <b>margin</b> (present if <b>computeMargin</b> = true, the default) is the signed distance of the check
+to its limit, <em><code>accumulatedDuration - lowerLimit</code></em>, divided by parameter <b>scale</b>: margin &ge; 0 exactly when the check holds,
+margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
+requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
+is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
+over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+Before the end of the first window the margin is provisional; a consumer takes the worst value over the decided points only. The sliding buffer holds 20 elements, so a margin over a busier window is approximate, as the property is.</p>
 </html>"),   Icon(graphics={
           Text(
             extent={{-180,45},{0,15}},
@@ -286,6 +308,8 @@ results in
 
     accumulatedDuration = SlidingWindow.accumulatedDuration(buffer, time, check);
     y = accumulatedDuration >= lowerLimit;
+    robustness = accumulatedDuration - lowerLimit;
+
 
   annotation (defaultComponentName="minAccDuration1",Documentation(info="<html>
 <h4>Syntax</h4>
@@ -340,6 +364,15 @@ results in
     <td align=\"center\">simulation result</td>
    </tr>
 </table>
+<h4>Margin</h4>
+<p>
+Output <b>margin</b> (present if <b>computeMargin</b> = true, the default) is the signed distance of the check
+to its limit, <em><code>accumulatedDuration - lowerLimit</code></em>, divided by parameter <b>scale</b>: margin &ge; 0 exactly when the check holds,
+margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
+requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
+is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
+over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+Before the end of the first window the margin is provisional; a consumer takes the worst value over the decided points only. The sliding buffer holds 20 elements, so a margin over a busier window is approximate, as the property is.</p>
 </html>"),   Icon(graphics={
           Text(
             extent={{-180,45},{0,15}},
@@ -393,6 +426,8 @@ results in
 
     maxDuration = SlidingWindow.maxDuration(buffer, time, check);
     y = maxDuration <= upperLimit;
+    robustness = upperLimit - maxDuration;
+
 
   annotation (defaultComponentName="maxDuration1",Documentation(info="<html>
 <h4>Syntax</h4>
@@ -439,6 +474,15 @@ results in
     <td align=\"center\">simulation result</td>
    </tr>
 </table>
+<h4>Margin</h4>
+<p>
+Output <b>margin</b> (present if <b>computeMargin</b> = true, the default) is the signed distance of the check
+to its limit, <em><code>upperLimit - maxDuration</code></em>, divided by parameter <b>scale</b>: margin &ge; 0 exactly when the check holds,
+margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
+requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
+is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
+over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+Before the end of the first window the margin is provisional; a consumer takes the worst value over the decided points only. The sliding buffer holds 20 elements, so a margin over a busier window is approximate, as the property is.</p>
 </html>"),   Diagram(coordinateSystem(
           preserveAspectRatio=false,
           extent={{-200,-100},{200,100}},
@@ -503,6 +547,8 @@ results in
 
     accumulatedDuration = SlidingWindow.accumulatedDuration(buffer, time, check);
     y = accumulatedDuration <= upperLimit;
+    robustness = upperLimit - accumulatedDuration;
+
 
   annotation (defaultComponentName="maxAccDuration1",Documentation(info="<html>
 <h4>Syntax</h4>
@@ -549,6 +595,15 @@ results in
     <td align=\"center\">simulation result</td>
    </tr>
 </table>
+<h4>Margin</h4>
+<p>
+Output <b>margin</b> (present if <b>computeMargin</b> = true, the default) is the signed distance of the check
+to its limit, <em><code>upperLimit - accumulatedDuration</code></em>, divided by parameter <b>scale</b>: margin &ge; 0 exactly when the check holds,
+margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
+requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
+is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
+over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+Before the end of the first window the margin is provisional; a consumer takes the worst value over the decided points only. The sliding buffer holds 20 elements, so a margin over a busier window is approximate, as the property is.</p>
 </html>"),   Diagram(coordinateSystem(
           preserveAspectRatio=false,
           extent={{-200,-100},{200,100}},
@@ -629,6 +684,8 @@ results in
     maxDuration = SlidingWindow.maxDuration(buffer, time, check);
     y = if maxDuration >= lowerLimit and maxDuration <= upperLimit then Property.Satisfied else
         (if first and maxDuration <= upperLimit then Property.Undecided else Property.Violated);
+    robustness = min(maxDuration - lowerLimit, upperLimit - maxDuration);
+
 
   annotation (defaultComponentName="bandDuration1", Documentation(info="<html>
 <h4>Syntax</h4>
@@ -684,6 +741,15 @@ results in
     <td align=\"center\">simulation result</td>
    </tr>
 </table>
+<h4>Margin</h4>
+<p>
+Output <b>margin</b> (present if <b>computeMargin</b> = true, the default) is the signed distance of the check
+to its limit, <em><code>min(maxDuration - lowerLimit, upperLimit - maxDuration)</code></em>, divided by parameter <b>scale</b>: margin &ge; 0 exactly when the check holds,
+margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
+requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
+is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
+over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+Before the end of the first window the margin is provisional; a consumer takes the worst value over the decided points only. The sliding buffer holds 20 elements, so a margin over a busier window is approximate, as the property is.</p>
 </html>"),   Icon(graphics={
           Text(
             extent={{-180,45},{0,15}},
@@ -753,6 +819,8 @@ results in
     accumulatedDuration = SlidingWindow.accumulatedDuration(buffer, time, check);
     y = if accumulatedDuration >= lowerLimit and accumulatedDuration <= upperLimit then Property.Satisfied else
         (if first and accumulatedDuration <= upperLimit then Property.Undecided else Property.Violated);
+    robustness = min(accumulatedDuration - lowerLimit, upperLimit - accumulatedDuration);
+
 
   annotation (defaultComponentName="bandAccDuration1", Documentation(info="<html>
 <h4>Syntax</h4>
@@ -808,6 +876,15 @@ results in
     <td align=\"center\">simulation result</td>
    </tr>
 </table>
+<h4>Margin</h4>
+<p>
+Output <b>margin</b> (present if <b>computeMargin</b> = true, the default) is the signed distance of the check
+to its limit, <em><code>min(accumulatedDuration - lowerLimit, upperLimit - accumulatedDuration)</code></em>, divided by parameter <b>scale</b>: margin &ge; 0 exactly when the check holds,
+margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
+requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
+is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
+over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+Before the end of the first window the margin is provisional; a consumer takes the worst value over the decided points only. The sliding buffer holds 20 elements, so a margin over a busier window is approximate, as the property is.</p>
 </html>"),   Icon(graphics={
           Text(
             extent={{-180,45},{0,15}},
@@ -892,6 +969,8 @@ results in
        y = if nRising >= nRisingMin then Property.Satisfied else
            (if first then Property.Undecided else Property.Violated);
     end when;
+    robustness = nRising - nRisingMin;
+
     annotation(defaultComponentName="minRising1", Documentation(info="<html>
 <h4>Syntax</h4>
 
@@ -947,6 +1026,15 @@ results in
     <td align=\"center\">simulation result</td>
    </tr>
 </table>
+<h4>Margin</h4>
+<p>
+Output <b>margin</b> (present if <b>computeMargin</b> = true, the default) is the signed distance of the check
+to its limit, <em><code>nRising - nRisingMin</code></em>, divided by parameter <b>scale</b>: margin &ge; 0 exactly when the check holds,
+margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
+requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
+is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
+over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+Before the end of the first window the margin is provisional; a consumer takes the worst value over the decided points only. The sliding buffer holds 20 elements, so a margin over a busier window is approximate, as the property is.</p>
 </html>"),   Icon(graphics={
           Text(
             extent={{-180,45},{0,15}},
@@ -1016,6 +1104,8 @@ results in
        t_next = SlidingWindow.nextLeaving(buffer, time);
        y = nRising <= nRisingMax;
     end when;
+    robustness = nRisingMax - nRising;
+
   annotation (defaultComponentName="maxRising1", Documentation(info="<html>
 <h4>Syntax</h4>
 
@@ -1062,6 +1152,15 @@ results in
     <td align=\"center\">simulation result</td>
    </tr>
 </table>
+<h4>Margin</h4>
+<p>
+Output <b>margin</b> (present if <b>computeMargin</b> = true, the default) is the signed distance of the check
+to its limit, <em><code>nRisingMax - nRising</code></em>, divided by parameter <b>scale</b>: margin &ge; 0 exactly when the check holds,
+margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
+requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
+is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
+over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+Before the end of the first window the margin is provisional; a consumer takes the worst value over the decided points only. The sliding buffer holds 20 elements, so a margin over a busier window is approximate, as the property is.</p>
 </html>"),   Icon(graphics={
           Text(
             extent={{-180,45},{0,15}},
@@ -1149,6 +1248,8 @@ results in
        y = if nRising >= nRisingMin and nRising <= nRisingMax then Property.Satisfied else
            (if first and nRising <= nRisingMax then Property.Undecided else Property.Violated);
     end when;
+    robustness = min(nRising - nRisingMin, nRisingMax - nRising);
+
     annotation(defaultComponentName="bandRising1", Documentation(info="<html>
 <h4>Syntax</h4>
 
@@ -1204,6 +1305,15 @@ results in
     <td align=\"center\">simulation result</td>
    </tr>
 </table>
+<h4>Margin</h4>
+<p>
+Output <b>margin</b> (present if <b>computeMargin</b> = true, the default) is the signed distance of the check
+to its limit, <em><code>min(nRising - nRisingMin, nRisingMax - nRising)</code></em>, divided by parameter <b>scale</b>: margin &ge; 0 exactly when the check holds,
+margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
+requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
+is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
+over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+Before the end of the first window the margin is provisional; a consumer takes the worst value over the decided points only. The sliding buffer holds 20 elements, so a margin over a busier window is approximate, as the property is.</p>
 </html>"),   Icon(graphics={
           Text(
             extent={{-180,45},{0,15}},
@@ -1283,6 +1393,8 @@ results in
        t_next = SlidingWindow.nextLeaving(buffer, time);
        y = freqHzMean <= freqHzMeanMax;
     end when;
+    robustness = freqHzMeanMax - freqHzMean;
+
 
   annotation (defaultComponentName="maxFrequency1",Documentation(info="<html>
 <h4>Syntax</h4>
@@ -1353,6 +1465,15 @@ the frequency is only determined based on the rising and falling edges of check.
 more precise as using the <a href=\"modelica://Requirements.ChecksInSlidingWindow.MeanRisingFrequency\">MeanRisingFrequency</a> block that takes only the
 rising edges of check into account.
 </p>
+<h4>Margin</h4>
+<p>
+Output <b>margin</b> (present if <b>computeMargin</b> = true, the default) is the signed distance of the check
+to its limit, <em><code>freqHzMeanMax - freqHzMean</code></em>, divided by parameter <b>scale</b>: margin &ge; 0 exactly when the check holds,
+margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
+requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
+is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
+over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+Before the end of the first window the margin is provisional; a consumer takes the worst value over the decided points only. The sliding buffer holds 20 elements, so a margin over a busier window is approximate, as the property is.</p>
 </html>"),   Icon(graphics={
           Text(
             extent={{-180,45},{0,15}},
@@ -1445,6 +1566,8 @@ rising edges of check into account.
        t_next = SlidingWindow.nextLeaving(buffer, time);
        y = freqHzMean <= freqHzMeanMax;
     end when;
+    robustness = freqHzMeanMax - freqHzMean;
+
 
   annotation (defaultComponentName="maxRisingFrequency1",Documentation(info="<html>
 <h4>Syntax</h4>
@@ -1506,6 +1629,15 @@ results in
     <td align=\"center\">simulation result</td>
    </tr>
 </table>
+<h4>Margin</h4>
+<p>
+Output <b>margin</b> (present if <b>computeMargin</b> = true, the default) is the signed distance of the check
+to its limit, <em><code>freqHzMeanMax - freqHzMean</code></em>, divided by parameter <b>scale</b>: margin &ge; 0 exactly when the check holds,
+margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
+requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
+is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
+over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+Before the end of the first window the margin is provisional; a consumer takes the worst value over the decided points only. The sliding buffer holds 20 elements, so a margin over a busier window is approximate, as the property is.</p>
 </html>"),   Icon(graphics={
           Text(
             extent={{-180,45},{0,15}},
@@ -1544,6 +1676,14 @@ results in
       "Increase of the input signal in the sliding time window"
      annotation (Placement(transformation(extent={{100,-70},{120,-50}})));
 
+    parameter Real scale(min=Modelica.Constants.eps) = 1
+      "Scale of the margin: margin = (upperLimit - increase)/scale, with scale the requirement's tolerance (1 = raw)"
+      annotation(Dialog(tab="Margin"));
+    parameter Boolean computeMargin = true "= true, if the normalized margin output is provided"
+      annotation(Dialog(tab="Margin"), choices(checkBox=true), Evaluate=true);
+    Requirements.Interfaces.MarginOutput margin = (upperLimit - increase)/scale if computeMargin
+      "Normalized margin of the check: >= 0 exactly when the check holds, in units of scale (phase 12 of the ModCheck plan)"
+      annotation (Placement(transformation(extent={{100,-100},{120,-80}})));
     Modelica.Blocks.Interfaces.RealInput u "Real input signal"
       annotation (Placement(transformation(extent={{-140,-20},{-100,20}})));
 
@@ -1664,6 +1804,15 @@ results in
     <td align=\"center\">simulation result</td>
    </tr>
 </table>
+<h4>Margin</h4>
+<p>
+Output <b>margin</b> (present if <b>computeMargin</b> = true, the default) is the signed distance of the check
+to its limit, <em><code>upperLimit - increase</code></em>, divided by parameter <b>scale</b>: margin &ge; 0 exactly when the check holds,
+margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
+requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
+is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
+over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+</p>
 </html>"));
   end MaxIncrease;
 
@@ -1685,6 +1834,14 @@ results in
       "Increase of the input signal in the sliding time window in [%]"
      annotation (Placement(transformation(extent={{100,-70},{120,-50}})));
 
+    parameter Real scale(min=Modelica.Constants.eps) = 1
+      "Scale of the margin: margin = (upperPercentageLimit - percentageIncrease)/scale, with scale the requirement's tolerance (1 = raw)"
+      annotation(Dialog(tab="Margin"));
+    parameter Boolean computeMargin = true "= true, if the normalized margin output is provided"
+      annotation(Dialog(tab="Margin"), choices(checkBox=true), Evaluate=true);
+    Requirements.Interfaces.MarginOutput margin = (upperPercentageLimit - percentageIncrease)/scale if computeMargin
+      "Normalized margin of the check: >= 0 exactly when the check holds, in units of scale (phase 12 of the ModCheck plan)"
+      annotation (Placement(transformation(extent={{100,-100},{120,-80}})));
     Modelica.Blocks.Interfaces.RealInput u "Real input signal"
       annotation (Placement(transformation(extent={{-140,-20},{-100,20}})));
   protected
@@ -1812,6 +1969,15 @@ results in
     <td align=\"center\">simulation result</td>
    </tr>
 </table>
+<h4>Margin</h4>
+<p>
+Output <b>margin</b> (present if <b>computeMargin</b> = true, the default) is the signed distance of the check
+to its limit, <em><code>upperPercentageLimit - percentageIncrease</code> (in %)</em>, divided by parameter <b>scale</b>: margin &ge; 0 exactly when the check holds,
+margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
+requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
+is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
+over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+</p>
 </html>"));
   end MaxPercentageIncrease;
   annotation (Icon(graphics={

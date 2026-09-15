@@ -1020,3 +1020,120 @@ cases:
     variables: [time, "*.y"]
     integral_abs_variables: [controller.y, PumpRPMGenerator.y, PT1.y]
     integral_tolerance: 0.02
+
+  - name: MR_OM_Examples_Elementary_Margin_During
+    # Added 2026-09-15 with the margin outputs (library 0.9.0, ModCheck plan phase 12):
+    # the block family's margin asserted against its closed-form value at every
+    # instant and the sign invariant continuously; the stored `*.margin` trajectories
+    # are the reference, so a margin that drifts is caught like a verdict.
+    enabled: true
+    model: Requirements.Examples.Elementary.Margin.During
+    start_time: 0.0
+    final_time: 10.0
+    ncp: 1000
+    rtol: 1.0e-06
+    modifiers: {}
+    variables: [time, "*.y", "*.margin"]
+
+  - name: MR_OM_Examples_Elementary_Margin_Band
+    # Added 2026-09-15 with the margin outputs (library 0.9.0, ModCheck plan phase 12):
+    # the block family's margin asserted against its closed-form value at every
+    # instant and the sign invariant continuously; the stored `*.margin` trajectories
+    # are the reference, so a margin that drifts is caught like a verdict.
+    enabled: true
+    model: Requirements.Examples.Elementary.Margin.Band
+    start_time: 0.0
+    final_time: 10.0
+    ncp: 1000
+    rtol: 1.0e-06
+    modifiers: {}
+    variables: [time, "*.y", "*.margin"]
+
+  - name: MR_OM_Examples_Elementary_Margin_Duration
+    # Added 2026-09-15 with the margin outputs (library 0.9.0, ModCheck plan phase 12):
+    # the block family's margin asserted against its closed-form value at every
+    # instant and the sign invariant continuously; the stored `*.margin` trajectories
+    # are the reference, so a margin that drifts is caught like a verdict.
+    enabled: true
+    model: Requirements.Examples.Elementary.Margin.Duration
+    start_time: 0.0
+    final_time: 5.0
+    ncp: 500
+    rtol: 1.0e-06
+    modifiers: {}
+    variables: [time, "*.y", "*.margin"]
+
+  - name: MR_OM_Examples_Elementary_Margin_Rising
+    # Added 2026-09-15 with the margin outputs (library 0.9.0, ModCheck plan phase 12):
+    # the block family's margin asserted against its closed-form value at every
+    # instant and the sign invariant continuously; the stored `*.margin` trajectories
+    # are the reference, so a margin that drifts is caught like a verdict.
+    enabled: true
+    model: Requirements.Examples.Elementary.Margin.Rising
+    start_time: 0.0
+    final_time: 6.0
+    ncp: 600
+    rtol: 1.0e-06
+    modifiers: {}
+    variables: [time, "*.y", "*.margin"]
+
+  - name: MR_OM_Examples_Elementary_Margin_RisingFrequency
+    # Added 2026-09-15 with the margin outputs (library 0.9.0, ModCheck plan phase 12):
+    # the block family's margin asserted against its closed-form value at every
+    # instant and the sign invariant continuously; the stored `*.margin` trajectories
+    # are the reference, so a margin that drifts is caught like a verdict.
+    enabled: true
+    model: Requirements.Examples.Elementary.Margin.RisingFrequency
+    start_time: 0.0
+    final_time: 3.0
+    ncp: 3000
+    rtol: 1.0e-06
+    modifiers: {}
+    # crossing.y, the plant's 2 Hz edge train, is left out: its edges land exactly on the
+    # sample grid, where two tools store opposite sides of the event; the block's
+    # property and the margins are the reference.
+    variables: [time, "maxFrequency1.y", "*.margin"]
+
+  - name: MR_OM_Examples_Elementary_Margin_WithinDomain
+    # Added 2026-09-15 with the margin outputs (library 0.9.0, ModCheck plan phase 12):
+    # the block family's margin asserted against its closed-form value at every
+    # instant and the sign invariant continuously; the stored `*.margin` trajectories
+    # are the reference, so a margin that drifts is caught like a verdict.
+    enabled: true
+    model: Requirements.Examples.Elementary.Margin.WithinDomain
+    start_time: 0.0
+    final_time: 10.0
+    ncp: 1000
+    rtol: 1.0e-06
+    modifiers: {}
+    variables: [time, "*.y", "*.margin"]
+
+  - name: MR_OM_Examples_Elementary_Margin_SlidingIncrease
+    # Added 2026-09-15 with the margin outputs (library 0.9.0, ModCheck plan phase 12):
+    # the block family's margin asserted against its closed-form value at every
+    # instant and the sign invariant continuously; the stored `*.margin` trajectories
+    # are the reference, so a margin that drifts is caught like a verdict.
+    enabled: true
+    model: Requirements.Examples.Elementary.Margin.SlidingIncrease
+    start_time: 0.0
+    final_time: 5.0
+    ncp: 500
+    rtol: 1.0e-06
+    modifiers: {}
+    variables: [time, "*.y", "*.margin"]
+
+  - name: MR_OM_Examples_Elementary_Margin_FFT
+    # Added 2026-09-15 with the margin outputs (library 0.9.0, ModCheck plan phase 12):
+    # the block family's margin asserted against its closed-form value at every
+    # instant and the sign invariant continuously; the stored `*.margin` trajectories
+    # are the reference, so a margin that drifts is caught like a verdict.
+    # DISABLED -- does not build in OpenModelica, as the other FFT examples (measured 2026-09-13):
+    #   omc 1.27.1 cannot build the ChecksInFixedWindow_withFFT blocks
+    enabled: false
+    model: Requirements.Examples.Elementary.Margin.FFT
+    start_time: 0.0
+    final_time: 6.0
+    ncp: 600
+    rtol: 1.0e-06
+    modifiers: {}
+    variables: [time, "*.y", "*.margin"]

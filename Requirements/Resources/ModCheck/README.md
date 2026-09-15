@@ -47,6 +47,20 @@ with the new `Examples.Elementary.LogicalBlocks.PropertyTable4` as a case in the
 (omc, Dymola and the composite carry its reference). The numbers below are the 0.7.1
 measurement and stand as history.
 
+**Version 0.9.0, 2026-09-15** (the margin outputs, ModCheck plan phase 12): the eight examples of
+`Examples.Elementary.Margin` are cases in the three lists with `variables: [time, "*.y", "*.margin"]`, so the
+margins are references too. Stored on OpenModelica (7: the FFT example does not build there, as the other FFT
+examples) and Dymola (all 8, the FFT one included), the Dymola references copied into the composite (79 entries).
+No existing reference changed: every block's `y` is as in 0.8.0, the new `margin`, `duration` and `countRising`
+outputs are not in the older cases' `*.y` filter: the full suites afterwards pass **omc 316/316** (21 disabled) and
+**Dymola 336/336** (9 skipped). The examples assert inside `when sample(0, dt)` clauses with `noEvent` conditions:
+Modelon Impact keeps an event-generating relation such as `abs(margin) < 1e-9` frozen between events and does not
+re-evaluate it after a discrete jump of a count, and a `noEvent` assert outside a `when` is evaluated during solver
+trial steps too (Dymola's root finder then fails on a stale `y` beside a crossed margin) -- at the sample instants
+every value is settled on every tool. The Impact composite suite afterwards: **371/371** (5 skipped); the
+`RisingFrequency` case stores `maxFrequency1.y` and the margins only, because the plant's 2 Hz edges land
+exactly on its sample grid, where two tools store opposite sides of an event.
+
 **Full run, 2026-09-14** (`Impact/`, against the composite Dymola + OpenModelica
 reference): **296/296 checks pass** on the 63 cases with a reference — every
 funnel error exactly 0, 205 of 208 final values identical and the other three

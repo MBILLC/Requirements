@@ -1049,6 +1049,80 @@ Undefined, or the empty vector). Elements that are Undefined do not affect the r
 </table>
 </html>"));
   end or4All;
+
+  function marginAnd
+    "Margin of a conjunction: the minimum of the margins whose property is applicable (not Undefined)"
+    extends Modelica.Icons.Function;
+    import Requirements.Types.Property;
+    input Real m[:] "Margins";
+    input Property p[size(m,1)] "The properties the margins belong to";
+    output Real result "min of m[i] over i with p[i] <> Undefined; 0 when no element is applicable";
+  protected
+    Boolean any = false;
+  algorithm
+    result := 0;
+    for i in 1:size(m,1) loop
+      if p[i] <> Property.Undefined then
+        result := if any then min(result, m[i]) else m[i];
+        any := true;
+      end if;
+    end for;
+    annotation(Documentation(info="<html>
+<h4>Syntax</h4>
+<blockquote><p>
+result = <b>marginAnd</b>(m, p);
+</p></blockquote>
+<h4>Description</h4>
+<p>
+The margin of <code>and4All(p)</code>: the minimum of the margins m[i] over the elements whose property p[i] is applicable (not Undefined) -- conjunction is the minimum in the robustness semantics, and an inapplicable element drops out of the combination as it does in <a href=\"modelica://Requirements.LogicalFunctions.and4All\">and4All</a>.
+When no element is applicable the result is 0 (the combined property is Undefined then, and a consumer
+masks the margin with it); no NaN is produced. ModCheck plan section 18.4 / 18.5.
+</p>
+</html>", revisions="<html>
+<table border=1 cellspacing=0 cellpadding=2>
+<tr><th>Date</th> <th align=\"left\">Description</th></tr>
+<tr><td valign=\"top\"> Sept. 15, 2026 </td>
+    <td valign=\"top\"> Added with the margin outputs (H. Tummescheit, Model Based Innovation LLC)</td></tr>
+</table>
+</html>"));
+  end marginAnd;
+
+  function marginOr
+    "Margin of a disjunction: the maximum of the margins whose property is applicable (not Undefined)"
+    extends Modelica.Icons.Function;
+    import Requirements.Types.Property;
+    input Real m[:] "Margins";
+    input Property p[size(m,1)] "The properties the margins belong to";
+    output Real result "max of m[i] over i with p[i] <> Undefined; 0 when no element is applicable";
+  protected
+    Boolean any = false;
+  algorithm
+    result := 0;
+    for i in 1:size(m,1) loop
+      if p[i] <> Property.Undefined then
+        result := if any then max(result, m[i]) else m[i];
+        any := true;
+      end if;
+    end for;
+    annotation(Documentation(info="<html>
+<h4>Syntax</h4>
+<blockquote><p>
+result = <b>marginOr</b>(m, p);
+</p></blockquote>
+<h4>Description</h4>
+<p>
+The margin of <code>or4All(p)</code>: the maximum of the margins m[i] over the elements whose property p[i] is applicable (not Undefined) -- disjunction is the maximum in the robustness semantics; see <a href=\"modelica://Requirements.LogicalFunctions.marginAnd\">marginAnd</a>.
+When no element is applicable the result is 0 (the combined property is Undefined then, and a consumer
+masks the margin with it); no NaN is produced. ModCheck plan section 18.4 / 18.5.
+</p>
+</html>", revisions="<html>
+<table border=1 cellspacing=0 cellpadding=2>
+<tr><th>Date</th> <th align=\"left\">Description</th></tr>
+<tr><td valign=\"top\"> Sept. 15, 2026 </td>
+    <td valign=\"top\"> Added with the margin outputs (H. Tummescheit, Model Based Innovation LLC)</td></tr>
+</table>
+</html>"));
+  end marginOr;
   annotation (Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,
             -100},{100,100}}),
                    graphics={

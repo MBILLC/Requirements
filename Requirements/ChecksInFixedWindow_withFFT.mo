@@ -796,6 +796,14 @@ As can be seen, the first FFT fulfills the check (THD &lt; THDmax), whereas the 
         Modelica.Blocks.Interfaces.RealOutput scaledDistance
         "Minimum distance of FFT Amplitudes of u to maxAmplitude (>= 0 if inside, otherwise outside of maxAmplitude)"
                                                                                                           annotation (Placement(transformation(extent={{300,-210},{320,-190}})));
+        parameter Real scale(min=Modelica.Constants.eps) = 1
+          "Scale of the margin: margin = scaledDistance/scale, with scale the requirement's tolerance (1 = the scaled distance itself)"
+          annotation(Dialog(tab="Margin"));
+        parameter Boolean computeMargin = true "= true, if the normalized margin output is provided"
+          annotation(Dialog(tab="Margin"), choices(checkBox=true), Evaluate=true);
+        Requirements.Interfaces.MarginOutput margin = scaledDistance/scale if computeMargin
+          "Normalized margin of the last FFT check: >= 0 exactly when it holds, in units of scale (phase 12 of the ModCheck plan)"
+          annotation (Placement(transformation(extent={{300,-260},{320,-240}})));
 
         final parameter Integer ns = Internal.get_ns(f_max, f_resolution)
         "Number of FFT sample points (is even and can be expressed as ns = 2^i*3^j*5^k)";

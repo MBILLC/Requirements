@@ -3219,6 +3219,329 @@ when the pack is switched off while the flight phase is still 2 (until 250 s).
 </html>"));
     end Conversions;
   end Units;
+
+  package Margin "Library of examples asserting the margin outputs of the check blocks against closed-form values"
+    extends Modelica.Icons.ExamplesPackage;
+
+    model During "A ramp against a threshold: During's margin is (8 - u)/scale in closed form"
+      extends Modelica.Icons.Example;
+      import Requirements.Types.Property;
+      Modelica.Blocks.Sources.Ramp level(height=10, duration=10) "u = time on [0, 10]"
+        annotation (Placement(transformation(extent={{-80,10},{-60,30}})));
+      Requirements.Sources.BooleanConstant always
+        annotation (Placement(transformation(extent={{-80,40},{-60,60}})));
+      Requirements.ChecksInFixedWindow.During during1(
+        check=level.y < 8,
+        rho=8 - level.y,
+        scale=0.5) "the level shall be below 8, tolerance 0.5"
+        annotation (Placement(transformation(extent={{-40,40},{0,60}})));
+    equation
+      connect(always.y, during1.condition) annotation (Line(points={{-59,50},{-42,50}}, color={255,0,255}));
+      when time >= 10 then
+        assert(noEvent(during1.y == Property.Violated and abs(during1.margin + 4) < 1e-6),
+          "During: at the end the level is 10, two above the limit of 8: violated by 4 tolerances");
+      end when;
+      when sample(0, 0.01) then
+        assert(noEvent(abs(during1.margin - (8 - time)/0.5) < 1e-6), "During: the margin is not (8 - u)/scale");
+        assert(noEvent(during1.y <> Property.Satisfied or during1.margin >= -1e-6), "During: satisfied with a negative margin");
+        assert(noEvent(during1.y <> Property.Violated or during1.margin <= 1e-6), "During: violated with a positive margin");
+      end when;
+      annotation (experiment(StopTime=10, Interval=0.01), Documentation(info="<html>
+<p>The level rises from 0 to 10 in 10 s against <em>the level shall be below 8</em> with a tolerance of 0.5:
+<code>During(check = u &lt; 8, rho = 8 &minus; u, scale = 0.5)</code>. The margin is <code>(8 &minus; t)/0.5</code>
+at every instant, asserted in closed form; it crosses zero at t = 8 s together with the property, and the
+worst value is &minus;4 at the end: violated by four tolerances. The sign invariant (satisfied &hArr; margin &ge; 0)
+is asserted continuously. Phase 12 of ModCheck's requirements plan (section 18.5).</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+    end During;
+
+    model Band "A sine against a band: During's margin is min(u - lo, hi - u)/scale in closed form, the worst 0.5 at t = 7.5 s"
+      extends Modelica.Icons.Example;
+      import Requirements.Types.Property;
+      Modelica.Blocks.Sources.Sine T(amplitude=7, f=0.1, offset=293.15) "a temperature in K"
+        annotation (Placement(transformation(extent={{-80,10},{-60,30}})));
+      Requirements.Sources.BooleanConstant always
+        annotation (Placement(transformation(extent={{-80,40},{-60,60}})));
+      Requirements.ChecksInFixedWindow.During during1(
+        check=T.y >= 285.15 and T.y <= 303.15,
+        rho=min(T.y - 285.15, 303.15 - T.y),
+        scale=2) "the temperature shall remain within 12 degC and 30 degC, tolerance 2 K"
+        annotation (Placement(transformation(extent={{-40,40},{0,60}})));
+    protected
+      Real s = sin(2*Modelica.Constants.pi*0.1*time);
+    equation
+      connect(always.y, during1.condition) annotation (Line(points={{-59,50},{-42,50}}, color={255,0,255}));
+      when time >= 7.5 then
+        assert(noEvent(abs(during1.margin - 0.5) < 1e-4), "Band: the worst margin, at t = 7.5 s, is not 0.5");
+      end when;
+      when sample(0, 0.01) then
+        assert(noEvent(abs(during1.margin - min(8 + 7*s, 10 - 7*s)/2) < 1e-6), "Band: the margin is not min(u - lo, hi - u)/scale");
+        assert(noEvent(during1.y == Property.Satisfied), "Band: the sine stays inside the band");
+        assert(noEvent(during1.margin >= 0), "Band: satisfied with a negative margin");
+      end when;
+      annotation (experiment(StopTime=10, Interval=0.01), Documentation(info="<html>
+<p>A temperature 293.15 + 7 sin(2&pi; t / 10 s) K against <em>within 12 degC and 30 degC</em> (285.15 .. 303.15 K)
+with a tolerance of 2 K: <code>During(check = lo &le; u &le; hi, rho = min(u &minus; lo, hi &minus; u), scale = 2)</code>.
+The margin is <code>min(8 + 7 sin, 10 &minus; 7 sin)/2</code> in closed form; the requirement is satisfied
+throughout and the closest call is at t = 7.5 s (the minimum of the sine, 1 K above the lower bound): margin 0.5,
+half a tolerance -- what a report shows amber.</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+    end Band;
+
+    model Duration "Min/Max/BandDuration on one condition phase: the margin is the running duration against its limit, piecewise linear"
+      extends Modelica.Icons.Example;
+      import Requirements.Types.Property;
+      Modelica.Blocks.Sources.BooleanTable condition(startValue=false, table={1,4}) "true on [1, 4)"
+        annotation (Placement(transformation(extent={{-80,40},{-60,60}})));
+      Modelica.Blocks.Sources.BooleanTable check(startValue=false, table={1.5,3}) "true on [1.5, 3)"
+        annotation (Placement(transformation(extent={{-80,10},{-60,30}})));
+      Requirements.ChecksInFixedWindow.MinDuration minDuration(durationMin=1, check=check.y, scale=0.5)
+        annotation (Placement(transformation(extent={{-40,60},{0,80}})));
+      Requirements.ChecksInFixedWindow.MaxDuration maxDuration(durationMax=1, check=check.y, scale=0.5)
+        annotation (Placement(transformation(extent={{-40,20},{0,40}})));
+      Requirements.ChecksInFixedWindow.BandDuration bandDuration(durationMin=0.5, durationMax=2, check=check.y, scale=0.5)
+        annotation (Placement(transformation(extent={{-40,-20},{0,0}})));
+    protected
+      Real d = if time < 1.5 then 0 elseif time < 3 then time - 1.5 else 1.5 "the accumulated duration in closed form";
+      Boolean inside = (time > 1.6 and time < 2.9) or (time > 3.1 and time < 3.9) or time > 4.1 "away from the event instants";
+    equation
+      connect(condition.y, minDuration.condition) annotation (Line(points={{-59,50},{-50,50},{-50,70},{-42,70}}, color={255,0,255}));
+      connect(condition.y, maxDuration.condition) annotation (Line(points={{-59,50},{-50,50},{-50,30},{-42,30}}, color={255,0,255}));
+      connect(condition.y, bandDuration.condition) annotation (Line(points={{-59,50},{-50,50},{-50,-10},{-42,-10}}, color={255,0,255}));
+      when time >= 4.5 then
+        assert(noEvent(minDuration.y == Property.Satisfied and abs(minDuration.margin - 1) < 1e-6), "MinDuration: 1.5 s of 1 s, margin 1");
+        assert(noEvent(maxDuration.y == Property.Violated and abs(maxDuration.margin + 1) < 1e-6), "MaxDuration: 1.5 s over 1 s, margin -1");
+        assert(noEvent(bandDuration.y == Property.Satisfied and abs(bandDuration.margin - 1) < 1e-6), "BandDuration: 1.5 s in [0.5, 2], margin 1");
+      end when;
+      when sample(0, 0.01) then
+        assert(noEvent(not inside or abs(minDuration.margin - (d - 1)/0.5) < 1e-6), "MinDuration: the margin is not (duration - durationMin)/scale");
+        assert(noEvent(not inside or abs(maxDuration.margin - (1 - d)/0.5) < 1e-6), "MaxDuration: the margin is not (durationMax - duration)/scale");
+        assert(noEvent(not inside or abs(bandDuration.margin - min(d - 0.5, 2 - d)/0.5) < 1e-6), "BandDuration: the margin is not min(...)/scale");
+        assert(noEvent(minDuration.y <> Property.Satisfied or minDuration.margin >= -1e-6), "MinDuration: satisfied with a negative margin");
+        assert(noEvent(minDuration.y <> Property.Violated or minDuration.margin <= 1e-6), "MinDuration: violated with a positive margin");
+        assert(noEvent(maxDuration.y <> Property.Satisfied or maxDuration.margin >= -1e-6), "MaxDuration: satisfied with a negative margin");
+        assert(noEvent(maxDuration.y <> Property.Violated or maxDuration.margin <= 1e-6), "MaxDuration: violated with a positive margin");
+        assert(noEvent(bandDuration.y <> Property.Satisfied or bandDuration.margin >= -1e-6), "BandDuration: satisfied with a negative margin");
+        assert(noEvent(bandDuration.y <> Property.Violated or bandDuration.margin <= 1e-6), "BandDuration: violated with a positive margin");
+      end when;
+      annotation (experiment(StopTime=5, Interval=0.01), Documentation(info="<html>
+<p>One condition phase [1, 4) s in which the check is true on [1.5, 3) s, 1.5 s in total, against
+<code>MinDuration(durationMin = 1)</code>, <code>MaxDuration(durationMax = 1)</code> and
+<code>BandDuration(0.5, 2)</code>, all with <code>scale = 0.5</code>. The blocks' new output <code>duration</code>
+is the running accumulated duration of the phase (0, then t &minus; 1.5, then 1.5, frozen after the phase),
+and the margins are <code>(duration &minus; 1)/0.5</code>, <code>(1 &minus; duration)/0.5</code> and the band's
+minimum, asserted in closed form away from the event instants. MinDuration turns Satisfied at t = 2.5 s where its
+margin crosses zero, MaxDuration Violated there; at the end the verdicts are Satisfied / Violated / Satisfied with
+margins 1 / &minus;1 / 1. While a duration block is still Undecided its margin is provisional (negative for
+MinDuration until the minimum is reached), which is why a consumer takes the worst value over the decided
+points only.</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+    end Duration;
+
+    model Rising "The five count checks on one edge train: the margins are count differences, scale 1"
+      extends Modelica.Icons.Example;
+      import Requirements.Types.Property;
+      Modelica.Blocks.Sources.BooleanTable condition(startValue=false, table={1,5}) "true on [1, 5)"
+        annotation (Placement(transformation(extent={{-80,40},{-60,60}})));
+      Modelica.Blocks.Sources.BooleanTable check(startValue=false, table={2,2.1,3,3.1,4,4.1}) "rising edges at 2, 3, 4 s"
+        annotation (Placement(transformation(extent={{-80,10},{-60,30}})));
+      Requirements.ChecksInFixedWindow.FixedRising fixedRising(nRising=3, check=check.y)
+        annotation (Placement(transformation(extent={{-40,80},{0,100}})));
+      Requirements.ChecksInFixedWindow.MinRising minRising(nRisingMin=2, check=check.y)
+        annotation (Placement(transformation(extent={{-40,50},{0,70}})));
+      Requirements.ChecksInFixedWindow.MaxRising maxRising(nRisingMax=2, check=check.y)
+        annotation (Placement(transformation(extent={{-40,20},{0,40}})));
+      Requirements.ChecksInFixedWindow.BandRising bandRising(nRisingMin=1, nRisingMax=2, check=check.y)
+        annotation (Placement(transformation(extent={{-40,-10},{0,10}})));
+      Requirements.ChecksInFixedWindow.NoRising noRising(check=check.y)
+        annotation (Placement(transformation(extent={{-40,-40},{0,-20}})));
+    protected
+      Integer n = if time < 2 then 0 elseif time < 3 then 1 elseif time < 4 then 2 else 3 "edges so far";
+      Boolean inside = time > 1.1 and time < 4.9 and abs(time - 2) > 0.15 and abs(time - 3) > 0.15 and abs(time - 4) > 0.15
+        "inside the phase, away from the edges";
+    equation
+      connect(condition.y, fixedRising.condition) annotation (Line(points={{-59,50},{-50,50},{-50,90},{-42,90}}, color={255,0,255}));
+      connect(condition.y, minRising.condition) annotation (Line(points={{-59,50},{-50,50},{-50,60},{-42,60}}, color={255,0,255}));
+      connect(condition.y, maxRising.condition) annotation (Line(points={{-59,50},{-50,50},{-50,30},{-42,30}}, color={255,0,255}));
+      connect(condition.y, bandRising.condition) annotation (Line(points={{-59,50},{-50,50},{-50,0},{-42,0}}, color={255,0,255}));
+      connect(condition.y, noRising.condition) annotation (Line(points={{-59,50},{-50,50},{-50,-30},{-42,-30}}, color={255,0,255}));
+      when time >= 5.5 then
+        assert(noEvent(fixedRising.y == Property.Satisfied and abs(fixedRising.margin) < 1e-9), "FixedRising: exactly 3 edges, margin 0");
+        assert(noEvent(minRising.y == Property.Satisfied and abs(minRising.margin - 1) < 1e-9), "MinRising: 3 of at least 2, margin 1");
+        assert(noEvent(maxRising.y == Property.Undefined), "MaxRising: Undefined after the phase");
+        assert(noEvent(bandRising.y == Property.Violated and abs(bandRising.margin + 1) < 1e-9), "BandRising: 3 above the band's 2, margin -1");
+        assert(noEvent(noRising.y == Property.Violated and abs(noRising.margin + 3) < 1e-9), "NoRising: 3 edges, margin -3");
+      end when;
+      when sample(0, 0.01) then
+        assert(noEvent(not inside or abs(fixedRising.margin + abs(n - 3)) < 1e-9), "FixedRising: the margin is not -|count - nRising|");
+        assert(noEvent(not inside or abs(minRising.margin - (n - 2)) < 1e-9), "MinRising: the margin is not count - nRisingMin");
+        assert(noEvent(not inside or abs(maxRising.margin - (2 - n)) < 1e-9), "MaxRising: the margin is not nRisingMax - count");
+        assert(noEvent(not inside or abs(bandRising.margin - min(n - 1, 2 - n)) < 1e-9), "BandRising: the margin is not min(count - nMin, nMax - count)");
+        assert(noEvent(not inside or abs(noRising.margin + n) < 1e-9), "NoRising: the margin is not -count");
+        assert(noEvent(fixedRising.y <> Property.Satisfied or fixedRising.margin >= 0), "FixedRising: satisfied with a negative margin");
+        assert(noEvent(fixedRising.y <> Property.Violated or fixedRising.margin <= 0), "FixedRising: violated with a positive margin");
+        assert(noEvent(minRising.y <> Property.Satisfied or minRising.margin >= 0), "MinRising: satisfied with a negative margin");
+        assert(noEvent(minRising.y <> Property.Violated or minRising.margin <= 0), "MinRising: violated with a positive margin");
+        assert(noEvent(maxRising.y <> Property.Satisfied or maxRising.margin >= 0), "MaxRising: satisfied with a negative margin");
+        assert(noEvent(maxRising.y <> Property.Violated or maxRising.margin <= 0), "MaxRising: violated with a positive margin");
+        assert(noEvent(bandRising.y <> Property.Satisfied or bandRising.margin >= 0), "BandRising: satisfied with a negative margin");
+        assert(noEvent(bandRising.y <> Property.Violated or bandRising.margin <= 0), "BandRising: violated with a positive margin");
+        assert(noEvent(noRising.y <> Property.Satisfied or noRising.margin >= 0), "NoRising: satisfied with a negative margin");
+        assert(noEvent(noRising.y <> Property.Violated or noRising.margin <= 0), "NoRising: violated with a positive margin");
+      end when;
+      annotation (experiment(StopTime=6, Interval=0.01), Documentation(info="<html>
+<p>One condition phase [1, 5) s with rising edges of the check at 2, 3 and 4 s against
+<code>FixedRising(3)</code>, <code>MinRising(2)</code>, <code>MaxRising(2)</code>, <code>BandRising(1, 2)</code> and
+<code>NoRising</code>, every <code>scale = 1</code> (a count has no other unit). The blocks' <code>countRising</code>
+is an output now and the margins are count differences -- <code>&minus;|count &minus; 3|</code>,
+<code>count &minus; 2</code>, <code>2 &minus; count</code>, <code>min(count &minus; 1, 2 &minus; count)</code>,
+<code>&minus;count</code> -- asserted exactly between the edges. MaxRising turns Violated at the third edge with
+margin &minus;1, BandRising too; FixedRising's margin is 0 when satisfied (an exact count has no headroom);
+MaxRising is Undefined after the phase and its margin is masked then.</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+    end Rising;
+
+    model RisingFrequency "A 2 Hz edge train against MaxRisingFrequency(3 Hz): the margin is 1 Hz once the frequency is known"
+      extends Modelica.Icons.Example;
+      import Requirements.Types.Property;
+      constant Real pi = Modelica.Constants.pi;
+      Requirements.Sources.RealExpression expr1(y=sin(2*pi*2*time))
+        annotation (Placement(transformation(extent={{-90,10},{-50,30}})));
+      Requirements.SignalAnalysis.CrossingMonitoring crossing
+        annotation (Placement(transformation(extent={{-40,10},{-20,30}})));
+      Requirements.Sources.BooleanConstant always
+        annotation (Placement(transformation(extent={{-80,40},{-60,60}})));
+      Requirements.ChecksInFixedWindow.MaxRisingFrequency maxFrequency1(freqHzMax=3, check=crossing.y)
+        annotation (Placement(transformation(extent={{-40,40},{0,60}})));
+    equation
+      connect(expr1.y, crossing.u) annotation (Line(points={{-48,20},{-42,20}}, color={0,0,127}));
+      connect(always.y, maxFrequency1.condition) annotation (Line(points={{-59,50},{-42,50}}, color={255,0,255}));
+      when sample(0, 1e-3) then
+        assert(noEvent(time > 0.9 or abs(maxFrequency1.margin - 3) < 1e-9), "MaxRisingFrequency: before the second edge the frequency is 0, the margin freqHzMax");
+        assert(noEvent(time < 1.2 or abs(maxFrequency1.margin - 1) < 1e-4), "MaxRisingFrequency: the margin is not freqHzMax - 2 Hz");
+        assert(noEvent(maxFrequency1.y <> Property.Satisfied or maxFrequency1.margin >= -1e-6), "MaxRisingFrequency: satisfied with a negative margin");
+        assert(noEvent(maxFrequency1.y <> Property.Violated or maxFrequency1.margin <= 1e-6), "MaxRisingFrequency: violated with a positive margin");
+      end when;
+      annotation (experiment(StopTime=3, Interval=1e-3), Documentation(info="<html>
+<p>The upward zero crossings of a 2 Hz sine (every 0.5 s from t = 0.5 s) against
+<code>MaxRisingFrequency(freqHzMax = 3)</code>: the block's <code>freqHz</code> is 0 until the second rising edge
+at t = 1 s (margin 3, the whole limit) and 2 Hz from then on (margin 1, asserted to 1e-4: the edges are located
+by the solver). Satisfied throughout with one Hz of headroom.</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+    end RisingFrequency;
+
+    model WithinDomain "A point crossing a square: the margin is the signed distance to the nearest edge over scale, in closed form"
+      extends Modelica.Icons.Example;
+      import Requirements.Types.Property;
+      Requirements.ChecksInFixedWindow.WithinDomain withinDomain(polygon=[0,0; 2,0; 2,2; 0,2], scale=0.25)
+        annotation (Placement(transformation(extent={{-20,0},{20,40}})));
+      Requirements.Sources.RealExpression px(y=1)
+        annotation (Placement(transformation(extent={{-90,0},{-50,20}})));
+      Requirements.Sources.RealExpression py(y=0.5 + 0.1*time)
+        annotation (Placement(transformation(extent={{-90,-30},{-50,-10}})));
+      Requirements.Sources.BooleanConstant always
+        annotation (Placement(transformation(extent={{-60,30},{-40,50}})));
+    equation
+      connect(px.y, withinDomain.point[1]) annotation (Line(points={{-48,10},{-22,10}}, color={0,0,127}));
+      connect(py.y, withinDomain.point[2]) annotation (Line(points={{-48,-20},{-30,-20},{-30,10},{-22,10}}, color={0,0,127}));
+      connect(always.y, withinDomain.condition) annotation (Line(points={{-39,40},{-30,40},{-30,20.1},{-22,20.1}}, color={255,0,255}));
+      when time >= 5 then
+        assert(noEvent(abs(withinDomain.margin - 4) < 1e-6), "WithinDomain: at t = 5 s the point is 1 from every edge, four tolerances");
+      end when;
+      when sample(0, 0.01) then
+        assert(noEvent(abs(withinDomain.margin - min(0.5 + 0.1*time, 1.5 - 0.1*time)/0.25) < 1e-6), "WithinDomain: the margin is not distance/scale");
+        assert(noEvent(withinDomain.y == Property.Satisfied and withinDomain.margin >= 0), "WithinDomain: the point stays inside");
+      end when;
+      annotation (experiment(StopTime=10, Interval=0.01), Documentation(info="<html>
+<p>The point (1, 0.5 + 0.1 t) moves up through the square [0, 2] &times; [0, 2] against
+<code>WithinDomain(scale = 0.25)</code>: the block's <code>distance</code> to the nearest edge is
+<code>min(0.5 + 0.1 t, 1.5 &minus; 0.1 t)</code> (the bottom edge, then the top one) and the margin is that over
+0.25, asserted in closed form; the farthest point from any edge is the centre at t = 5 s, four tolerances away.</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+    end WithinDomain;
+
+    model SlidingIncrease "A ramp against MaxIncrease: the margin is upperLimit - increase, with increase = min(t, window) in closed form"
+      extends Modelica.Icons.Example;
+      Modelica.Blocks.Sources.Ramp u(height=10, duration=10, offset=20) "u = 20 + t"
+        annotation (Placement(transformation(extent={{-80,60},{-60,80}})));
+      Requirements.ChecksInSlidingWindow.MaxIncrease maxIncrease(window=2, upperLimit=3)
+        annotation (Placement(transformation(extent={{-44,60},{-24,80}})));
+    equation
+      connect(u.y, maxIncrease.u) annotation (Line(points={{-59,70},{-46,70}}, color={0,0,127}));
+      when sample(0, 0.01) then
+        assert(noEvent(abs(maxIncrease.margin - (3 - min(time, 2))) < 1e-3), "MaxIncrease: the margin is not upperLimit - increase");
+        assert(noEvent(not maxIncrease.y or maxIncrease.margin >= -1e-6), "MaxIncrease: satisfied with a negative margin");
+        assert(noEvent(maxIncrease.y or maxIncrease.margin <= 1e-6), "MaxIncrease: violated with a positive margin");
+      end when;
+      annotation (experiment(StopTime=5, Interval=0.01), Documentation(info="<html>
+<p>A ramp of 1 per second against <code>MaxIncrease(window = 2, upperLimit = 3)</code>: the increase over the
+window is <code>t</code> while the window still reaches back to the start (u(t &minus; window) = u(0) there) and
+2 from t = 2 s on, so the margin is <code>3 &minus; min(t, 2)</code>, asserted to 1e-3 (the delayed signal is
+interpolated). Satisfied throughout with one unit of headroom. The sliding-window checks with a buffer
+(<code>SlidingWindow.push</code>) carry the same <code>margin</code> output; this example uses the one block of
+the family OpenModelica builds.</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+    end SlidingIncrease;
+
+    model FFT "WithinAbsoluteDomain with a scale: the margin is scaledDistance/scale and agrees in sign with the verdict"
+      extends Modelica.Icons.Example;
+      import Requirements.Types.Property;
+      Requirements.ChecksInFixedWindow_withFFT.WithinAbsoluteDomain fft(
+        f_max=4,
+        f_resolution=0.2,
+        maxAmplitude=[0,6; 1,6; 2,4; 3,1.5; 4,1.5],
+        scale=0.5)
+        annotation (Placement(transformation(extent={{8,0},{68,60}})));
+      Modelica.Blocks.Sources.Sine sine2(amplitude=3, f=2)
+        annotation (Placement(transformation(extent={{-80,0},{-60,20}})));
+      Modelica.Blocks.Sources.Sine sine3(amplitude=1.5, f=3)
+        annotation (Placement(transformation(extent={{-80,-40},{-60,-20}})));
+      Modelica.Blocks.Sources.Constant const(k=5)
+        annotation (Placement(transformation(extent={{-80,40},{-60,60}})));
+      Modelica.Blocks.Math.MultiSum multiSum(nu=3)
+        annotation (Placement(transformation(extent={{-36,24},{-24,36}})));
+      Requirements.Sources.BooleanConstant const1
+        annotation (Placement(transformation(extent={{-40,60},{-20,80}})));
+    equation
+      connect(const.y, multiSum.u[1]) annotation (Line(points={{-59,50},{-48,50},{-48,32.8},{-36,32.8}}, color={0,0,127}));
+      connect(sine2.y, multiSum.u[2]) annotation (Line(points={{-59,10},{-48,10},{-48,30},{-36,30}}, color={0,0,127}));
+      connect(sine3.y, multiSum.u[3]) annotation (Line(points={{-59,-30},{-46,-30},{-46,27.2},{-36,27.2}}, color={0,0,127}));
+      connect(multiSum.y, fft.u) annotation (Line(points={{-22.98,30},{6,30}}, color={0,0,127}));
+      connect(const1.y, fft.condition) annotation (Line(points={{-19,70},{-10,70},{-10,50},{6,50}}, color={255,0,255}));
+      when time >= 5.5 then
+        assert(noEvent(fft.y == Property.Satisfied and fft.margin > 0), "FFT: the spectrum is within the limit, the margin positive");
+      end when;
+      when sample(0, 0.01) then
+        assert(noEvent(abs(fft.margin - fft.scaledDistance/0.5) < 1e-12), "FFT: the margin is not scaledDistance/scale");
+        assert(noEvent(fft.y <> Property.Satisfied or fft.margin >= 0), "FFT: satisfied with a negative margin");
+        assert(noEvent(fft.y <> Property.Violated or fft.margin <= 0), "FFT: violated with a positive margin");
+      end when;
+      annotation (experiment(StopTime=6), Documentation(info="<html>
+<p>The stimulus of <a href=\"modelica://Requirements.Examples.Elementary.ChecksInFixedWindow_withFFT.WithinAbsoluteDomain1\">WithinAbsoluteDomain1</a>
+(5 + 3 sin 2 Hz + 1.5 sin 3 Hz against the limit polygon) with <code>scale = 0.5</code> and without the terminate
+block: the FFT completes at t = 4.975 s, the property is Satisfied and the margin is <code>scaledDistance/scale</code>,
+positive -- the FFT blocks' <code>scaledDistance</code> is their robustness (kept, ModCheck plan section 9 (f)). The
+value itself is not closed-form (leakage); it is the stored reference of this example in the regression lists.
+OpenModelica does not build the FFT checks; the example runs on Dymola and Modelon Impact.</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+    end FFT;
+    annotation (Documentation(info="<html>
+<p>Every check block of the library carries a <code>margin</code> output since version 0.9.0 (ModCheck plan
+section 18.5): the signed distance of the check to its limit divided by the block's <code>scale</code> (the
+requirement's tolerance), &ge; 0 exactly when the check holds. These examples assert the margins against
+closed-form values at every instant and the sign invariant (satisfied &hArr; margin &ge; 0) continuously, one
+example per block family; each is a case in the regression lists beside this library, with the margins stored.</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+  end Margin;
   annotation (Documentation(info="<html>
 <p>
 This package contains example models to demonstrate all components of library
