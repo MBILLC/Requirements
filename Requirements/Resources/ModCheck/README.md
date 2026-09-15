@@ -13,8 +13,8 @@ the two baselines share `ReferenceResults/` under different case-name prefixes.
 |---|---|---|---|---|
 | `regression_cases_requirements.yaml` | Dymola 2026x, Cvode | 68 | 60 | 8 refused by the Dymola license ("too complex for the current license"), reported SKIPPED |
 | `regression_cases_requirements_openmodelica.yaml` | OpenModelica 1.27.1, cvode | 68 | 48 | 20 do not build in omc — disabled with omc's words: the `SlidingWindow.push()` buffer record (14), the FFT checks (6). Two more (`CheckMotorWithLosses`, `CheckPumpingSystem`) were unblocked on 2026-09-14, `DEVMI_DIFFERENCES.md` §5 |
-| `Impact/regression_cases_requirements_impact.yaml` | Modelon Impact (Sept. 2026), cvode | 68 | — | runs against the composite reference in `Impact/ReferenceResults/`: Dymola's 60 references plus OpenModelica's for the three cases Dymola's license refuses and omc builds (`LimitedCabinAltitudeRateOfChange`, `CheckMotorWithLosses`, `CheckPumpingSystem`); 5 cases have no reference from either tool and are reported SKIPPED |
-| `Impact/ImpactOnly/regression_cases_requirements_impact_only.yaml` | Modelon Impact (Sept. 2026), cvode | 5 | 5 | the five cases above with no Dymola or OpenModelica reference (`MainPowerSupplyRequirements`, four FFT examples), checked against Impact's own stored result in `Impact/ImpactOnly/ReferenceResults/`: 63/63 at the 100× spread |
+| `Impact/regression_cases_requirements_impact.yaml` | Modelon Impact (Sept. 2026), cvode | 68 | — | runs against the composite reference in `Impact/ReferenceResults/`: Dymola's 60 references plus OpenModelica's for the three cases Dymola's license refuses and omc builds (`LimitedCabinAltitudeRateOfChange`, `CheckMotorWithLosses`, `CheckPumpingSystem`) plus, since 2026-09-15, Impact's own references for the 5 cases neither tool can produce (`reference_from: impact` in the manifest), so no case is SKIPPED any more |
+| `Impact/ImpactOnly/regression_cases_requirements_impact_only.yaml` | Modelon Impact (Sept. 2026), cvode | 5 | 5 | the five cases above with no Dymola or OpenModelica reference (`MainPowerSupplyRequirements`, four FFT examples), checked against Impact's own stored result in `Impact/ImpactOnly/ReferenceResults/`: 63/63 at the 100× spread. Kept as the historical record; the composite list now carries the same five with Impact's own references |
 
 Both suites pass at ModCheck's 100× rtol spread. One case is hand-tuned in
 each list — `SimplePumpingSystem.Components.PumpingSystem`, an on-off pressure
@@ -22,6 +22,14 @@ controller over 2000 s whose switching instants move with tolerance; its relay
 signals are checked by accumulated |difference| at a measured tolerance.
 
 ## Modelon Impact
+
+**Impact as its own reference, 2026-09-15 (evening).** The five cases the composite suite reported
+"not run here" -- `MainPowerSupplyRequirements` and the four FFT examples above Dymola's license cap,
+which OpenModelica does not build -- now have Impact's own references in `Impact/ReferenceResults/`
+(`--store --case` on the composite list, `reference_from: impact` in the manifest): the composite
+report has no SKIPPED card any more, every case of the list has a reference, and the full suite
+afterwards passes **434/434** at the 100× spread with 0 skipped. Impact is a sound baseline
+for these: its results matched the Dymola references exactly on every case both could run (below).
 
 The fork's library (upstream's sliding-window refactor, `uses Modelica 4.1.0`)
 imports into an Impact workspace as a project and its sliding-window examples
