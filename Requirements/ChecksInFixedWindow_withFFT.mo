@@ -17,7 +17,7 @@ package ChecksInFixedWindow_withFFT
   equation
     when {iTick == ns, terminal() and time < nextTime} then
        fA_plot             = Internal.amplitudeFrequencyCurveForIcon(A_buf,A_max_plot);
-       (y, scaledDistance) = Internal.checkDomain(A_buf, f_max_plot, maxAmplitude, periods_ok);
+       (yFFT, scaledDistance) = Internal.checkDomain(A_buf, f_max_plot, maxAmplitude, periods_ok);
     end when;
 
     annotation (defaultComponentName="fft_absoluteDomain1",Diagram(coordinateSystem(preserveAspectRatio=false,
@@ -253,7 +253,7 @@ As can be seen, the first FFT fulfills the check (scaledDistance = 0), whereas t
     // Dymola and OpenModelica give identical results in every form.
     when {iTick == ns, terminal() and time < nextTime} then
        (f_base2, A_base2, maxAmplitude2, A_max_plot, A_max_plot_perCent, maxAmplitudePlot,
-        f_base2_line, fA_plot, y, scaledDistance) = Internal.checkRelativeDomain(
+        f_base2_line, fA_plot, yFFT, scaledDistance) = Internal.checkRelativeDomain(
            A_buf, f_resolution, f_base, searchInterval, maxAmplitude, f_max_plot, periods_ok);
     end when;
 
@@ -524,7 +524,7 @@ As can be seen, the first FFT fulfills the check (scaledDistance = 0), whereas t
     // problem: its inputs come only from other when-clauses and parameters.
     // Dymola and OpenModelica give identical results in every form.
     when {iTick == ns, terminal() and time < nextTime} then
-       (f_base2, A_base2, index_base2, A_max_plot, f_base2_line, fA_plot, THD, scaledDistance, y) =
+       (f_base2, A_base2, index_base2, A_max_plot, f_base2_line, fA_plot, THD, scaledDistance, yFFT) =
           Internal.checkTHD(A_buf, f_resolution, f_base, searchInterval, n_harmonics, THDmax, f_max_plot, periods_ok);
     end when;
 
@@ -830,16 +830,24 @@ As can be seen, the first FFT fulfills the check (THD &lt; THDmax), whereas the 
         Boolean startFFT
         "First time instant where u shall be stored in buffer for FFT computation";
         Integer fileIndex "Index of file name (= i-th FFT calculation)";
+        Requirements.Types.Property yFFT
+        "Property of the last computed FFT (= y once an FFT has been computed)";
       initial equation
         pre(condition)  = false;
         pre(Tstart)     = time - 1;
         pre(nextTime)   = time - 1;
         pre(iTick)      = -1;
         pre(periods_ok) = true;
-        y               = Property.Undecided;
+        yFFT            = Property.Undefined;
         scaledDistance  = 1;
         fileIndex       = 0;
       equation
+        // Undefined (not applicable) before the first rising edge of condition,
+        // Undecided while the first buffer is being filled, then the verdict of
+        // the last computed FFT (fileIndex counts the FFT computations).
+        y = if fileIndex > 0 then yFFT else
+            (if iTick >= 1 then Property.Undecided else Property.Undefined);
+
         // Remove previous result files
         when initial() then
            Internal.removeFFTresultFiles(resultDirectory);
@@ -1703,12 +1711,13 @@ All blocks of this library have the following interfaces:
     
 <li> <a href=\"modelica://Requirements.Types.Property\">Property</a> output <b>y</b>:
      If the check is successful, y = Property.Satisfied. If the check fails,
-     y = Property.Violated. If neither of the two properties hold
-     (for example before the first rising edge of input condition), y = Property.Undecided.</li>
+     y = Property.Violated. Before the first rising edge of input condition,
+     y = Property.Undefined (the check is not applicable yet); from that edge until the first
+     FFT has been computed, and when the FFT covered too few periods, y = Property.Undecided.</li>
      
 <li> Real output <b>scaledDistance</b>: The (scaled) \"distance\" between the FFT
      and its allowed domain.<br>
-     If y = Property.Undecided, scaledDistance = 1.<br>
+     If y = Property.Undecided or Property.Undefined, scaledDistance = 1.<br>
      If y = Property.Satisfied, scaledDistance &ge; 0.<br>
      If y = Property.Violated, scaledDistance &lt; 0.<br>
      This signal can be used for example to formulate a constraint in 

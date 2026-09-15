@@ -1850,7 +1850,10 @@ All blocks of this library have the following interface:
      <a href=\"modelica://Requirements.Types.Property\">Property</a>.
      If the check is successful, y = Property.Satisfied. If the check fails,
      y = Property.Violated. If neither of the two properties hold
-     (for example when condition = false), y = Property.Undecided.<br>
+     (the first sliding window is not yet complete), y = Property.Undecided.
+     The sliding-window blocks have no condition input, so they never emit Property.Undefined
+     (not applicable); combine them with <a href=\"modelica://Requirements.LogicalFunctions.during3\">during3</a>
+     to restrict them to a condition.<br>
      If Property.Undecided cannot occur, output y is a Boolean instead of a Property.</li>
 </ul>
 <p></p>

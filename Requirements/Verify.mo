@@ -81,8 +81,8 @@ into your model.
 <p>
 Block PrintViolations has to be dragged in the top-level of the model, where components of
 library Requirements are used. This block provides the file name, to which the Requirement
-blocks write their status at the end of the simulation (whether a Requirement is Violated
-or Untested). Furthermore, the PrintViolations block reads this log-file at the end of
+blocks write their status at the end of the simulation (whether a Requirement is Violated,
+Untested or Satisfied, and in how many attempts, i.e. phases in which its property was applicable). Furthermore, the PrintViolations block reads this log-file at the end of
 the simulation and prints a summary to the output window.
 </p>
 
@@ -149,11 +149,13 @@ kind of tool once <code>useEvaluationTime</code> is switched on; with the defaul
       Documentation(info="<html>
 <p>
 This block is used to verify a requirement. The input signal \"property\" can have the
-three values Violated, Undecided, or Satisfied
+four values Violated, Undecided, Satisfied or Undefined
 (= elements of enumeration
 <a href=\"modelica://Requirements.Types.Property\">Property</a>).
-A requirement is violated, if property = Violated, it is untested, if property = Undecided,
-and it is satisfied, if property = Satisfied. If a required property is naturally 
+A requirement is violated, if property = Violated at any instant; it is untested, if property was
+Undecided (applicable, not decided) or Undefined (not applicable) all the time; and it is satisfied
+otherwise. The number of <em>attempts</em> (phases in which the property was not Undefined) is
+logged beside the verdict. If a required property is naturally 
 defined as Boolean, use block 
 <a href=\"modelica://Requirements.Verify.BooleanRequirement\">BooleanRequirement</a>
 instead.

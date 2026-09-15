@@ -6,7 +6,7 @@ package Internal "Library of internal components (should not be directly used)"
 
      Real dummy1 annotation(HideResult=true);
      Real dummy2 annotation(HideResult=true);
-     flow Real status "Return 0 (Violated), 1 (Undecided), ... 2 (Satisfied)" annotation(HideResult=true);
+     flow Real status "Return 0 (Violated), 1 (Untested), ... 2 (Satisfied)" annotation(HideResult=true);
      flow Real one "Return 1 (to calculate number of requirement blocks"  annotation(HideResult=true);
   end SortingPort;
 
@@ -38,25 +38,31 @@ package Internal "Library of internal components (should not be directly used)"
       "= true, if requirement is untested, otherwise requirement is tested and satisfied";
     input Modelica.Units.SI.Time firstFailureTime
       "Time instant of first failure (if atLeastOneFailure=true)";
+     input Integer attempts = 1
+      "Number of phases in which the property was applicable (not Undefined)";
      output Real ok "Dummy variable needed for sorting";
   protected
      String text = Modelica.Utilities.Strings.replace(requirementText,"\n"," ");
   algorithm
+     // One line per requirement: <verdict>,<observation>,<requirement>[,<first failure time>],<attempts>,<text>
      if atLeastOneFailure then
         print("Violated," + checkedComponentName +
               "," + requirementName +
               "," + String(firstFailureTime) +
+              "," + String(attempts) +
               "," + text,
               logFile);
 
      elseif untested then
         print("Untested," + checkedComponentName +
               "," + requirementName +
+              "," + String(attempts) +
               "," + text,
               logFile);
      else
         print("Satisfied," + checkedComponentName +
               "," + requirementName +
+              "," + String(attempts) +
               "," + text,
               logFile);
      end if;
@@ -97,6 +103,7 @@ package Internal "Library of internal components (should not be directly used)"
      String reqName;
      String reqTime;
      String reqText;
+     String attempts;
      Integer nViolated=0;
      Integer nUntested=0;
      Integer nSatisfied=0;
@@ -168,20 +175,22 @@ package Internal "Library of internal components (should not be directly used)"
                  "    <td>Observation</td>\n" +
                  "    <td>Requirement</td>\n" +
                  "    <td align=\"right\">First violation at</td>\n"+
+                 "    <td align=\"right\">Attempts</td>\n"+
                  "    <td>Description</td>\n" +
                  "    </tr>", htmlFile);
 
            for i in 1:nViolated loop
-              (instance,reqName,reqText,reqTime) :=getElements(violated[i], true);
+              (instance,reqName,reqText,reqTime,attempts) :=getElements(violated[i], true);
               print("<tr><td>" + instance + "</td>\n" +
                     "    <td>" + reqName  + "</td>\n" +
                     "    <td align=\"right\">" + reqTime + " s</td>\n" +
+                    "    <td align=\"right\">" + attempts + "</td>\n" +
                     "    <td>" + reqText  + "</td>\n" +
                     "    </tr>", htmlFile);
               if reqText<>"" then
                  reqText :=": " + reqText;
               end if;
-              print("   " + instance + " (" + reqName + " first violation at " + reqTime + " s" + ")" + reqText);
+              print("   " + instance + " (" + reqName + " first violation at " + reqTime + " s, " + attempts + " attempts)" + reqText);
            end for;
            print("</table>", htmlFile);
         end if;
@@ -202,20 +211,22 @@ package Internal "Library of internal components (should not be directly used)"
                  "<tr style=\"background-color:rgb(230, 230, 230);\">\n" +
                  "    <td>Observation</td>\n" +
                  "    <td>Requirement</td>\n" +
+                 "    <td align=\"right\">Attempts</td>\n" +
                  "    <td>Description</td>\n" +
                  "    </tr>", htmlFile);
 
            for i in 1:nUntested loop
-              (instance,reqName,reqText) :=getElements(untested[i], false);
+              (instance,reqName,reqText,reqTime,attempts) :=getElements(untested[i], false);
               print("<tr><td>" + instance + "</td>\n" +
                     "    <td>" + reqName  + "</td>\n" +
+                    "    <td align=\"right\">" + attempts + "</td>\n" +
                     "    <td>" + reqText  + "</td>\n" +
                     "    </tr>", htmlFile);
 
               if reqText<>"" then
                  reqText :=": " + reqText;
               end if;
-              print("   " + instance + " (" + reqName + ")" + reqText);
+              print("   " + instance + " (" + reqName + ", " + attempts + " attempts)" + reqText);
            end for;
            print("</table>", htmlFile);
         end if;
@@ -236,19 +247,21 @@ package Internal "Library of internal components (should not be directly used)"
                  "<tr style=\"background-color:rgb(230, 230, 230);\">\n" +
                  "    <td>Observation</td>\n" +
                  "    <td>Requirement</td>\n" +
+                 "    <td align=\"right\">Attempts</td>\n" +
                  "    <td>Description</td>\n" +
                  "    </tr>", htmlFile);
 
-             for i in 1:nSatisfied loop
-              (instance,reqName,reqText) :=getElements(satisfied[i], false);
+           for i in 1:nSatisfied loop
+              (instance,reqName,reqText,reqTime,attempts) :=getElements(satisfied[i], false);
               print("<tr><td>" + instance + "</td>\n" +
                     "    <td>" + reqName  + "</td>\n" +
+                    "    <td align=\"right\">" + attempts + "</td>\n" +
                     "    <td>" + reqText  + "</td>\n" +
                     "    </tr>", htmlFile);
               if reqText<>"" then
                  reqText :=": " + reqText;
               end if;
-              print("   " + instance + " (" + reqName + ")" + reqText);
+              print("   " + instance + " (" + reqName + ", " + attempts + " attempts)" + reqText);
            end for;
            print("</table>", htmlFile);
         end if;
@@ -339,6 +352,7 @@ package Internal "Library of internal components (should not be directly used)"
     output String requirementText "Text of requirement";
     output String firstFailureTime
       "Time instant of first failure (if violated=true; otherwise dummy";
+    output String attempts "Number of phases in which the property was applicable";
   protected
      String line2;
      String reqFullName;
@@ -352,6 +366,7 @@ package Internal "Library of internal components (should not be directly used)"
      else
         firstFailureTime:="???";
      end if;
+     (attempts, line2) :=removeFirstElement(line2);
      requirementText :=line2;
 
      // Remove first two names from reqFullName

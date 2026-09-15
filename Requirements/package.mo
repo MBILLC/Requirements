@@ -1,5 +1,5 @@
 within ;
-package Requirements "Requirements (Version 0.7.1) - Defining requirements formally and checking them when simulating"
+package Requirements "Requirements (Version 0.8.0) - Defining requirements formally and checking them when simulating"
   extends Modelica.Icons.Package;
 
 
@@ -8,6 +8,93 @@ package UsersGuide "User's Guide"
 
 package ReleaseNotes "Release notes"
   extends Modelica.Icons.ReleaseNotes;
+
+  class Version_0_8_0 "Version 0.8.0 (Sept. 15, 2026)"
+  extends Modelica.Icons.ReleaseNotes;
+
+    annotation (Documentation(info="<html>
+<p>
+<b>Four-valued logic.</b> <a href=\"modelica://Requirements.Types.Property\">Types.Property</a> gains a
+fourth value, <code>Undefined</code>: the property is <em>not applicable</em> (its condition, time locator
+or scope is false, or the component it is stated for is absent), as distinct from <code>Undecided</code>,
+which now means <em>applicable but not yet decided</em> (a duration not yet reached, a count still below
+its minimum, a sliding window not yet full, an FFT with too few periods). The operators follow the
+extended temporal logic (ETL) of EDF's ReqSysPro and the CRML language: Undefined is the neutral element
+of <em>and</em> and <em>or</em>, so a check that is outside its period, or a component to which a
+requirement does not apply, drops out of a combination instead of holding it Undecided. This is a change
+of requirement semantics; the library's version is raised accordingly.
+</p>
+
+<h4>Changes</h4>
+<ul>
+<li> <code>Types.Property = enumeration(Violated, Undecided, Satisfied, Undefined)</code>. Undefined is
+     <b>appended</b> (Integer value 4): the values 1, 2, 3 of every stored result stay valid, and a consumer
+     that knows three values fails on a 4 instead of misreading it. <code>Types.Boolean4</code> is CRML's
+     name for the same type. The value order carries no meaning (the algebra has two different orders);
+     a combination is never a <code>min</code> or <code>max</code> over the values.</li>
+
+<li> <a href=\"modelica://Requirements.LogicalFunctions\">LogicalFunctions</a>: <code>and4</code>,
+     <code>or4</code>, <code>not4</code> (the 16-entry tables, transcribed from the CRML specification),
+     <code>and4All</code>, <code>or4All</code> (the folds over a vector, seeded with Undefined; the empty
+     vector gives Undefined) and <code>cardUndefined</code>. <code>forall3</code> is superseded by
+     <code>and4All</code> and delegates to it for a non-empty vector. <code>IntegerToProperty</code>
+     accepts 4; <code>during</code> and <code>during3</code> return Undefined, not Undecided, while their
+     condition is false.</li>
+
+<li> <a href=\"modelica://Requirements.LogicalBlocks\">LogicalBlocks</a>: <code>PropertyAnd</code>,
+     <code>PropertyOr</code> and <code>PropertyNot</code> delegate to the functions; an unconnected
+     PropertyAnd / PropertyOr (<code>nu = 0</code>) is Undefined, the neutral element (was Satisfied /
+     Violated). <code>PropertyToBoolean</code> gains <code>parameter Boolean undefined = false</code>
+     beside <code>undecided</code>. <code>IntegerToProperty</code> accepts 4; <code>Sources.PropertyConstant</code>
+     offers the fourth literal and <code>Sources.PropertyTable</code> accepts 4 in its table.</li>
+
+<li> <b>Every check block of <a href=\"modelica://Requirements.ChecksInFixedWindow\">ChecksInFixedWindow</a>
+     emits Undefined while its condition is false</b>, and before the first true condition phase (the
+     value was Undecided): <code>During</code>, <code>WithinDomain</code>, <code>WhenRising</code>,
+     <code>WhenFalling</code>, <code>WhenChanging</code>, <code>MaxRising</code>,
+     <code>MaxRisingFrequency</code> outside the phase; the initial value of <code>MinDuration</code>,
+     <code>MaxDuration</code>, <code>BandDuration</code>, <code>NoRising</code>, <code>FixedRising</code>,
+     <code>MinRising</code>, <code>BandRising</code> when the condition is false at initialization. Inside a
+     true condition phase Undecided keeps its meaning (not yet decidable), and a block that decides at the
+     end of a phase keeps that verdict on its output after the phase, as before. The FFT checks
+     (<a href=\"modelica://Requirements.ChecksInFixedWindow_withFFT\">ChecksInFixedWindow_withFFT</a>) are
+     Undefined before the first rising edge of their condition and Undecided from that edge until the first
+     FFT is computed (the output is now an equation over the internal <code>yFFT</code> and the FFT counter,
+     no longer assigned in the when-clause; the blocks' results at and after the FFT instants are unchanged).
+     The sliding-window checks have no condition input and never emit Undefined.</li>
+
+<li> <a href=\"modelica://Requirements.Verify.Requirement\">Verify.Requirement</a> (through
+     <a href=\"modelica://Requirements.Interfaces.PartialRequirement\">PartialRequirement</a>) and
+     <a href=\"modelica://Requirements.Verify.PrintViolations\">PrintViolations</a> collapse the four values to
+     the three verdicts: a property that was Undefined or Undecided throughout is <em>untested</em>; the
+     <code>status</code> stays 0 / 1 / 2 and the satisfaction percentage is unchanged. New beside every
+     verdict: <b>attempts</b>, the number of phases in which the property was applicable (not Undefined);
+     an untested requirement with 0 attempts was never applicable, one with attempts &gt; 0 was applicable
+     but never decided. The log file gains the attempts as a column before the text
+     (<code>Violated,&lt;observation&gt;,&lt;requirement&gt;,&lt;first failure time&gt;,&lt;attempts&gt;,&lt;text&gt;</code>;
+     <code>Untested,...,&lt;attempts&gt;,&lt;text&gt;</code>), the printed summary and the HTML log show them.</li>
+
+<li> <a href=\"modelica://Requirements.Examples.Elementary.LogicalBlocks.PropertyTable4\">Examples.Elementary.LogicalBlocks.PropertyTable4</a>
+     asserts every entry of the three tables through the blocks (all 16 pairs over 16 s) and the functions,
+     the laws that hold (commutativity, associativity, involution, De Morgan), and the laws that <b>fail</b>
+     with counterexamples: absorption (12 of 64 triples) and distributivity (6 of 64) fail wherever
+     Undefined is involved, in addition to the complements law the CRML paper acknowledges. The algebra is
+     not a lattice; <b>an expression over Property values must never be simplified</b> by Boolean rewriting.</li>
+
+<li> <code>conversion(noneFromVersion=\"0.7.1\")</code>: no model needs conversion. A model that reads a
+     stored Property result as three values must be updated to accept 4.</li>
+</ul>
+
+<h4>Effect on the examples' results</h4>
+<p>
+Wherever a check block's condition is false, its output moves from Undecided (2) to Undefined (4); the
+Satisfied and Violated phases, and the Undecided phases inside a true condition, are unchanged, and so
+is every verdict printed by PrintViolations. The regression baselines beside this library
+(<code>Resources/ModCheck</code>) were re-established on OpenModelica, Dymola and Modelon Impact for this
+version, with the changed references explained as Undecided &rarr; Undefined.
+</p>
+</html>"));
+  end Version_0_8_0;
 
   class Version_0_7_1 "Version 0.7.1 (Sept. 14, 2026)"
   extends Modelica.Icons.ReleaseNotes;
@@ -288,9 +375,10 @@ end UsersGuide;
 
   annotation (preferredView="info",
   uses(Modelica(version="4.1.0")),
-version="0.7.1",
-versionDate="2026-09-14",
-dateModified = "2026-09-14",
+version="0.8.0",
+versionDate="2026-09-15",
+dateModified = "2026-09-15",
+conversion(noneFromVersion="0.7.1"),
 revisionId="$Id:: package.mo 9390 2016-06-21 06:35:11Z #$",
 Documentation(info="<html>
 <p>
@@ -302,12 +390,17 @@ when a model is simulated. An overview of this library is given in the publicati
 
 <p>
 In order to define properties and requirements mostly a 2-valued logic is used.
-There are some functions and blocks based on 3-valued logic using type
-<a href=\"modelica://Requirements.Types.Property\">Property</a>, especially
+There are some functions and blocks based on 4-valued logic using type
+<a href=\"modelica://Requirements.Types.Property\">Property</a>
+(Violated, Undecided, Satisfied, Undefined; since version 0.8.0, with the extended temporal
+logic of EDF's ReqSysPro / CRML), especially
 block <a href=\"modelica://Requirements.Verify.Requirement\">Requirement</a>.
-Furthermore, there are cast-operators to map 2-valued to 3-valued logic and vice versa.
-3-valued logic is used to define (a) if a property is not tested (because only relevant
-in a certain situation) and (b) if a requirement was not tested in a simulation run.
+Furthermore, there are cast-operators to map 2-valued to 4-valued logic and vice versa.
+4-valued logic is used to define (a) if a property is not applicable (Undefined: only relevant
+in a certain situation, and outside it), (b) if a property is applicable but not yet decided
+(Undecided) and (c) if a requirement was not tested in a simulation run. The four values
+combine with <code>and4</code> / <code>or4</code> / <code>not4</code>, where Undefined is the
+neutral element; the algebra is not a lattice and Property expressions are never simplified.
 </p>
 
 <p>

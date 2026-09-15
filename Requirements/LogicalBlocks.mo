@@ -59,18 +59,18 @@ This block is demonstrated with example
   end BooleanToProperty;
 
   block IntegerToProperty
-    "Convert Integer (1,2,3) to Property (Violated, Undecided, Satisfied)"
+    "Convert Integer (1,2,3,4) to Property (Violated, Undecided, Satisfied, Undefined)"
     import Requirements.Types.Property;
     extends Interfaces.PartialConversion;
     Modelica.Blocks.Interfaces.IntegerInput u
-      "Integer input signal (with only values 1,2,3)"
+      "Integer input signal (with only values 1,2,3,4)"
       annotation (Placement(transformation(extent={{-90,-20},{-50,20}})));
     Requirements.Interfaces.PropertyOutput y "Property output signal"
       annotation (Placement(transformation(extent={{50,-10},{70,10}})));
   equation
-    assert(u>=1 and u<=3, "Integer input u (=" + String(u) + ") cannot be converted to Property output (u = 1, 2 or 3 required)");
-    y = if u == 3 then Property.Satisfied else
-        (if u == 2 then Property.Undecided else Property.Violated);
+    assert(u>=1 and u<=4, "Integer input u (=" + String(u) + ") cannot be converted to Property output (u = 1, 2, 3 or 4 required)");
+    y = if u == 4 then Property.Undefined else (if u == 3 then Property.Satisfied else
+        (if u == 2 then Property.Undecided else Property.Violated));
     annotation (defaultComponentName="ItoP1",Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},
               {100,100}},
           grid={1,1}),     graphics={Text(
@@ -124,9 +124,11 @@ This block is demonstrated with example
   end IntegerToProperty;
 
   block PropertyToBoolean
-    "Convert  Property (Violated, Undecided, Satisfied) to Boolean (false, true)"
+    "Convert  Property (Violated, Undecided, Satisfied, Undefined) to Boolean (false, true)"
     import Requirements.Types.Property;
     parameter Boolean undecided=false "Boolean value of Property.Undecided"
+                                            annotation(choices(checkBox=true));
+    parameter Boolean undefined=false "Boolean value of Property.Undefined (not applicable)"
                                             annotation(choices(checkBox=true));
     Requirements.Interfaces.PropertyInput u "Property input signal"
       annotation (Placement(transformation(extent={{-140,-20},{-100,20}})));
@@ -134,7 +136,8 @@ This block is demonstrated with example
       annotation (Placement(transformation(extent={{100,-10},{120,10}})));
   equation
     y = if u == Property.Satisfied then true else
-       (if u == Property.Undecided then undecided else false);
+       (if u == Property.Undecided then undecided else
+       (if u == Property.Undefined then undefined else false));
 
     annotation (defaultComponentName="PtoB1",Diagram(coordinateSystem(
           preserveAspectRatio=false,
@@ -175,8 +178,8 @@ This block is demonstrated with example
       Documentation(info="<html>
 <p>
 The Property input u is converted to a Boolean output y according to the following table
-(note, <b>undecided</b> is a parameter that defines, how a Property.Undecided value
-shall be mapped to a Boolean):
+(note, <b>undecided</b> and <b>undefined</b> are parameters that define, how a Property.Undecided
+and a Property.Undefined value shall be mapped to a Boolean; both default to false):
 </p>
 
 <blockquote>
@@ -204,7 +207,7 @@ This block is demonstrated with example
   end PropertyToBoolean;
 
   block PropertyToInteger
-    "Convert Property (Violated, Undecided, Satisfied) to Integer (1,2,3)"
+    "Convert Property (Violated, Undecided, Satisfied, Undefined) to Integer (1,2,3,4)"
     import Requirements.Types.Property;
     extends Interfaces.PartialConversion;
     Requirements.Interfaces.PropertyInput u "Property input signal"
@@ -701,7 +704,7 @@ This block is similar to block <a href=\"modelica://Modelica.Blocks.MathBoolean.
 </html>"));
   end AllTrue;
 
-  block PropertyNot "3-valued logic 'not' of Property input u: y = not u"
+  block PropertyNot "4-valued logic 'not' of Property input u: y = not4(u)"
     import Requirements.Types.Property;
 
     Requirements.Interfaces.PropertyInput u "Property input signal" annotation (Placement(transformation(extent={{-90,-20},{-50,20}})));
@@ -710,8 +713,7 @@ This block is similar to block <a href=\"modelica://Modelica.Blocks.MathBoolean.
       "Property output signal y = not u"
       annotation (Placement(transformation(extent={{50,-10},{70,10}})));
   equation
-    y = if u == Property.Satisfied then Property.Violated elseif
-           u == Property.Violated  then Property.Satisfied else Property.Undecided;
+    y = Requirements.LogicalFunctions.not4(u);
 
     annotation (defaultComponentName="not1", Icon(coordinateSystem(
           preserveAspectRatio=false,
@@ -744,8 +746,9 @@ y = <b>not</b> u
 </pre></blockquote>
 
 <p>
-The \"not\" of a property value u is defined according to the following table
-(see also <a href=\"http://en.wikipedia.org/wiki/Three-valued_logic\">Wikipedia</a>):
+The \"not\" of a property value u is the four-valued
+<a href=\"modelica://Requirements.LogicalFunctions.not4\">not4</a>, defined according to the following table
+(Undecided and Undefined are fixed: a property that is not decided, or not applicable, stays so under negation):
 </p>
 
 <blockquote>
@@ -759,13 +762,16 @@ The \"not\" of a property value u is defined according to the following table
 <tr><td valign=\"top\"><b>Undecided</b> </td>
     <td valign=\"top\">Undecided</td></tr>
 
-<tr><td valign=\"top\"><b>Satisfied</b</td>
+<tr><td valign=\"top\"><b>Satisfied</b></td>
     <td valign=\"top\">Violated</td></tr>
+
+<tr><td valign=\"top\"><b>Undefined</b></td>
+    <td valign=\"top\">Undefined</td></tr>
 </table>
 </blockquote>
 
 <p>
-Violated, Undecided, and Satisfied are elements of enumeration
+Violated, Undecided, Satisfied and Undefined are elements of enumeration
 <a href=\"modelica://Requirements.Types.Property\">Property</a>.
 </p>
 
@@ -797,22 +803,19 @@ results in
   end PropertyNot;
 
   block PropertyOr
-    "3-valued logic 'or' of Property input u: y = u[1] or u[2] or ... or u[nu]"
+    "4-valued logic 'or' of Property input u: y = or4All(u) = u[1] or u[2] or ... or u[nu]"
     extends Requirements.Interfaces.PartialPropertyVISO;
-    import Requirements.LogicalFunctions.*;
     import Requirements.Types.Property;
   equation
-    y = if cardSatisfied(u) > 0  then Property.Satisfied elseif
-           cardViolated(u) == nu then Property.Violated else
-                                      Property.Undecided;
+    y = Requirements.LogicalFunctions.or4All(u);
     annotation (defaultComponentName="or1", Icon(graphics={Text(
             extent={{-40,15},{40,-15}},
             lineColor={0,0,0},
             textString="or")}),
       Documentation(info="<html>
 <p>
-Property output y is the 3-valued logic <b>or</b> of the elements
-of the property input vector u:
+Property output y is the 4-valued logic <b>or</b> of the elements
+of the property input vector u, <a href=\"modelica://Requirements.LogicalFunctions.or4All\">or4All</a>(u):
 </p>
 
 <blockquote><pre>
@@ -821,7 +824,7 @@ y = u[1] <b>or</b> u[2] <b>or</b> ... <b/>or</b> u[size(u,1)]
 
 <p>
 The \"or\" of two property values u[1] and u[2] is defined according to the following table
-(see also <a href=\"http://en.wikipedia.org/wiki/Three-valued_logic\">Wikipedia</a>):
+(the extended temporal logic of EDF's ReqSysPro / CRML; Undefined, not applicable, is the neutral element):
 </p>
 
 <blockquote>
@@ -829,28 +832,40 @@ The \"or\" of two property values u[1] and u[2] is defined according to the foll
 <tr><td valign=\"top\">u[1] <b>or</b> u[2]</td>
     <td valign=\"top\"><b>Violated</b></td>
     <td valign=\"top\"><b>Undecided</b></td>
-    <td valign=\"top\"><b>Satisfied</b></td></tr>
+    <td valign=\"top\"><b>Satisfied</b></td>
+    <td valign=\"top\"><b>Undefined</b></td></tr>
 
 <tr><td valign=\"top\"><b>Violated</b></td>
     <td valign=\"top\"> Violated </td>
     <td valign=\"top\"> Undecided </td>
-    <td valign=\"top\"> Satisfied </td></tr>
+    <td valign=\"top\"> Satisfied </td>
+    <td valign=\"top\"> Violated </td></tr>
 
 <tr><td valign=\"top\"><b>Undecided</b></td>
     <td valign=\"top\"> Undecided </td>
     <td valign=\"top\"> Undecided </td>
-    <td valign=\"top\"> Satisfied </td></tr>
+    <td valign=\"top\"> Satisfied </td>
+    <td valign=\"top\"> Undecided </td></tr>
 
 <tr><td valign=\"top\"><b>Satisfied</b></td>
     <td valign=\"top\"> Satisfied </td>
     <td valign=\"top\"> Satisfied </td>
+    <td valign=\"top\"> Satisfied </td>
     <td valign=\"top\"> Satisfied </td></tr>
+
+<tr><td valign=\"top\"><b>Undefined</b></td>
+    <td valign=\"top\"> Violated </td>
+    <td valign=\"top\"> Undecided </td>
+    <td valign=\"top\"> Satisfied </td>
+    <td valign=\"top\"> Undefined </td></tr>
 </table>
 </blockquote>
 
 <p>
-Violated, Undecided, and Satisfied are elements of enumeration
-<a href=\"modelica://Requirements.Types.Property\">Property</a>.
+Violated, Undecided, Satisfied and Undefined are elements of enumeration
+<a href=\"modelica://Requirements.Types.Property\">Property</a>. The algebra is not a lattice
+(absorption and distributivity fail with Undefined): a diagram of these blocks must be evaluated
+as drawn, never simplified.
 </p>
 
 <p>
@@ -863,7 +878,7 @@ connectorSizing annotation).
 
 <p>
 If no connection to the input connector <b>u</b> is present,
-the output is set to: y = Violated.
+the output is y = Undefined, the neutral element (before version 0.8.0 it was Violated).
 </p>
 
 <h4>Example</h4>
@@ -905,22 +920,19 @@ results in
   end PropertyOr;
 
   block PropertyAnd
-    "3-valued logic 'and' of Property input u: y = u[1] and u[2] and ... and u[nu]"
+    "4-valued logic 'and' of Property input u: y = and4All(u) = u[1] and u[2] and ... and u[nu]"
     extends Requirements.Interfaces.PartialPropertyVISO;
-    import Requirements.LogicalFunctions.*;
     import Requirements.Types.Property;
   equation
-    y = if cardSatisfied(u) == nu then Property.Satisfied elseif
-           cardViolated(u) > 0    then Property.Violated else
-                                       Property.Undecided;
+    y = Requirements.LogicalFunctions.and4All(u);
     annotation (defaultComponentName="and1", Icon(graphics={Text(
             extent={{-40,15},{40,-15}},
             lineColor={0,0,0},
             textString="and")}),
       Documentation(info="<html>
 <p>
-Property output y is the 3-valued logic <b>and</b> of the elements
-of the property input vector u:
+Property output y is the 4-valued logic <b>and</b> of the elements
+of the property input vector u, <a href=\"modelica://Requirements.LogicalFunctions.and4All\">and4All</a>(u):
 </p>
 
 <blockquote><pre>
@@ -929,7 +941,7 @@ y = u[1] <b>and</b> u[2] <b>and</b> ... <b/>and</b> u[size(u,1)]
 
 <p>
 The \"and\" of two property values u[1] and u[2] is defined according to the following table
-(see also <a href=\"http://en.wikipedia.org/wiki/Three-valued_logic\">Wikipedia</a>):
+(the extended temporal logic of EDF's ReqSysPro / CRML; Undefined, not applicable, is the neutral element):
 </p>
 
 <blockquote>
@@ -937,9 +949,11 @@ The \"and\" of two property values u[1] and u[2] is defined according to the fol
 <tr><td valign=\"top\">u[1] <b>and</b> u[2]</td>
     <td valign=\"top\"><b>Violated</b></td>
     <td valign=\"top\"><b>Undecided</b></td>
-    <td valign=\"top\"><b>Satisfied</b></td></tr>
+    <td valign=\"top\"><b>Satisfied</b></td>
+    <td valign=\"top\"><b>Undefined</b></td></tr>
 
 <tr><td valign=\"top\"><b>Violated</b></td>
+    <td valign=\"top\"> Violated </td>
     <td valign=\"top\"> Violated </td>
     <td valign=\"top\"> Violated </td>
     <td valign=\"top\"> Violated </td></tr>
@@ -947,18 +961,28 @@ The \"and\" of two property values u[1] and u[2] is defined according to the fol
 <tr><td valign=\"top\"><b>Undecided</b></td>
     <td valign=\"top\"> Violated </td>
     <td valign=\"top\"> Undecided </td>
+    <td valign=\"top\"> Undecided </td>
     <td valign=\"top\"> Undecided </td></tr>
 
 <tr><td valign=\"top\"><b>Satisfied</b></td>
     <td valign=\"top\"> Violated </td>
     <td valign=\"top\"> Undecided </td>
+    <td valign=\"top\"> Satisfied </td>
     <td valign=\"top\"> Satisfied </td></tr>
+
+<tr><td valign=\"top\"><b>Undefined</b></td>
+    <td valign=\"top\"> Violated </td>
+    <td valign=\"top\"> Undecided </td>
+    <td valign=\"top\"> Satisfied </td>
+    <td valign=\"top\"> Undefined </td></tr>
 </table>
 </blockquote>
 
 <p>
-Violated, Undecided, and Satisfied are elements of enumeration
-<a href=\"modelica://Requirements.Types.Property\">Property</a>.
+Violated, Undecided, Satisfied and Undefined are elements of enumeration
+<a href=\"modelica://Requirements.Types.Property\">Property</a>. The algebra is not a lattice
+(absorption and distributivity fail with Undefined): a diagram of these blocks must be evaluated
+as drawn, never simplified.
 </p>
 
 <p>
@@ -971,7 +995,7 @@ connectorSizing annotation).
 
 <p>
 If no connection to the input connector <b>u</b> is present,
-the output is set to: y = Satisfied.
+the output is y = Undefined, the neutral element (before version 0.8.0 it was Satisfied).
 </p>
 
 <h4>Example</h4>

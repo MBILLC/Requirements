@@ -35,6 +35,18 @@ examples that stop through `FallingEdgeTerminate` need `terminate1.delay > 0`
 for Impact to record their final verdict, which the Impact case list sets as a
 modifier on the two examples concerned.
 
+**Re-baseline for version 0.8.0, 2026-09-15** (the four-valued `Property`): the three
+suites were compared against the 0.7.1 baselines first — omc 263/271, Dymola 278/284, Impact
+composite 314/322, Impact-only 59/63 — and every failed check was a Property output moving
+from Undecided (2) to Undefined (4) where a check block's condition is false or its first
+phase has not started (`During`, `MinDuration`, `BandDuration`, `FixedRising`,
+`MaxRisingFrequency`, the `during` blocks of `Verify.Requirement`, `SignalsFromFile` and
+`MainPowerSupplyRequirements`); nothing else changed, the FFT examples included. All four
+baselines were then re-stored (omc, Dymola, the composite refreshed from both, Impact-only),
+with the new `Examples.Elementary.LogicalBlocks.PropertyTable4` as a case in the three lists
+(omc, Dymola and the composite carry its reference). The numbers below are the 0.7.1
+measurement and stand as history.
+
 **Full run, 2026-09-14** (`Impact/`, against the composite Dymola + OpenModelica
 reference): **296/296 checks pass** on the 63 cases with a reference — every
 funnel error exactly 0, 205 of 208 final values identical and the other three

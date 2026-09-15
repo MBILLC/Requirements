@@ -721,7 +721,10 @@ into the top level of your model.");
       "Instance name of Requirement";
     Boolean atLeastOneFailure "=true, if property = Violated at least one time";
     Boolean untested
-      "= true, if property=Property.Undecided all the time, otherwise false";
+      "= true, if property was never Satisfied or Violated (Undecided or Undefined all the time), otherwise false";
+    Integer attempts
+      "Number of times the property became applicable (maximal phases with property <> Property.Undefined)";
+    Boolean applicable "= true while property <> Property.Undefined";
     Real firstFailureTime;
     Real firstTestedTime;
     parameter Real startTime(fixed=false);
@@ -746,12 +749,13 @@ into the top level of your model.");
     pre(firstFailureTime) = startTime;
     pre(firstTestedTime)  = startTime;
     pre(ok) = 1.0;
+    attempts              = if localProperty <> Property.Undefined then 1 else 0;
 
     if localProperty == Property.Violated then
        atLeastOneFailure = true;
        untested          = false;
        pre(status)       = 0;
-    elseif localProperty == Property.Undecided then
+    elseif localProperty == Property.Undecided or localProperty == Property.Undefined then
        atLeastOneFailure = false;
        untested          = true;
        pre(status)       = 1;
@@ -778,8 +782,8 @@ into the top level of your model.");
           atLeastOneFailure :=true;
           firstFailureTime :=time;
        elseif pre(atLeastOneFailure) and time <= firstFailureTime and
-            (localProperty==Property.Satisfied or localProperty==Property.Undecided) then
-          // current event iteration changed property to Satisfied or Undecided
+            localProperty<>Property.Violated then
+          // current event iteration changed property to Satisfied, Undecided or Undefined
           atLeastOneFailure := false;
           firstFailureTime := startTime;
        end if;
@@ -789,8 +793,8 @@ into the top level of your model.");
           untested :=false;
           firstTestedTime := time;
        elseif not pre(untested) and time <= firstTestedTime and
-              localProperty==Property.Undecided then
-           // current event iteration changed property back to Undecided
+              (localProperty==Property.Undecided or localProperty==Property.Undefined) then
+           // current event iteration changed property back to Undecided or Undefined
           untested := true;
           firstTestedTime := startTime;
        end if;
@@ -801,6 +805,12 @@ into the top level of your model.");
   equation
     connect(dummy.sortingPort, printViolations.sortingPort);
 
+    // attempts: the number of phases in which the property was applicable
+    applicable = localProperty <> Property.Undefined;
+    when applicable then
+       attempts = pre(attempts) + 1;
+    end when;
+
     when (if printViolations.useEvaluationTime then time >= printViolations.evaluationTime
           else terminal()) then
       ok =Requirements.Internal.printViolationsToLogFile(
@@ -810,7 +820,8 @@ into the top level of your model.");
           text,
           atLeastOneFailure,
           untested,
-          firstFailureTime);
+          firstFailureTime,
+          attempts);
     end when;
     annotation (Diagram(coordinateSystem(
             preserveAspectRatio=false, extent={{-100,-100},{100,100}}),
@@ -818,8 +829,13 @@ into the top level of your model.");
       Documentation(info="<html>
 <p>
 This block is used to verify a requirement. The input signal \"property\" can have the
-three values Violated, Undecided, or Satisfied. The goal is that \"property\" is always Satisfied.
-A requirement is violated, if property = Violated. It is untested, if property=Undecided.
+four values Violated, Undecided, Satisfied or Undefined
+(<a href=\"modelica://Requirements.Types.Property\">Property</a>). The goal is that \"property\" is
+always Satisfied. A requirement is violated, if property = Violated at any instant. It is untested,
+if property was Undecided (applicable, but not decided) or Undefined (not applicable) all the time:
+the four values collapse to the three verdicts violated / untested / satisfied here, and the log
+records beside the verdict the number of <em>attempts</em>, the phases in which the property was
+applicable (not Undefined); an untested requirement with 0 attempts was never applicable.
 A Boolean signal can be casted to the three-valued logic required by \"property\"
 by cast blocks, such as 
 <a href=\"modelica://Requirements.LogicalBlocks.ToProperty\">ToProperty</a>,
@@ -841,7 +857,7 @@ Requirement block that is either violated or untested:
 If the Requirement instance is violated at least once:
 </p>
 <pre>
-   Requirement violated: &lt;full path name&gt; (at time = &lt;first failure time&gt; s)
+   Requirement violated: &lt;full path name&gt; (at time = &lt;first failure time&gt; s, &lt;n&gt; attempts)
 </pre>
 
 <p>
@@ -849,7 +865,7 @@ If the Requirement instance is not tested:
 </p>
 
 <pre>
-   Requirement untested: &lt;full path name&gt;
+   Requirement untested: &lt;full path name&gt; (&lt;n&gt; attempts)
 </pre>
 
 <p>
@@ -864,6 +880,8 @@ For an example to use the Requirement block in textual form, see
 
 <tr><td valign=\"top\"> Sept. 14, 2026 </td>
     <td valign=\"top\"> The instant the verdict is taken at comes from the inner <code>printViolations</code>: <code>terminal()</code>, or <code>evaluationTime</code> when its <code>useEvaluationTime</code> is set (H. Tummescheit, Model Based Innovation LLC)</td></tr>
+<tr><td valign=\"top\"> Sept. 15, 2026 </td>
+    <td valign=\"top\"> Four-valued <code>Property</code>: <code>Undefined</code> (not applicable) counts as untested like <code>Undecided</code>; <code>attempts</code>, the number of phases in which the property was applicable, is logged beside the verdict (H. Tummescheit, Model Based Innovation LLC)</td></tr>
 </table>
 </html>"));
   end PartialRequirement;

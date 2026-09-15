@@ -9,7 +9,7 @@ package ChecksInFixedWindow
 
   equation
      y = if condition then
-          (if check then Property.Satisfied else Property.Violated) else Property.Undecided;
+          (if check then Property.Satisfied else Property.Violated) else Property.Undefined;
     annotation (defaultComponentName="during1",
           Icon(coordinateSystem(preserveAspectRatio=false, extent={{-200,-100},
               {200,100}}), graphics={
@@ -38,7 +38,7 @@ In every duration where the Boolean input <b>condition</b> is true,
 the Boolean input <b>check</b> must be true.
 During a true condition phase, property output <b>y</b> = Satisfied if check = true,
 and Violated if check = false.
-During a false condition phase, property output y = Undecided.
+During a false condition phase, property output y = Undefined (the check is not applicable).
 </p>
 
 
@@ -89,7 +89,7 @@ results in
     actualDuration = 0.0;
     startTime = time;
     startCheck = condition and check;
-    y = if condition and actualDuration >= durationMin then
+    y = if not condition then Property.Undefined elseif actualDuration >= durationMin then
            Property.Satisfied else Property.Undecided;
 
   algorithm
@@ -168,7 +168,8 @@ defined by parameter <b>durationMin</b>.
 Whenever this property is fulfilled, property output y = Satisfied.
 If this property is not fulfilled at the end of a true condition phase,
 property output y = Violated. 
-At initialization and when entering a true condition phase,
+At initialization with condition = false, property output y = Undefined (the check is
+not applicable before the first true condition phase); when entering a true condition phase,
 property output y = Undecided.
 Output y keeps its value, until one of the above conditions occur.
 </p>
@@ -220,7 +221,7 @@ results in
     actualDuration = 0.0;
     startTime = time;
     startCheck = condition and check;
-    y = if condition then Property.Satisfied else Property.Undecided;
+    y = if condition then Property.Satisfied else Property.Undefined;
 
   algorithm
     when condition then
@@ -303,7 +304,7 @@ defined by parameter <b>durationMax</b>.
 Whenever this property is fulfilled, property output y = Satisfied.
 If this property is not fulfilled during a true condition phase,
 property output y = Violated. 
-If condition=false during initialization, property output y = Undecided.
+If condition=false during initialization, property output y = Undefined (not applicable).
 Output y keeps its value, until one of the above conditions occur.
 </p>
 
@@ -353,7 +354,7 @@ results in
     actualDuration = 0.0;
     startTime = time;
     startCheck = condition and check;
-    y = if condition and actualDuration >= durationMin then
+    y = if not condition then Property.Undefined elseif actualDuration >= durationMin then
            Property.Satisfied else Property.Undecided;
 
   equation
@@ -460,8 +461,9 @@ the Boolean input <b>check</b> must be true at least for the time span defined b
 defined by parameter <b>durationMax</b>.
 Whenever this property is fulfilled, property output y = Satisfied.
 If this property is not fulfilled during a true condition phase, property output y = Violated.
-If condition=true and durationMin=0 during initialization, property output y = Satisfied
-else y = Undecided. Output y keeps its value, until one of the above conditions occur.
+If condition=true and durationMin=0 during initialization, property output y = Satisfied,
+if condition=true and durationMin&gt;0 then y = Undecided, and if condition=false then
+y = Undefined (not applicable). Output y keeps its value, until one of the above conditions occur.
 </p>
 
 <p>
@@ -502,7 +504,7 @@ results in
     import Requirements.Types.Property;
 
   initial equation
-    y = Property.Undecided;
+    y = if condition then Property.Undecided else Property.Undefined;
   equation
     when condition then
        y = Property.Undecided;
@@ -543,7 +545,7 @@ property = <b>NoRising</b>(condition=..., check=...).y;
 <p>
 In every duration where the Boolean input <b>condition</b> is true,
 the Boolean input <b>check</b> must not have any rising edges. 
-Property output <b>y</b> is initialized to Undecided.
+Property output <b>y</b> is initialized to Undefined (not applicable) if condition=false, and to Undecided if condition=true.
 When condition becomes true (so entering a duration), property output y = Undecided 
 until either check has a rising edge in this duration, then y = Violated,
 or the condition becomes false without any rising edge of check,
@@ -592,7 +594,7 @@ results in
     discrete Integer countRising;
   initial equation
     countRising = 0;
-    y = if condition and nRising == 0 then Property.Satisfied else Property.Undecided;
+    y = if not condition then Property.Undefined elseif nRising == 0 then Property.Satisfied else Property.Undecided;
   equation
     when condition then
        countRising = 0;
@@ -651,7 +653,7 @@ property = <b>FixedRising</b>(condition=..., check=..., nRising=1).y;
 In every duration where the Boolean input <b>condition</b> is true,
 a number of <b>nRising</b> edges of the Boolean input <b>check</b> 
 must occur. The default for nRising=1 (so exactly one rising edge).
-Property output <b>y</b> is initialized to Undecided.
+Property output <b>y</b> is initialized to Undefined (not applicable) if condition=false, and to Undecided if condition=true.
 When condition becomes true (so entering a duration), property output y = Undecided,
 as long as the number of rising edges &lt; nRising. If condition is true and
 the number of rising edges == nRising, output y = Satisfied. If 
@@ -703,7 +705,7 @@ results in
     discrete Integer countRising;
   initial equation
     countRising = 0;
-    y = if condition and nRisingMin == 0 then Property.Satisfied else Property.Undecided;
+    y = if not condition then Property.Undefined elseif nRisingMin == 0 then Property.Satisfied else Property.Undecided;
   equation
     when condition then
        countRising = 0;
@@ -760,7 +762,7 @@ property = <b>MinRising</b>(condition=..., check=..., nRisingMin=1).y;
 In every duration where the Boolean input <b>condition</b> is true,
 a minimum number of <b>nRisingMin</b> edges of the Boolean input <b>check</b> 
 must occur. The default for nRisingMin=1 (so at least one rising edge).
-Property output <b>y</b> is initialized to Undecided.
+Property output <b>y</b> is initialized to Undefined (not applicable) if condition=false, and to Undecided if condition=true.
 When condition becomes true (so entering a duration), property output y = Undecided,
 as long as the number of rising edges &lt; nRisingMin. If condition is true and
 the number of rising edges &ge; nRisingMin, output y = Satisfied. If at the end
@@ -811,7 +813,7 @@ results in
     discrete Integer countRising;
   initial equation
     countRising = 0;
-    y = if condition then Property.Satisfied else Property.Undecided;
+    y = if condition then Property.Satisfied else Property.Undefined;
   equation
     when condition then
        countRising = 0;
@@ -821,7 +823,7 @@ results in
        y = if countRising <= nRisingMax then Property.Satisfied else Property.Violated;
     elsewhen not condition then
        countRising = 0;
-       y = Property.Undecided;
+       y = Property.Undefined;
     end when;
 
     annotation (defaultComponentName="maxRising1",
@@ -868,12 +870,12 @@ property = <b>MaxRising</b>(condition=..., check=..., nRisingMax=1).y;
 In every duration where the Boolean input <b>condition</b> is true,
 the number of rising edges of the Boolean input <b>check</b> is not allowed to exceed
 parameter <b>nRisingMax</b>. The default for nRisingMax=1 (so at most one rising edge).
-Property output <b>y</b> is initialized to Undecided if condition=false,
+Property output <b>y</b> is initialized to Undefined (not applicable) if condition=false,
 and is initialized to Satisfied if condition=true.
 When condition becomes true (so entering a duration), property output y = Satisfied,
 as long as the number of rising edges &le; nRisingMax. If condition is true and
 the number of rising edges &gt; nRisingMax, output y = Violated.
-If condition is false, output y = Undecided.
+If condition is false, output y = Undefined.
 </p>
 
 <p>
@@ -921,7 +923,7 @@ results in
     discrete Integer countRising;
   initial equation
     countRising = 0;
-    y = if condition and nRisingMin==0 and nRisingMax>=0 then Property.Satisfied else Property.Undecided;
+    y = if not condition then Property.Undefined elseif nRisingMin==0 and nRisingMax>=0 then Property.Satisfied else Property.Undecided;
   equation
     assert(nRisingMin <= nRisingMax, "nRisingMin > nRisingMax");
     when condition then
@@ -994,7 +996,8 @@ In every duration where the Boolean input <b>condition</b> is true,
 a minimum number of <b>nRisingMin</b> edges of the Boolean input <b>check</b> 
 must occur and a maximum number of <b>nRisingMax</b> edges is allowed. The default for nRisingMin=1 (so at least one rising edge), whereas
 the default for nRisingMax=2 (so at most two rising edges). If condition = true and
-nRisingMin = 0, then Property output <b>y</b> is initialized to Satisfied, otherwise to Undecided.
+nRisingMin = 0, then Property output <b>y</b> is initialized to Satisfied, to Undecided if condition = true and
+nRisingMin &gt; 0, and to Undefined (not applicable) if condition = false.
 </p>
 
 <p>
@@ -1058,7 +1061,7 @@ results in
     timeOfLastRising = time;
     T = 0;
     freqHz = 0;
-    y = if condition then Property.Satisfied else Property.Undecided;
+    y = if condition then Property.Satisfied else Property.Undefined;
 
   equation
     when condition then
@@ -1083,7 +1086,7 @@ results in
        timeOfLastRising = time;
        T = 0;
        freqHz = 0;
-       y = Property.Undecided;
+       y = Property.Undefined;
     end when;
 
     annotation (defaultComponentName="maxFrequency1",
@@ -1154,7 +1157,7 @@ signal <b>freqHz</b>. Once the frequency cannot be computed
 rising edge of check in a true condition phase), it is set to freqHz = 0.
 If the frequency is not larger as freqHzMax, property output
 <b>y</b> is set to Satisfied. If the limit is violated,
-y = Violated. In all other cases, y = Undecided.
+y = Violated. While condition is false, y = Undefined (not applicable).
 </p>
 
 <p>
@@ -1196,7 +1199,7 @@ results in
     import Requirements.Types.Property;
 
   initial equation
-    y=if condition then BooleanToProperty(check) else Property.Undecided;
+    y=if condition then BooleanToProperty(check) else Property.Undefined;
   equation
     when condition then
        y = BooleanToProperty(check);
@@ -1215,7 +1218,7 @@ property = <b>WhenRising</b>(condition=..., check=...).y;
 At the time instants where condition has a rising edge, property is set to 
 \"<a href=\"modelica://Requirements.LogicalFunctions.BooleanToProperty\">BooleanToProperty</a>(check)\" (so either Satisfied or Violated)
 and keeps this value until the next rising edge. Before the first rising edge,
-property = Undecided. If condition = true during initialization, property = toProperty(check)
+property = Undefined (not applicable). If condition = true during initialization, property = toProperty(check)
 at initialization. 
 </p>
 
@@ -1284,7 +1287,7 @@ results in
     import Requirements.Types.Property;
 
   initial equation
-    y=if not condition then BooleanToProperty(check) else Property.Undecided;
+    y=if not condition then BooleanToProperty(check) else Property.Undefined;
   equation
     when not condition then
        y = BooleanToProperty(check);
@@ -1303,7 +1306,7 @@ property = <b>WhenFalling</b>(condition=..., check=...).y;
 At the time instants where condition has a falling edge, property is set to 
 \"<a href=\"modelica://Requirements.LogicalFunctions.BooleanToProperty\">BooleanToProperty</a>(check)\" (so either Satisfied or Violated)
 and keeps this value until the next falling edge. Before the first falling edge,
-property = Undecided. If condition = false during initialization, property = toProperty(check)
+property = Undefined (not applicable). If condition = false during initialization, property = toProperty(check)
 at initialization. 
 </p>
 
@@ -1372,7 +1375,7 @@ results in
     import Requirements.Types.Property;
 
   initial equation
-    y = Property.Undecided;
+    y = Property.Undefined;
   equation
     when {condition, not condition} then
        y = BooleanToProperty(check);
@@ -1390,7 +1393,7 @@ property = <b>WhenChanging</b>(condition=..., check=...).y;
 <p>
 At the time instants where condition has a changing edge, property is set to 
 \"<a href=\"modelica://Requirements.LogicalFunctions.BooleanToProperty\">BooleanToProperty</a>(check)\" (so either Satisfied or Violated)
-and keeps this value until the next changing edge. At initialization, property = Undecided, independently of the value of condition. 
+and keeps this value until the next changing edge. At initialization, property = Undefined (not applicable), independently of the value of condition. 
 </p>
 
 <p>
@@ -1533,7 +1536,7 @@ results in
     (distance, polygonPoint) = Requirements.Utilities.distancePointToPolygon(polygon, point);
     y = if condition then
            (if distance >= 0 then Property.Satisfied else Property.Violated) else
-           Property.Undecided;
+           Property.Undefined;
 
     poly_px = x_min + x_scale*(polygonPoint[1]-poly_x_min);
     poly_py = y_min + y_scale*(polygonPoint[2]-poly_y_min);
@@ -1605,7 +1608,7 @@ The area inside the polygon is the desired domain.
 <p>
 When condition is true, output y = Satisfied if the point is on or 
 within the polygon, and y = Violated if the point is outside of the 
-polygon. When condition is false, y = Undecided.
+polygon. When condition is false, y = Undefined (not applicable).
 </p>
 
 <p>
@@ -1704,8 +1707,15 @@ All blocks of this library have the following interface:
 <li> Property output <b>y</b> is of enumeration type 
      <a href=\"modelica://Requirements.Types.Property\">Property</a>.
      If the check is successful, y = Property.Satisfied. If the check fails,
-     y = Property.Violated. If neither of the two properties hold
-     (for example when condition = false), y = Property.Undecided.</li>
+     y = Property.Violated. If neither of the two properties hold yet inside a true
+     condition phase (a duration not yet reached, a count still below its minimum),
+     y = Property.Undecided. While condition = false, and before the first true condition phase,
+     y = Property.Undefined: the check is not applicable (before version 0.8.0 this was Undecided
+     too; the two are distinguished so that a combination of checks and a requirement over a set
+     of components can leave the inapplicable ones out, see
+     <a href=\"modelica://Requirements.Types.Property\">Property</a>). A block that decides at the
+     end of a condition phase (the duration and count checks) keeps that verdict on y after the
+     phase, until the next phase starts.</li>
 </ul>
 </html>"));
 end ChecksInFixedWindow;

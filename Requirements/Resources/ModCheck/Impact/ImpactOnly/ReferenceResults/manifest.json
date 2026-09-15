@@ -33,7 +33,7 @@
       "onTable.y",
       "time"
     ],
-    "bytes": 9131,
+    "bytes": 9136,
     "metrics": {
       "solver": "CVode",
       "linear_multistep_method": "BDF",
@@ -41,14 +41,14 @@
       "linear_solver_type": "DENSE",
       "atol": 1e-06,
       "rtol": 1e-06,
-      "cpu_time": 0.05426471296232194,
+      "cpu_time": 0.05690793699977803,
       "steps": 562,
       "error_test_failures": 0,
       "convergence_failures": 0,
       "state_events": 19,
       "kind": "dynamic"
     },
-    "descriptor": "impact workspace 'modelica-requirements-fork'"
+    "descriptor": "impact workspace 'requirements-redesign'"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInFixedWindow_withFFT_MaxTotalHamonicDistortion1",
@@ -73,13 +73,13 @@
       "linear_solver_type": "DENSE",
       "atol": 1e-06,
       "rtol": 1e-06,
-      "cpu_time": 0.3333811810007319,
+      "cpu_time": 0.29401453800164745,
       "steps": 1156,
       "error_test_failures": 0,
       "convergence_failures": 0,
       "kind": "dynamic"
     },
-    "descriptor": "impact workspace 'modelica-requirements-fork'"
+    "descriptor": "impact workspace 'requirements-redesign'"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInFixedWindow_withFFT_MaxTotalHamonicDistortion2",
@@ -97,7 +97,7 @@
       "sine5.y",
       "time"
     ],
-    "bytes": 51369,
+    "bytes": 51372,
     "metrics": {
       "solver": "CVode",
       "linear_multistep_method": "BDF",
@@ -105,13 +105,13 @@
       "linear_solver_type": "DENSE",
       "atol": 1e-06,
       "rtol": 1e-06,
-      "cpu_time": 0.4862440190045163,
+      "cpu_time": 0.5356507549986418,
       "steps": 2190,
       "error_test_failures": 0,
       "convergence_failures": 0,
       "kind": "dynamic"
     },
-    "descriptor": "impact workspace 'modelica-requirements-fork'"
+    "descriptor": "impact workspace 'requirements-redesign'"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInFixedWindow_withFFT_WithinAbsoluteDomain2",
@@ -127,7 +127,7 @@
       "sine5.y",
       "time"
     ],
-    "bytes": 28209,
+    "bytes": 28216,
     "metrics": {
       "solver": "CVode",
       "linear_multistep_method": "BDF",
@@ -135,13 +135,13 @@
       "linear_solver_type": "DENSE",
       "atol": 1e-06,
       "rtol": 1e-06,
-      "cpu_time": 0.2656682379893027,
+      "cpu_time": 0.29847324599904823,
       "steps": 1403,
       "error_test_failures": 0,
       "convergence_failures": 0,
       "kind": "dynamic"
     },
-    "descriptor": "impact workspace 'modelica-requirements-fork'"
+    "descriptor": "impact workspace 'requirements-redesign'"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInFixedWindow_withFFT_WithinRelativeDomain2",
@@ -157,7 +157,7 @@
       "sine5.y",
       "time"
     ],
-    "bytes": 28562,
+    "bytes": 28569,
     "metrics": {
       "solver": "CVode",
       "linear_multistep_method": "BDF",
@@ -165,12 +165,12 @@
       "linear_solver_type": "DENSE",
       "atol": 1e-06,
       "rtol": 1e-06,
-      "cpu_time": 0.25050345400813967,
+      "cpu_time": 0.2935553040006198,
       "steps": 1403,
       "error_test_failures": 0,
       "convergence_failures": 0,
       "kind": "dynamic"
     },
-    "descriptor": "impact workspace 'modelica-requirements-fork'"
+    "descriptor": "impact workspace 'requirements-redesign'"
   }
 ]

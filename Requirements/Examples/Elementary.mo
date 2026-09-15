@@ -2910,6 +2910,175 @@ results in
 </html>
 "),     experiment(StopTime=14));
     end PropertyAnd;
+
+    model PropertyTable4
+      "The four-valued (ETL) tables of and4, or4 and not4 asserted entry by entry, and the laws that fail"
+      extends Modelica.Icons.Example;
+      import Requirements.Types.Property;
+      import Requirements.LogicalFunctions.and4;
+      import Requirements.LogicalFunctions.or4;
+      import Requirements.LogicalFunctions.not4;
+      import Requirements.LogicalFunctions.and4All;
+      import Requirements.LogicalFunctions.or4All;
+
+      // The four values in their Integer order (1, 2, 3, 4)
+      constant Property V = Property.Violated;
+      constant Property U = Property.Undecided;
+      constant Property S = Property.Satisfied;
+      constant Property N = Property.Undefined "Undefined: not applicable, the neutral element";
+      constant Property values[4] = {V, U, S, N};
+      // The tables, transcribed from the CRML specification (rows a, columns b):
+      // Undefined is neutral, an Undecided operand decides only against Violated (and)
+      // or Satisfied (or), negation fixes Undecided and Undefined
+      constant Property andTable[4, 4] = {{V, V, V, V}, {V, U, U, U}, {V, U, S, S}, {V, U, S, N}};
+      constant Property orTable[4, 4] = {{V, U, S, V}, {U, U, S, U}, {S, S, S, S}, {V, U, S, N}};
+      constant Property notTable[4] = {S, U, V, N};
+
+      // The two sources run through all 16 pairs (a changes every 4 s, b every second)
+      Requirements.Sources.PropertyTable a(table=[0,1; 4,2; 8,3; 12,4])
+        annotation (Placement(transformation(extent={{-80,20},{-60,40}})));
+      Requirements.Sources.PropertyTable b(table=[0,1; 1,2; 2,3; 3,4; 4,1; 5,2; 6,3; 7,4;
+            8,1; 9,2; 10,3; 11,4; 12,1; 13,2; 14,3; 15,4])
+        annotation (Placement(transformation(extent={{-80,-20},{-60,0}})));
+      Requirements.LogicalBlocks.PropertyAnd and1(nu=2)
+        annotation (Placement(transformation(extent={{-20,30},{0,50}})));
+      Requirements.LogicalBlocks.PropertyOr or1(nu=2)
+        annotation (Placement(transformation(extent={{-20,0},{0,20}})));
+      Requirements.LogicalBlocks.PropertyNot not1
+        annotation (Placement(transformation(extent={{-20,-30},{0,-10}})));
+      Requirements.LogicalBlocks.PropertyAnd andEmpty "nu = 0: the neutral element, Undefined"
+        annotation (Placement(transformation(extent={{40,30},{60,50}})));
+      Requirements.LogicalBlocks.PropertyOr orEmpty "nu = 0: the neutral element, Undefined"
+        annotation (Placement(transformation(extent={{40,0},{60,20}})));
+      Integer nAbsorption = countAbsorptionFailures(values)
+        "Triples (a,b,c) at which a and (a or b) = a fails: 12 of 64";
+      Integer nDistributivity = countDistributivityFailures(values)
+        "Triples (a,b,c) at which a and (b or c) = (a and b) or (a and c) fails: 6 of 64";
+    protected
+      function tablesHold
+        "true if and4, or4 and not4 reproduce the tables at every entry and are commutative, associative, involutive and De Morgan dual"
+        input Property values[4];
+        input Property andTable[4, 4];
+        input Property orTable[4, 4];
+        input Property notTable[4];
+        output Boolean ok = true;
+      algorithm
+        for i in 1:4 loop
+          ok := ok and not4(values[i]) == notTable[i] and not4(not4(values[i])) == values[i];
+          for j in 1:4 loop
+            ok := ok and and4(values[i], values[j]) == andTable[i, j];
+            ok := ok and or4(values[i], values[j]) == orTable[i, j];
+            ok := ok and and4(values[i], values[j]) == and4(values[j], values[i]);
+            ok := ok and or4(values[i], values[j]) == or4(values[j], values[i]);
+            ok := ok and or4(values[i], values[j]) == not4(and4(not4(values[i]), not4(values[j])));
+            for k in 1:4 loop
+              ok := ok and and4(and4(values[i], values[j]), values[k]) == and4(values[i], and4(values[j], values[k]));
+              ok := ok and or4(or4(values[i], values[j]), values[k]) == or4(values[i], or4(values[j], values[k]));
+            end for;
+          end for;
+        end for;
+      end tablesHold;
+
+      function countAbsorptionFailures "Number of triples (a,b,c) at which a and4 (a or4 b) <> a"
+        input Property values[4];
+        output Integer n = 0;
+      algorithm
+        for i in 1:4 loop
+          for j in 1:4 loop
+            for k in 1:4 loop
+              n := n + (if and4(values[i], or4(values[i], values[j])) <> values[i] then 1 else 0);
+            end for;
+          end for;
+        end for;
+      end countAbsorptionFailures;
+
+      function countDistributivityFailures "Number of triples (a,b,c) at which a and4 (b or4 c) <> (a and4 b) or4 (a and4 c)"
+        input Property values[4];
+        output Integer n = 0;
+      algorithm
+        for i in 1:4 loop
+          for j in 1:4 loop
+            for k in 1:4 loop
+              n := n + (if and4(values[i], or4(values[j], values[k])) <>
+                           or4(and4(values[i], values[j]), and4(values[i], values[k])) then 1 else 0);
+            end for;
+          end for;
+        end for;
+      end countDistributivityFailures;
+    equation
+      connect(a.y, and1.u[1]) annotation (Line(points={{-59,30},{-40,30},{-40,43.5},{-15,43.5}}, color={255,0,128}));
+      connect(b.y, and1.u[2]) annotation (Line(points={{-59,-10},{-40,-10},{-40,36.5},{-15,36.5}}, color={255,0,128}));
+      connect(a.y, or1.u[1]) annotation (Line(points={{-59,30},{-40,30},{-40,13.5},{-15,13.5}}, color={255,0,128}));
+      connect(b.y, or1.u[2]) annotation (Line(points={{-59,-10},{-40,-10},{-40,6.5},{-15,6.5}}, color={255,0,128}));
+      connect(a.y, not1.u) annotation (Line(points={{-59,30},{-40,30},{-40,-20},{-17,-20}}, color={255,0,128}));
+
+      // The blocks follow the tables at every instant of the 16 pairs
+      assert(and1.y == andTable[Integer(a.y), Integer(b.y)], "PropertyAnd differs from the and4 table");
+      assert(or1.y == orTable[Integer(a.y), Integer(b.y)], "PropertyOr differs from the or4 table");
+      assert(not1.y == notTable[Integer(a.y)], "PropertyNot differs from the not4 table");
+      assert(andEmpty.y == N and orEmpty.y == N, "an unconnected PropertyAnd / PropertyOr is Undefined, the neutral element");
+
+      // Every entry of the three tables through the functions, with the laws that hold
+      assert(tablesHold(values, andTable, orTable, notTable),
+        "and4 / or4 / not4 differ from the ETL tables, or commutativity, associativity, involution or De Morgan fails");
+
+      // The laws that FAIL, with the counterexamples of the research (every one involves Undefined):
+      // absorption: Undefined and (Undefined or Satisfied) = Satisfied, not Undefined
+      assert(and4(N, or4(N, S)) == S and or4(N, and4(N, S)) == S, "absorption counterexample");
+      // distributivity: Satisfied and (Violated or Undefined) = Violated, but (S and V) or (S and N) = Satisfied
+      assert(and4(S, or4(V, N)) == V and or4(and4(S, V), and4(S, N)) == S, "distributivity counterexample");
+      // complements: Undecided and not Undecided = Undecided, Undefined and not Undefined = Undefined
+      assert(and4(U, not4(U)) == U and and4(N, not4(N)) == N, "complements counterexample");
+      assert(nAbsorption == 12 and nDistributivity == 6, "12 of 64 absorption and 6 of 64 distributivity failures expected");
+
+      // The folds: Undefined elements drop out, the vector is otherwise a Kleene and / or
+      assert(and4All({N, S, N}) == S and and4All({N, U, S}) == U and and4All({S, V, U}) == V and and4All({N, N}) == N, "and4All");
+      assert(or4All({N, V, N}) == V and or4All({V, U, N}) == U and or4All({V, S, U}) == S and or4All({N, N}) == N, "or4All");
+      annotation (experiment(StopTime=16), Documentation(info="<html>
+<p>
+The four-valued logic of <a href=\"modelica://Requirements.Types.Property\">Types.Property</a>,
+asserted: the two sources run through all 16 pairs of values in 16 s and the blocks
+<a href=\"modelica://Requirements.LogicalBlocks.PropertyAnd\">PropertyAnd</a>,
+<a href=\"modelica://Requirements.LogicalBlocks.PropertyOr\">PropertyOr</a> and
+<a href=\"modelica://Requirements.LogicalBlocks.PropertyNot\">PropertyNot</a> are compared with the
+tables of the extended temporal logic (ETL) of EDF's ReqSysPro / CRML at every instant; the functions
+<a href=\"modelica://Requirements.LogicalFunctions.and4\">and4</a>,
+<a href=\"modelica://Requirements.LogicalFunctions.or4\">or4</a> and
+<a href=\"modelica://Requirements.LogicalFunctions.not4\">not4</a> are checked against every table entry,
+and the laws that hold (commutativity, associativity, involution, De Morgan) and the ones that fail are
+asserted with counterexamples. An unconnected PropertyAnd or PropertyOr (<code>nu = 0</code>) gives
+Undefined, the neutral element.
+</p>
+
+<h4>The laws that fail</h4>
+<p>
+The Modelica 2023 paper on CRML states that the four-valued algebra satisfies all Boolean laws except the
+complements law. Enumerating all 64 triples over the four values from the paper's own three generating
+rules (Undefined is neutral; an Undecided operand decides only against Violated for <em>and</em> and
+Satisfied for <em>or</em>; negation fixes Undecided and Undefined) shows more:
+</p>
+<table border=1 cellspacing=0 cellpadding=2>
+<tr><th>Law</th><th>Result</th><th>Counterexample</th></tr>
+<tr><td>De Morgan, involution, commutativity, associativity, idempotence</td><td>hold</td><td>&mdash;</td></tr>
+<tr><td>Absorption <code>a and (a or b) = a</code></td><td><b>fails, 12 of 64 triples</b></td>
+    <td><code>a = Undefined, b = Satisfied</code>: <code>Undefined or Satisfied = Satisfied</code>,
+        <code>Undefined and Satisfied = Satisfied &ne; Undefined</code></td></tr>
+<tr><td>Distributivity <code>a and (b or c) = (a and b) or (a and c)</code></td><td><b>fails, 6 of 64 triples</b></td>
+    <td><code>a = Satisfied, b = Violated, c = Undefined</code>: left side <code>Satisfied and Violated = Violated</code>,
+        right side <code>Violated or Satisfied = Satisfied</code></td></tr>
+<tr><td>Complements <code>a and not a = Violated</code></td><td>fails (acknowledged by the paper)</td>
+    <td><code>Undecided</code>, <code>Undefined</code></td></tr>
+</table>
+<p>
+Every absorption and distributivity failure involves Undefined: they are caused by the neutral-element
+design itself. The structure is therefore not a Boolean algebra and not a lattice (Undefined is the top of
+the <em>and</em>-order and the bottom of the <em>or</em>-order). Absorption and distributivity are exactly
+the rewrites an expression simplifier applies, so <b>no Boolean simplification may be applied to an
+expression over Property values</b>: a diagram of Property blocks is evaluated as drawn.
+</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+    end PropertyTable4;
   end LogicalBlocks;
 
   package Sources "Library of examples using Sources blocks"

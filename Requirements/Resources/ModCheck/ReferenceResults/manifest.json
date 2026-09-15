@@ -6,7 +6,7 @@
     "bytes": 0,
     "metrics": {},
     "skipped": "Dymola: \"the model is too complex for the current license\" (documented cap 1000 unknowns outside the MSL)",
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_AircraftRequirements_LimitedControlFrequency",
@@ -19,7 +19,7 @@
     ],
     "bytes": 7144,
     "metrics": {
-      "cpu_time": 0.012,
+      "cpu_time": 0.007,
       "steps": 91,
       "function_evaluations": 163,
       "jacobian_evaluations": 24,
@@ -29,13 +29,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.147018299991032,
+      "wall_time": 4.734489300004498,
       "samples": 565,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_AircraftRequirements_LimitedFreshECSFlow",
@@ -47,7 +47,7 @@
     ],
     "bytes": 2226,
     "metrics": {
-      "cpu_time": 0.017,
+      "cpu_time": 0.011,
       "steps": 18,
       "function_evaluations": 30,
       "jacobian_evaluations": 4,
@@ -57,13 +57,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.7758346000046,
+      "wall_time": 5.615816199999244,
       "samples": 513,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_AircraftRequirements_MaximumCabinDissipatedPowerIncrease",
@@ -84,13 +84,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.677271499997005,
+      "wall_time": 5.408512999994855,
       "samples": 511,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_AircraftRequirements_MaximumCabinTemperatureIncrease",
@@ -101,7 +101,7 @@
     ],
     "bytes": 1908,
     "metrics": {
-      "cpu_time": 0.013,
+      "cpu_time": 0.006,
       "steps": 15,
       "function_evaluations": 24,
       "jacobian_evaluations": 3,
@@ -111,13 +111,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.852579700003844,
+      "wall_time": 5.762903299997561,
       "samples": 509,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_AircraftRequirements_MinimumAirDistributionPerformance",
@@ -130,9 +130,9 @@
       "during1.y",
       "time"
     ],
-    "bytes": 3288,
+    "bytes": 3289,
     "metrics": {
-      "cpu_time": 0.013,
+      "cpu_time": 0.006,
       "steps": 19,
       "function_evaluations": 31,
       "jacobian_evaluations": 4,
@@ -142,13 +142,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.116770299995551,
+      "wall_time": 5.1729673000008916,
       "samples": 507,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_AircraftRequirements_MinimumOperationalServiceLife",
@@ -161,9 +161,9 @@
       "minRising1.y",
       "time"
     ],
-    "bytes": 19352,
+    "bytes": 19361,
     "metrics": {
-      "cpu_time": 0.047,
+      "cpu_time": 0.046,
       "steps": 11329,
       "function_evaluations": 28000,
       "jacobian_evaluations": 5557,
@@ -173,13 +173,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.358715400012443,
+      "wall_time": 5.598742800000764,
       "samples": 11560,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_AircraftRequirements_PreventHeatExchangerClogging",
@@ -195,7 +195,7 @@
     ],
     "bytes": 5096,
     "metrics": {
-      "cpu_time": 0.011,
+      "cpu_time": 0.006,
       "steps": 10,
       "function_evaluations": 16,
       "jacobian_evaluations": 2,
@@ -205,13 +205,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.281028600002173,
+      "wall_time": 5.565527900005691,
       "samples": 503,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_AircraftRequirements_TriggerAPUStartSequence",
@@ -222,9 +222,9 @@
       "maxRising1.y",
       "time"
     ],
-    "bytes": 2791,
+    "bytes": 2792,
     "metrics": {
-      "cpu_time": 0.011,
+      "cpu_time": 0.005,
       "steps": 49,
       "function_evaluations": 85,
       "jacobian_evaluations": 12,
@@ -234,13 +234,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.033649499993771,
+      "wall_time": 4.870249599996896,
       "samples": 521,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_BackupPowerSupply_MainPowerSupplyRequirements",
@@ -249,7 +249,7 @@
     "bytes": 0,
     "metrics": {},
     "skipped": "Dymola: \"the model is too complex for the current license\" (documented cap 1000 unknowns outside the MSL)",
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInFixedWindow_BandDuration",
@@ -262,7 +262,7 @@
       "condition.y",
       "time"
     ],
-    "bytes": 3477,
+    "bytes": 3481,
     "metrics": {
       "cpu_time": 0.002,
       "steps": 80,
@@ -274,13 +274,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.639135699981125,
+      "wall_time": 5.259831700001087,
       "samples": 545,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInFixedWindow_BandRising",
@@ -293,7 +293,7 @@
       "condition.y",
       "time"
     ],
-    "bytes": 2753,
+    "bytes": 2756,
     "metrics": {
       "cpu_time": 0.002,
       "steps": 79,
@@ -305,13 +305,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.59713829998509,
+      "wall_time": 5.897637599999143,
       "samples": 523,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInFixedWindow_During",
@@ -324,9 +324,9 @@
       "during.y",
       "time"
     ],
-    "bytes": 3426,
+    "bytes": 3427,
     "metrics": {
-      "cpu_time": 0.001,
+      "cpu_time": 0.002,
       "steps": 67,
       "function_evaluations": 118,
       "jacobian_evaluations": 17,
@@ -336,13 +336,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.652150400012033,
+      "wall_time": 5.216473500004213,
       "samples": 530,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInFixedWindow_FixedRising",
@@ -356,7 +356,7 @@
       "fixedRising2.y",
       "time"
     ],
-    "bytes": 3044,
+    "bytes": 3048,
     "metrics": {
       "cpu_time": 0.002,
       "steps": 108,
@@ -368,13 +368,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.3708391999825835,
+      "wall_time": 5.766535299997486,
       "samples": 533,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInFixedWindow_MaxDuration",
@@ -387,7 +387,7 @@
       "maxDuration.y",
       "time"
     ],
-    "bytes": 3452,
+    "bytes": 3453,
     "metrics": {
       "cpu_time": 0.002,
       "steps": 80,
@@ -399,13 +399,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.534926699998323,
+      "wall_time": 5.2725946999999,
       "samples": 541,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInFixedWindow_MaxRising",
@@ -418,7 +418,7 @@
       "maxRising.y",
       "time"
     ],
-    "bytes": 2758,
+    "bytes": 2759,
     "metrics": {
       "cpu_time": 0.002,
       "steps": 79,
@@ -430,13 +430,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.35166690000915,
+      "wall_time": 5.3938979000013205,
       "samples": 523,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInFixedWindow_MaxRisingFrequency",
@@ -449,9 +449,9 @@
       "maxFrequency1.y",
       "time"
     ],
-    "bytes": 36754,
+    "bytes": 36756,
     "metrics": {
-      "cpu_time": 0.009,
+      "cpu_time": 0.008,
       "steps": 347,
       "function_evaluations": 617,
       "jacobian_evaluations": 90,
@@ -461,13 +461,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.941087900020648,
+      "wall_time": 5.800254800000403,
       "samples": 5178,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInFixedWindow_MinDuration",
@@ -480,7 +480,7 @@
       "minDuration.y",
       "time"
     ],
-    "bytes": 3457,
+    "bytes": 3461,
     "metrics": {
       "cpu_time": 0.002,
       "steps": 80,
@@ -492,13 +492,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.653325599996606,
+      "wall_time": 5.313524899996992,
       "samples": 541,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInFixedWindow_MinRising",
@@ -511,7 +511,7 @@
       "minRising1.y",
       "time"
     ],
-    "bytes": 2753,
+    "bytes": 2757,
     "metrics": {
       "cpu_time": 0.002,
       "steps": 79,
@@ -523,13 +523,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.3874654000101145,
+      "wall_time": 5.513849199996912,
       "samples": 523,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInFixedWindow_NoRising",
@@ -542,9 +542,9 @@
       "noRising1.y",
       "time"
     ],
-    "bytes": 2769,
+    "bytes": 2773,
     "metrics": {
-      "cpu_time": 0.002,
+      "cpu_time": 0.001,
       "steps": 70,
       "function_evaluations": 127,
       "jacobian_evaluations": 19,
@@ -554,13 +554,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.521029600000475,
+      "wall_time": 5.00249199999962,
       "samples": 519,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInFixedWindow_WhenChanging",
@@ -577,7 +577,7 @@
       "whenChanging2.y",
       "whenChanging3.y"
     ],
-    "bytes": 3699,
+    "bytes": 3702,
     "metrics": {
       "cpu_time": 0.001,
       "steps": 37,
@@ -589,13 +589,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.327917200018419,
+      "wall_time": 6.029384900000878,
       "samples": 509,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInFixedWindow_WhenFalling",
@@ -612,9 +612,9 @@
       "whenFalling2.y",
       "whenFalling3.y"
     ],
-    "bytes": 3687,
+    "bytes": 3688,
     "metrics": {
-      "cpu_time": 0.001,
+      "cpu_time": 0.002,
       "steps": 37,
       "function_evaluations": 64,
       "jacobian_evaluations": 9,
@@ -624,13 +624,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.431937299988931,
+      "wall_time": 5.374575399997411,
       "samples": 509,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInFixedWindow_WhenRising",
@@ -647,7 +647,7 @@
       "whenRising2.y",
       "whenRising3.y"
     ],
-    "bytes": 3685,
+    "bytes": 3687,
     "metrics": {
       "cpu_time": 0.001,
       "steps": 37,
@@ -659,13 +659,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.608568800002104,
+      "wall_time": 5.4295533999975305,
       "samples": 509,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInFixedWindow_WithinDomain",
@@ -677,7 +677,7 @@
     ],
     "bytes": 3246,
     "metrics": {
-      "cpu_time": 0.032,
+      "cpu_time": 0.037,
       "steps": 15,
       "function_evaluations": 24,
       "jacobian_evaluations": 3,
@@ -687,13 +687,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.39249570001266,
+      "wall_time": 5.431482899999537,
       "samples": 592,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInFixedWindow_withFFT_MaxTotalHamonicDistortion1",
@@ -701,8 +701,8 @@
     "variables": [],
     "bytes": 0,
     "metrics": {},
-    "skipped": "Dymola: \"the model is too complex for the current license\" (DAE of 894 unknowns; documented cap 1000 unknowns outside the MSL)",
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "skipped": "Dymola: \"the model is too complex for the current license\" (DAE of 895 unknowns; documented cap 1000 unknowns outside the MSL)",
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInFixedWindow_withFFT_MaxTotalHamonicDistortion2",
@@ -710,8 +710,8 @@
     "variables": [],
     "bytes": 0,
     "metrics": {},
-    "skipped": "Dymola: \"the model is too complex for the current license\" (DAE of 900 unknowns; documented cap 1000 unknowns outside the MSL)",
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "skipped": "Dymola: \"the model is too complex for the current license\" (DAE of 901 unknowns; documented cap 1000 unknowns outside the MSL)",
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInFixedWindow_withFFT_WithinAbsoluteDomain1",
@@ -727,7 +727,7 @@
     ],
     "bytes": 11708,
     "metrics": {
-      "cpu_time": 0.007,
+      "cpu_time": 0.008,
       "steps": 6,
       "function_evaluations": 9,
       "jacobian_evaluations": 1,
@@ -737,13 +737,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.020919600006891,
+      "wall_time": 5.589365200001339,
       "samples": 797,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInFixedWindow_withFFT_WithinAbsoluteDomain2",
@@ -751,8 +751,8 @@
     "variables": [],
     "bytes": 0,
     "metrics": {},
-    "skipped": "Dymola: \"the model is too complex for the current license\" (DAE of 547 unknowns; documented cap 1000 unknowns outside the MSL)",
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "skipped": "Dymola: \"the model is too complex for the current license\" (DAE of 548 unknowns; documented cap 1000 unknowns outside the MSL)",
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInFixedWindow_withFFT_WithinRelativeDomain1",
@@ -778,13 +778,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.32942809999804,
+      "wall_time": 5.171202500001527,
       "samples": 797,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInFixedWindow_withFFT_WithinRelativeDomain2",
@@ -792,8 +792,8 @@
     "variables": [],
     "bytes": 0,
     "metrics": {},
-    "skipped": "Dymola: \"the model is too complex for the current license\" (DAE of 575 unknowns; documented cap 1000 unknowns outside the MSL)",
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "skipped": "Dymola: \"the model is too complex for the current license\" (DAE of 576 unknowns; documented cap 1000 unknowns outside the MSL)",
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInSlidingWindow_BandAccumulatedDuration",
@@ -816,13 +816,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.251540400000522,
+      "wall_time": 5.266503899998497,
       "samples": 539,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInSlidingWindow_BandDuration",
@@ -845,13 +845,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.5349771000037435,
+      "wall_time": 5.716176900001301,
       "samples": 539,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInSlidingWindow_BandRising",
@@ -864,7 +864,7 @@
     ],
     "bytes": 2954,
     "metrics": {
-      "cpu_time": 0.001,
+      "cpu_time": 0.003,
       "steps": 76,
       "function_evaluations": 139,
       "jacobian_evaluations": 21,
@@ -874,13 +874,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.455358999985037,
+      "wall_time": 5.382063700002618,
       "samples": 554,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInSlidingWindow_MaxAccumulatedDuration",
@@ -903,13 +903,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.940889799996512,
+      "wall_time": 5.9269347000008565,
       "samples": 537,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInSlidingWindow_MaxDuration",
@@ -922,7 +922,7 @@
     ],
     "bytes": 2929,
     "metrics": {
-      "cpu_time": 0.002,
+      "cpu_time": 0.003,
       "steps": 81,
       "function_evaluations": 144,
       "jacobian_evaluations": 21,
@@ -932,13 +932,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.488101299997652,
+      "wall_time": 5.5194571999963955,
       "samples": 537,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInSlidingWindow_MaxFrequency",
@@ -961,13 +961,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.1686333999969065,
+      "wall_time": 4.641772299997683,
       "samples": 4718,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInSlidingWindow_MaxIncrease",
@@ -978,7 +978,7 @@
     ],
     "bytes": 2319,
     "metrics": {
-      "cpu_time": 0.001,
+      "cpu_time": 0.002,
       "steps": 14,
       "function_evaluations": 23,
       "jacobian_evaluations": 3,
@@ -988,13 +988,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.258038800006034,
+      "wall_time": 5.091256200001226,
       "samples": 511,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInSlidingWindow_MaxPercentageIncrease",
@@ -1015,13 +1015,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.598224599991227,
+      "wall_time": 5.703978300000017,
       "samples": 513,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInSlidingWindow_MaxRising",
@@ -1044,13 +1044,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.710222699999576,
+      "wall_time": 4.870185299994773,
       "samples": 545,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInSlidingWindow_MaxRisingFrequency",
@@ -1073,13 +1073,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 4.771051899995655,
+      "wall_time": 4.807688499997312,
       "samples": 4679,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInSlidingWindow_MinAccumulatedDuration",
@@ -1102,13 +1102,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.562424500007182,
+      "wall_time": 5.160259700001916,
       "samples": 534,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInSlidingWindow_MinAccumulatedDuration2",
@@ -1131,13 +1131,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.896044199995231,
+      "wall_time": 5.063440099998843,
       "samples": 534,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInSlidingWindow_MinDuration",
@@ -1160,13 +1160,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.437319799995748,
+      "wall_time": 5.925184099993203,
       "samples": 534,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInSlidingWindow_MinRising",
@@ -1189,13 +1189,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.876025900011882,
+      "wall_time": 5.1463261999961105,
       "samples": 542,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_LogicalBlocks_AllTrue",
@@ -1219,13 +1219,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 4.972038900014013,
+      "wall_time": 4.673481300000276,
       "samples": 507,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_LogicalBlocks_AnyTrue",
@@ -1239,7 +1239,7 @@
     ],
     "bytes": 2393,
     "metrics": {
-      "cpu_time": 0.002,
+      "cpu_time": 0.001,
       "steps": 29,
       "function_evaluations": 50,
       "jacobian_evaluations": 7,
@@ -1249,13 +1249,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.090737999998964,
+      "wall_time": 4.720699199999217,
       "samples": 507,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_LogicalBlocks_Conversions",
@@ -1284,13 +1284,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.953451499983203,
+      "wall_time": 5.483736599999247,
       "samples": 508,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_LogicalBlocks_DelayedRising",
@@ -1303,7 +1303,7 @@
     ],
     "bytes": 2846,
     "metrics": {
-      "cpu_time": 0.001,
+      "cpu_time": 0.002,
       "steps": 39,
       "function_evaluations": 66,
       "jacobian_evaluations": 9,
@@ -1313,13 +1313,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.695909800007939,
+      "wall_time": 5.510370100004366,
       "samples": 520,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_LogicalBlocks_PropertyAnd",
@@ -1352,13 +1352,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.662441199994646,
+      "wall_time": 5.292069900002389,
       "samples": 526,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_LogicalBlocks_PropertyNot",
@@ -1383,13 +1383,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.076888999989023,
+      "wall_time": 5.20878570000059,
       "samples": 511,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_LogicalBlocks_PropertyOr",
@@ -1422,13 +1422,54 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 6.28778680000687,
+      "wall_time": 5.721007799998915,
       "samples": 526,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
+  },
+  {
+    "name": "MR_Examples_Elementary_LogicalBlocks_PropertyTable4",
+    "model": "Requirements.Examples.Elementary.LogicalBlocks.PropertyTable4",
+    "variables": [
+      "a.ItoP.y",
+      "a.integerTable.realToInteger.y",
+      "a.integerTable.y",
+      "a.y",
+      "and1.y",
+      "andEmpty.y",
+      "b.ItoP.y",
+      "b.integerTable.realToInteger.y",
+      "b.integerTable.y",
+      "b.y",
+      "nAbsorption",
+      "nDistributivity",
+      "not1.y",
+      "or1.y",
+      "orEmpty.y",
+      "time"
+    ],
+    "bytes": 4011,
+    "metrics": {
+      "cpu_time": 0.001,
+      "steps": 53,
+      "function_evaluations": 101,
+      "jacobian_evaluations": 16,
+      "state_events": 0,
+      "time_events": 15,
+      "result_points": 176,
+      "kind": "dynamic",
+      "solver": "Cvode",
+      "rtol": 1e-06,
+      "wall_time": 5.23434090000228,
+      "samples": 176,
+      "dymola_version": "Dymola Version 2026x, 2025-10-10",
+      "msl_version": "4.1.0",
+      "spread_applied": true
+    },
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_LogicalBlocks_ThresholdComparisons",
@@ -1444,7 +1485,7 @@
     ],
     "bytes": 5204,
     "metrics": {
-      "cpu_time": 0.001,
+      "cpu_time": 0.002,
       "steps": 40,
       "function_evaluations": 67,
       "jacobian_evaluations": 9,
@@ -1454,13 +1495,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 4.788506100012455,
+      "wall_time": 5.561477199997171,
       "samples": 517,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_SignalAnalysis_CrossingMonitoring",
@@ -1482,13 +1523,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 4.890792099991813,
+      "wall_time": 5.024955599998066,
       "samples": 517,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_SignalAnalysis_Derivatives",
@@ -1514,13 +1555,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.425942400004715,
+      "wall_time": 4.536489400001301,
       "samples": 501,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_SignalAnalysis_Integrator",
@@ -1543,13 +1584,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 4.692876599990996,
+      "wall_time": 4.6869017999997595,
       "samples": 513,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_SignalAnalysis_MovingAverage",
@@ -1562,7 +1603,7 @@
     ],
     "bytes": 8551,
     "metrics": {
-      "cpu_time": 0.001,
+      "cpu_time": 0.002,
       "steps": 385,
       "function_evaluations": 576,
       "jacobian_evaluations": 10,
@@ -1572,13 +1613,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 4.990175500017358,
+      "wall_time": 4.655102299999271,
       "samples": 510,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_SignalAnalysis_TimeMonitoring",
@@ -1592,7 +1633,7 @@
     ],
     "bytes": 5082,
     "metrics": {
-      "cpu_time": 0.001,
+      "cpu_time": 0.002,
       "steps": 30,
       "function_evaluations": 51,
       "jacobian_evaluations": 7,
@@ -1602,13 +1643,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.712823899986688,
+      "wall_time": 5.869103999997606,
       "samples": 511,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_Sources_ConstantsAndExpressions",
@@ -1635,13 +1676,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.029258000024129,
+      "wall_time": 4.794666500005405,
       "samples": 505,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_Sources_PropertyTable",
@@ -1665,13 +1706,22 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.418307199986884,
+      "wall_time": 5.694653699996707,
       "samples": 510,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
+  },
+  {
+    "name": "MR_Examples_Elementary_Sources_SignalsFromFile",
+    "model": "Requirements.Examples.Elementary.Sources.SignalsFromFile",
+    "variables": [],
+    "bytes": 0,
+    "metrics": {},
+    "skipped": "Dymola: \"the model is too complex for the current license\" (DAE of 17 unknowns; documented cap 1000 unknowns outside the MSL)",
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_TimeLocators_After",
@@ -1685,7 +1735,7 @@
     ],
     "bytes": 3019,
     "metrics": {
-      "cpu_time": 0.002,
+      "cpu_time": 0.001,
       "steps": 33,
       "function_evaluations": 57,
       "jacobian_evaluations": 8,
@@ -1695,13 +1745,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.040924700006144,
+      "wall_time": 4.8482981999986805,
       "samples": 513,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_TimeLocators_AfterFor",
@@ -1714,7 +1764,7 @@
     ],
     "bytes": 2833,
     "metrics": {
-      "cpu_time": 0.002,
+      "cpu_time": 0.001,
       "steps": 37,
       "function_evaluations": 64,
       "jacobian_evaluations": 9,
@@ -1724,13 +1774,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.427259899995988,
+      "wall_time": 5.136169100005645,
       "samples": 520,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_TimeLocators_AfterUntil",
@@ -1743,7 +1793,7 @@
     ],
     "bytes": 2867,
     "metrics": {
-      "cpu_time": 0.001,
+      "cpu_time": 0.002,
       "steps": 53,
       "function_evaluations": 92,
       "jacobian_evaluations": 13,
@@ -1753,13 +1803,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.005837000004249,
+      "wall_time": 5.0112195999972755,
       "samples": 523,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_TimeLocators_Every",
@@ -1780,13 +1830,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 5.099368299997877,
+      "wall_time": 4.987554699997418,
       "samples": 543,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_TimeLocators_Until",
@@ -1810,13 +1860,41 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 4.758032799989451,
+      "wall_time": 4.729217699998117,
       "samples": 513,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
+  },
+  {
+    "name": "MR_Examples_Elementary_Units_Conversions",
+    "model": "Requirements.Examples.Elementary.Units.Conversions",
+    "variables": [
+      "kgps",
+      "m_kft",
+      "time"
+    ],
+    "bytes": 641,
+    "metrics": {
+      "cpu_time": 0.001,
+      "steps": 4,
+      "function_evaluations": 7,
+      "jacobian_evaluations": 1,
+      "state_events": 0,
+      "time_events": 0,
+      "result_points": 11,
+      "kind": "dynamic",
+      "solver": "Cvode",
+      "rtol": 1e-06,
+      "wall_time": 4.846759600004589,
+      "samples": 11,
+      "dymola_version": "Dymola Version 2026x, 2025-10-10",
+      "msl_version": "4.1.0",
+      "spread_applied": true
+    },
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_Verify_Requirement",
@@ -1831,7 +1909,7 @@
     ],
     "bytes": 2660,
     "metrics": {
-      "cpu_time": 0.016,
+      "cpu_time": 0.007,
       "steps": 18,
       "function_evaluations": 30,
       "jacobian_evaluations": 4,
@@ -1841,13 +1919,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 6.292334700003266,
+      "wall_time": 5.40940209999826,
       "samples": 504,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_MotorsWithLosses_CheckMotorWithLosses",
@@ -1856,7 +1934,7 @@
     "bytes": 0,
     "metrics": {},
     "skipped": "Dymola: \"the model is too complex for the current license\" (documented cap 1000 unknowns outside the MSL)",
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_SimplePumpingSystem_CheckPumpingSystem",
@@ -1865,7 +1943,7 @@
     "bytes": 0,
     "metrics": {},
     "skipped": "Dymola: \"the model is too complex for the current license\" (documented cap 1000 unknowns outside the MSL)",
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_SimplePumpingSystem_Components_PumpingSystem",
@@ -1880,7 +1958,7 @@
     ],
     "bytes": 38626,
     "metrics": {
-      "cpu_time": 0.75,
+      "cpu_time": 0.747,
       "steps": 1341,
       "function_evaluations": 2178,
       "jacobian_evaluations": 80,
@@ -1890,13 +1968,13 @@
       "kind": "dynamic",
       "solver": "Cvode",
       "rtol": 1e-06,
-      "wall_time": 7.4951286999857984,
+      "wall_time": 7.562354500005313,
       "samples": 5040,
       "dymola_version": "Dymola Version 2026x, 2025-10-10",
-      "msl_version": "4.0.0",
+      "msl_version": "4.1.0",
       "spread_applied": true
     },
-    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.0.0, Cvode"
+    "descriptor": "dymola 2026x, 2025-10-10, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_OM_Examples_AircraftRequirements_LimitedCabinAltitudeRateOfChange",
@@ -1921,11 +1999,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.0216659,
-      "simulation_time": 0.0140164,
+      "cpu_time": 0.0151969,
+      "simulation_time": 0.0097809,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.05199209999409504,
+      "wall_time": 0.3187684000004083,
       "samples": 508,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -1951,11 +2029,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.0207542,
-      "simulation_time": 0.0141828,
+      "cpu_time": 0.0218304,
+      "simulation_time": 0.0146431,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.04987049999181181,
+      "wall_time": 0.15583389999665087,
       "samples": 522,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -1980,11 +2058,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.010916,
-      "simulation_time": 0.0078751,
+      "cpu_time": 0.0111481,
+      "simulation_time": 0.0085699,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.03917459998046979,
+      "wall_time": 0.10794410000380594,
       "samples": 512,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -2009,11 +2087,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.012203,
-      "simulation_time": 0.0094951,
+      "cpu_time": 0.0119634,
+      "simulation_time": 0.0094881,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.03799270000308752,
+      "wall_time": 0.13296089999494143,
       "samples": 510,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -2033,7 +2111,7 @@
       "during1.y",
       "time"
     ],
-    "bytes": 3275,
+    "bytes": 3276,
     "metrics": {
       "state_events": 3,
       "time_events": 1,
@@ -2042,11 +2120,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.0157821,
-      "simulation_time": 0.0108316,
+      "cpu_time": 0.0103565,
+      "simulation_time": 0.008023,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.04418019999866374,
+      "wall_time": 0.08125649999419693,
       "samples": 510,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -2066,7 +2144,7 @@
       "minRising1.y",
       "time"
     ],
-    "bytes": 32528,
+    "bytes": 32539,
     "metrics": {
       "state_events": 2780,
       "time_events": 5335,
@@ -2075,11 +2153,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.0506943,
-      "simulation_time": 0.0131772,
+      "cpu_time": 0.0752958,
+      "simulation_time": 0.0156963,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.07802429998992011,
+      "wall_time": 0.155135999993945,
       "samples": 11563,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -2109,11 +2187,11 @@
       "jacobian_evaluations": 9,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.0140489,
-      "simulation_time": 0.0106742,
+      "cpu_time": 0.0122967,
+      "simulation_time": 0.0088755,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.040575799997895956,
+      "wall_time": 0.08223610000277404,
       "samples": 504,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -2131,7 +2209,7 @@
       "maxRising1.y",
       "time"
     ],
-    "bytes": 2849,
+    "bytes": 2850,
     "metrics": {
       "state_events": 6,
       "time_events": 5,
@@ -2140,11 +2218,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.0122108,
-      "simulation_time": 0.0096766,
+      "cpu_time": 0.012921,
+      "simulation_time": 0.0098671,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.03859699997701682,
+      "wall_time": 0.08263009999791393,
       "samples": 523,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -2164,7 +2242,7 @@
       "condition.y",
       "time"
     ],
-    "bytes": 3551,
+    "bytes": 3555,
     "metrics": {
       "state_events": 24,
       "time_events": 0,
@@ -2173,11 +2251,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.0043402,
-      "simulation_time": 0.0019659,
+      "cpu_time": 0.0022502,
+      "simulation_time": 0.0003328,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.03275929999654181,
+      "wall_time": 0.12353940000321018,
       "samples": 550,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -2197,7 +2275,7 @@
       "condition.y",
       "time"
     ],
-    "bytes": 2871,
+    "bytes": 2874,
     "metrics": {
       "state_events": 22,
       "time_events": 0,
@@ -2206,11 +2284,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.0024116,
-      "simulation_time": 0.0001279,
+      "cpu_time": 0.0021221,
+      "simulation_time": 0.0002559,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.03186739998636767,
+      "wall_time": 0.09934770000108983,
       "samples": 546,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -2230,7 +2308,7 @@
       "during.y",
       "time"
     ],
-    "bytes": 3464,
+    "bytes": 3465,
     "metrics": {
       "state_events": 16,
       "time_events": 0,
@@ -2239,11 +2317,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.0023146,
-      "simulation_time": 0.0001155,
+      "cpu_time": 0.002002,
+      "simulation_time": 0.0003202,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.03000689999316819,
+      "wall_time": 0.1083137000023271,
       "samples": 534,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -2264,7 +2342,7 @@
       "fixedRising2.y",
       "time"
     ],
-    "bytes": 3203,
+    "bytes": 3208,
     "metrics": {
       "state_events": 32,
       "time_events": 0,
@@ -2273,11 +2351,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.0026834,
-      "simulation_time": 0.000125,
+      "cpu_time": 0.0041666,
+      "simulation_time": 0.0005646,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.030609200010076165,
+      "wall_time": 0.11438020000059623,
       "samples": 566,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -2297,7 +2375,7 @@
       "maxDuration.y",
       "time"
     ],
-    "bytes": 3523,
+    "bytes": 3524,
     "metrics": {
       "state_events": 22,
       "time_events": 0,
@@ -2306,11 +2384,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.0044325,
-      "simulation_time": 0.0020945,
+      "cpu_time": 0.0022242,
+      "simulation_time": 0.0003516,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.03256399999372661,
+      "wall_time": 0.10798919999797363,
       "samples": 546,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -2330,7 +2408,7 @@
       "maxRising.y",
       "time"
     ],
-    "bytes": 2875,
+    "bytes": 2876,
     "metrics": {
       "state_events": 22,
       "time_events": 0,
@@ -2339,11 +2417,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.004323,
-      "simulation_time": 0.0019449,
+      "cpu_time": 0.0022594,
+      "simulation_time": 0.0002844,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.032934100017882884,
+      "wall_time": 0.11064739999710582,
       "samples": 546,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -2363,7 +2441,7 @@
       "maxFrequency1.y",
       "time"
     ],
-    "bytes": 36749,
+    "bytes": 36751,
     "metrics": {
       "state_events": 81,
       "time_events": 0,
@@ -2372,11 +2450,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.0107362,
-      "simulation_time": 0.0043664,
+      "cpu_time": 0.0086467,
+      "simulation_time": 0.0026708,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.03832950000651181,
+      "wall_time": 0.09997699999803444,
       "samples": 5164,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -2396,7 +2474,7 @@
       "minDuration.y",
       "time"
     ],
-    "bytes": 3527,
+    "bytes": 3531,
     "metrics": {
       "state_events": 22,
       "time_events": 0,
@@ -2405,11 +2483,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.0025913,
-      "simulation_time": 1.71e-05,
+      "cpu_time": 0.0021684,
+      "simulation_time": 0.0002817,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.03130080000846647,
+      "wall_time": 0.09917280000081519,
       "samples": 546,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -2429,7 +2507,7 @@
       "minRising1.y",
       "time"
     ],
-    "bytes": 2869,
+    "bytes": 2873,
     "metrics": {
       "state_events": 22,
       "time_events": 0,
@@ -2438,11 +2516,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.0023869,
-      "simulation_time": 0.000162,
+      "cpu_time": 0.002404,
+      "simulation_time": 0.0002509,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.03229299999657087,
+      "wall_time": 0.11367950000567362,
       "samples": 546,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -2462,7 +2540,7 @@
       "noRising1.y",
       "time"
     ],
-    "bytes": 2841,
+    "bytes": 2844,
     "metrics": {
       "state_events": 18,
       "time_events": 0,
@@ -2471,11 +2549,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.0024828,
-      "simulation_time": 8.82e-05,
+      "cpu_time": 0.0021272,
+      "simulation_time": 0.0003011,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.0301270000054501,
+      "wall_time": 0.10715630000049714,
       "samples": 538,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -2499,7 +2577,7 @@
       "whenChanging2.y",
       "whenChanging3.y"
     ],
-    "bytes": 3735,
+    "bytes": 3738,
     "metrics": {
       "state_events": 8,
       "time_events": 0,
@@ -2508,11 +2586,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.0022802,
-      "simulation_time": 0.000127,
+      "cpu_time": 0.0020967,
+      "simulation_time": 0.000225,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.02952240000013262,
+      "wall_time": 0.10432650000439025,
       "samples": 518,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -2536,7 +2614,7 @@
       "whenFalling2.y",
       "whenFalling3.y"
     ],
-    "bytes": 3724,
+    "bytes": 3725,
     "metrics": {
       "state_events": 8,
       "time_events": 0,
@@ -2545,11 +2623,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.0023066,
-      "simulation_time": 0.0001564,
+      "cpu_time": 0.0023396,
+      "simulation_time": 0.0005004,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.030625800020061433,
+      "wall_time": 0.11105379999935394,
       "samples": 518,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -2573,7 +2651,7 @@
       "whenRising2.y",
       "whenRising3.y"
     ],
-    "bytes": 3722,
+    "bytes": 3724,
     "metrics": {
       "state_events": 8,
       "time_events": 0,
@@ -2582,11 +2660,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.0023218,
-      "simulation_time": 0.0001526,
+      "cpu_time": 0.0020994,
+      "simulation_time": 0.0003747,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.029532499989727512,
+      "wall_time": 0.12154279999958817,
       "samples": 518,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -2612,11 +2690,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.128699,
-      "simulation_time": 0.032399,
+      "cpu_time": 0.140497,
+      "simulation_time": 0.0362084,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.16359880001982674,
+      "wall_time": 0.2530877999961376,
       "samples": 596,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -2641,11 +2719,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.0020199,
-      "simulation_time": 0.0002462,
+      "cpu_time": 0.0019539,
+      "simulation_time": 0.000649,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.02768229998764582,
+      "wall_time": 0.1030423999982304,
       "samples": 514,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -2670,11 +2748,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.0041013,
-      "simulation_time": 0.002219,
+      "cpu_time": 0.0019078,
+      "simulation_time": 0.0004254,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.031713100004708394,
+      "wall_time": 0.09884159999637632,
       "samples": 518,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -2702,11 +2780,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.00169,
-      "simulation_time": 0.0002421,
+      "cpu_time": 0.0014519,
+      "simulation_time": 0.0003795,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.026978199981385842,
+      "wall_time": 0.06778640000266023,
       "samples": 511,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -2734,11 +2812,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.0017067,
-      "simulation_time": 0.0002772,
+      "cpu_time": 0.0014844,
+      "simulation_time": 0.0004195,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.027352799981599674,
+      "wall_time": 0.06695180000679102,
       "samples": 511,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -2771,11 +2849,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.0023982,
-      "simulation_time": 0.0001565,
+      "cpu_time": 0.0021644,
+      "simulation_time": 0.0003989,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.02928100002463907,
+      "wall_time": 0.10042740000062622,
       "samples": 516,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -2802,11 +2880,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.0025341,
-      "simulation_time": 8.35e-05,
+      "cpu_time": 0.0017818,
+      "simulation_time": 0.0002481,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.039226200024131685,
+      "wall_time": 0.09457649999967543,
       "samples": 522,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -2843,11 +2921,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.0030484,
-      "simulation_time": 0.0003767,
+      "cpu_time": 0.0023891,
+      "simulation_time": 0.0004093,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.03397650000988506,
+      "wall_time": 0.11277469999913592,
       "samples": 528,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -2876,11 +2954,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.0042835,
-      "simulation_time": 0.0023287,
+      "cpu_time": 0.0018505,
+      "simulation_time": 0.0003212,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.03213199999299832,
+      "wall_time": 0.09429300000192598,
       "samples": 512,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -2917,12 +2995,55 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.0045996,
-      "simulation_time": 0.0021901,
+      "cpu_time": 0.0024408,
+      "simulation_time": 0.0004127,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.03374510002322495,
+      "wall_time": 0.09834370000316994,
       "samples": 528,
+      "omc_version": "OpenModelica v1.27.1 (64-bit)",
+      "msl_version": "4.1.0",
+      "spread_applied": true,
+      "rtol": 1e-06
+    },
+    "descriptor": "openmodelica v1.27.1 (64-bit), MSL 4.1.0, cvode"
+  },
+  {
+    "name": "MR_OM_Examples_Elementary_LogicalBlocks_PropertyTable4",
+    "model": "Requirements.Examples.Elementary.LogicalBlocks.PropertyTable4",
+    "variables": [
+      "a.ItoP.y",
+      "a.integerTable.realToInteger.y",
+      "a.integerTable.y",
+      "a.y",
+      "and1.y",
+      "andEmpty.y",
+      "b.ItoP.y",
+      "b.integerTable.realToInteger.y",
+      "b.integerTable.y",
+      "b.y",
+      "nAbsorption",
+      "nDistributivity",
+      "not1.y",
+      "or1.y",
+      "orEmpty.y",
+      "time"
+    ],
+    "bytes": 4067,
+    "metrics": {
+      "state_events": 15,
+      "time_events": 0,
+      "steps": 1495,
+      "function_evaluations": 1495,
+      "jacobian_evaluations": 0,
+      "error_test_failures": 0,
+      "convergence_failures": 0,
+      "cpu_time": 0.0022108,
+      "simulation_time": 0.0003028,
+      "kind": "dynamic",
+      "solver": "cvode",
+      "wall_time": 0.09527900000102818,
+      "samples": 192,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
       "spread_applied": true,
@@ -2951,11 +3072,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.0036939,
-      "simulation_time": 0.0020292,
+      "cpu_time": 0.0016141,
+      "simulation_time": 0.0003983,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.029084300011163577,
+      "wall_time": 0.06871169999794802,
       "samples": 518,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -2981,11 +3102,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.0017611,
-      "simulation_time": 0.0002325,
+      "cpu_time": 0.0014489,
+      "simulation_time": 0.0004667,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.02734579998650588,
+      "wall_time": 0.06996670000080485,
       "samples": 518,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -3015,11 +3136,11 @@
       "jacobian_evaluations": 10,
       "error_test_failures": 1,
       "convergence_failures": 0,
-      "cpu_time": 0.0029797,
-      "simulation_time": 0.0004514,
+      "cpu_time": 0.0087394,
+      "simulation_time": 0.0010107,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.02945430000545457,
+      "wall_time": 0.07617649999883724,
       "samples": 502,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -3046,11 +3167,11 @@
       "jacobian_evaluations": 16,
       "error_test_failures": 1,
       "convergence_failures": 0,
-      "cpu_time": 0.0029134,
-      "simulation_time": 0.0007755,
+      "cpu_time": 0.003002,
+      "simulation_time": 0.0005864,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.028172400023322552,
+      "wall_time": 0.07206930000393186,
       "samples": 516,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -3077,11 +3198,11 @@
       "jacobian_evaluations": 20,
       "error_test_failures": 12,
       "convergence_failures": 0,
-      "cpu_time": 0.0029966,
-      "simulation_time": 0.0006099,
+      "cpu_time": 0.0041454,
+      "simulation_time": 0.0009479,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.02850590000161901,
+      "wall_time": 0.06943809999938821,
       "samples": 511,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -3109,11 +3230,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.0021424,
-      "simulation_time": 0.0001477,
+      "cpu_time": 0.0018418,
+      "simulation_time": 0.000292,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.03336150001268834,
+      "wall_time": 0.10513820000051055,
       "samples": 514,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -3144,11 +3265,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.0020311,
-      "simulation_time": 0.0004815,
+      "cpu_time": 0.0015724,
+      "simulation_time": 0.0004095,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.02753859999938868,
+      "wall_time": 0.06681570000364445,
       "samples": 506,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -3176,11 +3297,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.0039978,
-      "simulation_time": 0.002062,
+      "cpu_time": 0.0018873,
+      "simulation_time": 0.0003038,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.03243410002323799,
+      "wall_time": 0.09559730000182753,
       "samples": 514,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -3204,7 +3325,7 @@
       "time",
       "whenRising1.y"
     ],
-    "bytes": 4428,
+    "bytes": 4431,
     "metrics": {
       "state_events": 9,
       "time_events": 0,
@@ -3213,11 +3334,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.0024346,
-      "simulation_time": 8.75e-05,
+      "cpu_time": 0.0071019,
+      "simulation_time": 0.0004246,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.06784300005529076,
+      "wall_time": 0.07421089999843389,
       "samples": 520,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -3245,11 +3366,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.0016921,
-      "simulation_time": 0.0002296,
+      "cpu_time": 0.0020476,
+      "simulation_time": 0.0005819,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.027134500007377937,
+      "wall_time": 0.0748096000024816,
       "samples": 516,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -3276,11 +3397,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.0020588,
-      "simulation_time": 0.0001309,
+      "cpu_time": 0.0017606,
+      "simulation_time": 0.0003018,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.02880970001569949,
+      "wall_time": 0.09764089999953285,
       "samples": 524,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -3307,11 +3428,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.0035709,
-      "simulation_time": 0.0018828,
+      "cpu_time": 0.0014265,
+      "simulation_time": 0.0004299,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.028876800002763048,
+      "wall_time": 0.06985129999520723,
       "samples": 526,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -3336,11 +3457,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.0038517,
-      "simulation_time": 0.0021777,
+      "cpu_time": 0.0016458,
+      "simulation_time": 0.000457,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.029249200015328825,
+      "wall_time": 0.06547519999730866,
       "samples": 546,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -3368,11 +3489,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.0018158,
-      "simulation_time": 0.0002821,
+      "cpu_time": 0.0014796,
+      "simulation_time": 0.0004174,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.02908380000735633,
+      "wall_time": 0.07336200000281679,
       "samples": 516,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -3398,11 +3519,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.0008946,
-      "simulation_time": 0.0002156,
+      "cpu_time": 0.0009465,
+      "simulation_time": 0.000268,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.026080299998284318,
+      "wall_time": 0.061941800006025005,
       "samples": 12,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -3431,11 +3552,11 @@
       "jacobian_evaluations": 0,
       "error_test_failures": 0,
       "convergence_failures": 0,
-      "cpu_time": 0.017932,
-      "simulation_time": 0.01512,
+      "cpu_time": 0.00868,
+      "simulation_time": 0.0059483,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.04515659998287447,
+      "wall_time": 0.11407060000055935,
       "samples": 508,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -3468,11 +3589,11 @@
       "jacobian_evaluations": 16,
       "error_test_failures": 8,
       "convergence_failures": 0,
-      "cpu_time": 0.0268484,
-      "simulation_time": 0.0194433,
+      "cpu_time": 0.0274158,
+      "simulation_time": 0.0160968,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 0.11956439999630675,
+      "wall_time": 0.14519180000206688,
       "samples": 516,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -3508,11 +3629,11 @@
       "jacobian_evaluations": 91,
       "error_test_failures": 103,
       "convergence_failures": 10,
-      "cpu_time": 1.11206,
-      "simulation_time": 1.06632,
+      "cpu_time": 1.17304,
+      "simulation_time": 1.12552,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 1.2245783999678679,
+      "wall_time": 1.296542899995984,
       "samples": 568,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",
@@ -3541,11 +3662,11 @@
       "jacobian_evaluations": 153,
       "error_test_failures": 98,
       "convergence_failures": 8,
-      "cpu_time": 2.97341,
-      "simulation_time": 2.87266,
+      "cpu_time": 3.1064,
+      "simulation_time": 3.00839,
       "kind": "dynamic",
       "solver": "cvode",
-      "wall_time": 3.01169439998921,
+      "wall_time": 3.2207787000006647,
       "samples": 5036,
       "omc_version": "OpenModelica v1.27.1 (64-bit)",
       "msl_version": "4.1.0",

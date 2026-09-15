@@ -952,6 +952,22 @@ cases:
     modifiers: {}
     variables: [time, m_kft, kgps]
 
+  - name: MR_OM_Examples_Elementary_LogicalBlocks_PropertyTable4
+    # Added 2026-09-15 with the four-valued Property (library 0.8.0): the two
+    # sources run through all 16 value pairs in 16 s; the blocks are asserted
+    # against the ETL tables at every instant, the functions against every
+    # entry, and the failed laws (absorption, distributivity) against their
+    # counterexamples. A model that translates and runs to the end is the test;
+    # the stored outputs are the 16-step table trajectories.
+    enabled: true
+    model: Requirements.Examples.Elementary.LogicalBlocks.PropertyTable4
+    start_time: 0.0
+    final_time: 16.0
+    ncp: 160
+    rtol: 1.0e-06
+    modifiers: {}
+    variables: [time, "*.y", nAbsorption, nDistributivity]
+
   - name: MR_OM_Examples_MotorsWithLosses_CheckMotorWithLosses
     # Generated 2026-09-13 from Requirements.Examples.MotorsWithLosses.CheckMotorWithLosses's experiment annotation.
     # No Tolerance in the annotation: rtol defaults to 1e-6 here, not Dymola's 1e-4.

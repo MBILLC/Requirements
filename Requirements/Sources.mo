@@ -99,7 +99,8 @@ literal value defined with BooleanExpression.
                           choices(choice=Requirements.Types.Property.Violated
           "Violated",     choice=Requirements.Types.Property.Undecided
           "Undecided",    choice=Requirements.Types.Property.Satisfied
-          "Satisfied",    __Dymola_radioButtons=true));
+          "Satisfied",    choice=Requirements.Types.Property.Undefined
+          "Undefined",    __Dymola_radioButtons=true));
     Requirements.Interfaces.PropertyOutput y
       "Constant Property output value"
       annotation (Placement(transformation(extent={{100,-10},{120,10}})));
@@ -196,7 +197,7 @@ in the parameter menu.
           0,
           0,
           2)
-      "Table matrix (first column time; second column y as Integer: =1 (Violated), =2 (Undecided), =3 (Satisfied))";
+      "Table matrix (first column time; second column y as Integer: =1 (Violated), =2 (Undecided), =3 (Satisfied), =4 (Undefined))";
 
     Requirements.Interfaces.PropertyOutput y
       "Constantly interpolated table value"
