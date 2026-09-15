@@ -478,7 +478,11 @@ double RequirementsCsv_getReal(void* obj, int column, double t, double tNext, do
 /* Time derivative of the i-th Real column at t times der_t: the slope of the
    linear segment t lies in (the segment to the right of a row, the segment to
    the left of an event's first row when evaluated on the left side), zero
-   outside the file's range and at its last row. The derivative annotation of
+   outside the file's range where the first/last row is held. At the file's
+   last row -- the final instant of a run that reads the file to its end --
+   the slope of the last segment (the one ending at that row, or at the first
+   row of a final event group), so a derived signal does not drop to zero in
+   the run's last stored row. The derivative annotation of
    Requirements.Internal.CSV.getReal, so der(reader.x) is available to a
    SignalAnalysis.ExactDerivative in a check model reading a file. */
 double RequirementsCsv_getRealDer(void* obj, int column, double t, double tNext, double tPre, double der_t)
@@ -497,7 +501,12 @@ double RequirementsCsv_getRealDer(void* obj, int column, double t, double tNext,
         if (i0 == 0) return 0.0;
         return (v[i0] - v[i0 - 1]) / (f->time[i0] - f->time[i0 - 1]) * der_t;
     }
-    if (i + 1 >= f->nRows) return 0.0;
+    if (i + 1 >= f->nRows) {
+        /* the last row: the slope of the segment ending at it (or at the first row of a final event group) */
+        i0 = RequirementsCsv_groupFirst(f, i);
+        if (i0 == 0) return 0.0;
+        return (v[i0] - v[i0 - 1]) / (f->time[i0] - f->time[i0 - 1]) * der_t;
+    }
     return (v[i + 1] - v[i]) / (f->time[i + 1] - f->time[i]) * der_t;
 }
 

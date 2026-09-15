@@ -924,7 +924,7 @@ function, so <code>der(reader.x)</code> &mdash; a <code>SignalAnalysis.ExactDeri
 </html>"));
     end getReal;
 
-    pure function getRealDer "Time derivative of the i-th Real column at time t (the slope of the linear segment; zero outside the file's range)"
+    pure function getRealDer "Time derivative of the i-th Real column at time t (the slope of the linear segment, the last segment's at the last row; zero outside the file's range)"
       input File file;
       input Integer column "Index into the realNames the file was opened with";
       input Real t "Current time";
@@ -936,7 +936,7 @@ function, so <code>der(reader.x)</code> &mdash; a <code>SignalAnalysis.ExactDeri
         annotation(Include="#include \"RequirementsCsv.h\"", IncludeDirectory="modelica://Requirements/Resources/Include");
       annotation(Documentation(info="<html>
 <p>On the left side of an event (the bracket as in <code>getReal</code>) the slope of the segment ending at the event's first row;
-otherwise the slope of the segment starting at the last row at or before <code>t</code>; zero outside the file's range and at its last row.</p>
+otherwise the slope of the segment starting at the last row at or before <code>t</code>; at the file's last row the slope of the segment ending there (or at the first row of a final event group), so a derived signal keeps its value in the final stored row of a run that reads the file to its end; zero outside the file's range, where the first / last row is held.</p>
 </html>"));
     end getRealDer;
 

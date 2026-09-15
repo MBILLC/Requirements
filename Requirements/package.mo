@@ -1,5 +1,5 @@
 within ;
-package Requirements "Requirements (Version 0.9.0) - Defining requirements formally and checking them when simulating"
+package Requirements "Requirements (Version 0.9.1) - Defining requirements formally and checking them when simulating"
   extends Modelica.Icons.Package;
 
 
@@ -8,6 +8,26 @@ package UsersGuide "User's Guide"
 
 package ReleaseNotes "Release notes"
   extends Modelica.Icons.ReleaseNotes;
+
+  class Version_0_9_1 "Version 0.9.1 (Sept. 15, 2026)"
+  extends Modelica.Icons.ReleaseNotes;
+
+    annotation (Documentation(info="<html>
+<p>
+<b>The MA-HS-CSV reader's derivative at the file's last row.</b>
+<a href=\"modelica://Requirements.Internal.CSV.getRealDer\">Internal.CSV.getRealDer</a> (the <code>derivative</code>
+annotation of <code>getReal</code>, in <code>Resources/Include/RequirementsCsv.h</code>) returned 0 at the file's last
+row, as it does beyond the file's range where the last row is held. A check model that reads a file to its end is
+evaluated at exactly that instant, so every derived signal (<code>SignalAnalysis.ExactDerivative</code> on a reader
+output) dropped to 0 in the run's final stored row and a check on a derivative could read a spurious edge there
+(seen on ModCheck's <code>TC-AC-CabinAltitudeRate-ShortExcursion</code>: a zero-length excursion out of the altitude-rate
+envelope at the stop time). At the last row the function now returns the slope of the segment ending at it (at the
+first row of a final event group), as the left side of an event does; beyond the file's range it is still 0. The
+ctypes test (<code>Resources/C-Sources/test</code>) probes every row instant, the last included, against the Python
+reader, which changed the same way. No other behaviour changes; no stored reference of this library moves.
+</p>
+</html>"));
+  end Version_0_9_1;
 
   class Version_0_9_0 "Version 0.9.0 (Sept. 15, 2026)"
   extends Modelica.Icons.ReleaseNotes;
@@ -454,10 +474,10 @@ end UsersGuide;
 
   annotation (preferredView="info",
   uses(Modelica(version="4.1.0")),
-version="0.9.0",
+version="0.9.1",
 versionDate="2026-09-15",
 dateModified = "2026-09-15",
-conversion(noneFromVersion="0.7.1", noneFromVersion="0.8.0"),
+conversion(noneFromVersion="0.7.1", noneFromVersion="0.8.0", noneFromVersion="0.9.0"),
 revisionId="$Id:: package.mo 9390 2016-06-21 06:35:11Z #$",
 Documentation(info="<html>
 <p>
