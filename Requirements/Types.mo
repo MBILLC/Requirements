@@ -89,4 +89,31 @@ the property became applicable, beside it); one that was Violated at any instant
    type Event = Boolean
     "Boolean that is only used as edge-type to emulate event signals";
 
+  type StepTarget = enumeration(
+      Stepping "The stepping signal after the step (the setpoint of a closed loop)",
+      Reference "A reference signal's current value (a disturbance step measured against the setpoint)")
+    "The target a step-response metric measures the response against (ModCheck's requirements plan, section 21.2); the post-processing target 'the response's final value' has no running form and is Python's alone"
+    annotation (Documentation(info="<html>
+<p>The target <code>yInf</code> of a step response's metrics: <b>Stepping</b> -- the stepping signal's
+value after the step, the setpoint of a closed loop; <b>Reference</b> -- a separate reference signal's
+current value, for a disturbance step measured against the setpoint. The third target of ModCheck's
+step-response requirements, the response's own final value, is only known when the window closes and has
+no running form: <code>step_checks.py</code> evaluates it, the blocks refuse it.</p>
+</html>"));
+
+  type StepMetric = enumeration(
+      Overshoot "The excursion beyond the target, in the direction of the change",
+      Undershoot "The excursion opposite to the change, beyond the starting value",
+      RiseTime "From the lower to the upper level (level1 .. level2 of the change)",
+      DelayTime "To half of the change",
+      SettlingTime "The last exit from the band around the target",
+      SteadyStateError "The deviation from the target at the window's end",
+      DampingRatio "From the log decrement of the first two extrema beyond the target",
+      DecayRatio "The third extremum over the first")
+    "The step-response metrics of ModCheck's requirements plan, section 21.2"
+    annotation (Documentation(info="<html>
+<p>The eight metrics of a step response (ModCheck's requirements plan, section 21.2), as
+<a href=\"modelica://Requirements.ChecksInFixedWindow.StepResponseCheck\">StepResponseCheck</a> bounds them.</p>
+</html>"));
+
 end Types;

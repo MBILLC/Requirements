@@ -1082,3 +1082,31 @@ cases:
     rtol: 1.0e-06
     modifiers: {}
     variables: [time, "*.y", "*.margin"]
+
+  - name: MR_Examples_Elementary_StepResponse_SecondOrder
+    # Added 2026-09-16 with the step-response blocks (library 0.10.0, ModCheck plan
+    # phase 15b): the running metrics and the checks' Property and margin asserted
+    # against the closed forms inside the example; the stored `*.y`, `*.margin` and
+    # `*.value` trajectories are the reference.
+    enabled: true
+    model: Requirements.Examples.Elementary.StepResponse.SecondOrder
+    start_time: 0.0
+    final_time: 6.0
+    ncp: 6000
+    rtol: 1.0e-06
+    modifiers: {}
+    variables: [time, "*.y", "*.margin", "*.value"]
+
+  - name: MR_Examples_Elementary_StepResponse_Disturbance
+    # Added 2026-09-16 with the step-response blocks (library 0.10.0, ModCheck plan
+    # phase 15b): the running metrics and the checks' Property and margin asserted
+    # against the closed forms inside the example; the stored `*.y`, `*.margin` and
+    # `*.value` trajectories are the reference.
+    enabled: true
+    model: Requirements.Examples.Elementary.StepResponse.Disturbance
+    start_time: 0.0
+    final_time: 6.0
+    ncp: 6000
+    rtol: 1.0e-06
+    modifiers: {}
+    variables: [time, "*.y", "*.margin", "*.value"]

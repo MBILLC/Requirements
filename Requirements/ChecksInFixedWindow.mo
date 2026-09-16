@@ -1864,6 +1864,256 @@ over a run and the instant it occurs are taken from the stored trajectory (ModCh
 </p>
 </html>"));
   end WithinDomain;
+  block StepResponseCheck
+    "One step-response metric of u after a step of r, bounded: Property and margin (ModCheck's requirements plan, section 21; the R3 layer of step_checks.py)"
+    import Modelica.Units.SI;
+    import Requirements.Types.Property;
+    import Requirements.Types.StepMetric;
+    import Requirements.Types.StepTarget;
+
+    Modelica.Blocks.Interfaces.RealInput u "The response"
+      annotation (Placement(transformation(extent={{-240,40},{-200,80}})));
+    Modelica.Blocks.Interfaces.RealInput r "The stepping signal"
+      annotation (Placement(transformation(extent={{-240,-20},{-200,20}})));
+    parameter StepTarget target = StepTarget.Stepping "The target: the stepping signal after the step, or the yRef input"
+      annotation(Evaluate=true);
+    Modelica.Blocks.Interfaces.RealInput yRef if target == StepTarget.Reference "The reference (target = Reference)"
+      annotation (Placement(transformation(extent={{-240,-80},{-200,-40}})));
+    parameter StepMetric metric = StepMetric.Overshoot "The metric bounded";
+    parameter Real bound "The bound: at most (at least for the damping ratio) -- in percent of the change when boundIsPercent, seconds for a time, u's unit otherwise";
+    parameter Boolean boundIsPercent = true "= true: an overshoot / undershoot / steady-state error bound in percent of |deltaY|; false: in u's unit"
+      annotation(Dialog(enable=metric == StepMetric.Overshoot or metric == StepMetric.Undershoot or metric == StepMetric.SteadyStateError));
+    parameter Real threshold(min=0) = 0 "A step is a change of r between two samples of at least this (0: any change)";
+    parameter SI.Time samplePeriod(min=Modelica.Constants.eps) = 1e-3 "The sampling period of the metrics";
+    parameter Real level1(min=0, max=1) = 0.1 "Lower rise-time level (fraction of the change)";
+    parameter Real level2(min=0, max=1) = 0.9 "Upper rise-time level";
+    parameter Real band(min=0) = 0.02 "Settling band: a fraction of the change (bandIsFraction) or absolute";
+    parameter Boolean bandIsFraction = true "= true: band is a fraction of |deltaY|";
+    parameter SI.Time T_window(min=0) = 0 "0: the window runs to the next step; > 0: closes T_window after the step";
+    parameter Real scale(min=Modelica.Constants.eps) = 1
+      "Scale of the margin: margin = robustness/scale, with scale the requirement's tolerance (1 = the raw robustness in the metric's unit)"
+      annotation(Dialog(tab="Margin"));
+    parameter Boolean computeMargin = true "= true, if the normalized margin output is provided"
+      annotation(Dialog(tab="Margin"), choices(checkBox=true), Evaluate=true);
+    Requirements.Interfaces.PropertyOutput y "Property output signal"
+      annotation (Placement(transformation(extent={{200,-10},{220,10}})));
+    Requirements.Interfaces.MarginOutput margin = robustness/scale if computeMargin
+      "Normalized margin of the check: >= 0 exactly when the check holds, in units of scale"
+      annotation (Placement(transformation(extent={{200,-100},{220,-80}})));
+    Modelica.Blocks.Interfaces.RealOutput value "The metric's running value (its final value at the window's close)"
+      annotation (Placement(transformation(extent={{200,60},{220,80}})));
+    Requirements.SignalAnalysis.StepResponse stepResponse(
+      target=target, threshold=threshold, samplePeriod=samplePeriod, level1=level1, level2=level2,
+      band=band, bandIsFraction=bandIsFraction, T_window=T_window)
+      annotation (Placement(transformation(extent={{-60,-20},{-20,20}})));
+  protected
+    discrete Real robustness "Signed distance of the metric to its bound, in the metric's unit (>= 0 exactly when the check holds)";
+    discrete Boolean decided "The open window's property has been decided (held until the window closes)";
+    discrete Boolean pendingStart "A window opened at a sample that also closed the previous one: Undecided from the next sample";
+    discrete Boolean closingByStep "The window closed at this sample by the next step (the metrics read with pre())";
+    discrete Real ov, us, dy, tl1, tl2, th, rt, dl, st, er, oa, aa1, aa2, aa3, ts;
+    discrete Integer ne, os, neClosed;
+    discrete Real zetaClosed, decayClosed;
+    discrete Boolean ib, nb;
+    discrete Real val "The metric's value now";
+    discrete Real rho "The running robustness";
+    discrete Boolean early "The bound is provably broken (or met) now";
+    discrete Property yNew;
+  equation
+    connect(u, stepResponse.u);
+    connect(r, stepResponse.r);
+    connect(yRef, stepResponse.yRef);
+  algorithm
+    when sample(samplePeriod/2, samplePeriod) then
+      closingByStep := stepResponse.closed and stepResponse.nSteps > pre(stepResponse.nSteps);
+      // the metrics of the window being judged: the previous sample's when the next step reset them
+      ov := if closingByStep then pre(stepResponse.overshoot) else stepResponse.overshoot;
+      us := if closingByStep then pre(stepResponse.undershoot) else stepResponse.undershoot;
+      dy := if closingByStep then pre(stepResponse.deltaY) else stepResponse.deltaY;
+      tl1 := if closingByStep then pre(stepResponse.tLevel1) else stepResponse.tLevel1;
+      tl2 := if closingByStep then pre(stepResponse.tLevel2) else stepResponse.tLevel2;
+      th := if closingByStep then pre(stepResponse.tHalf) else stepResponse.tHalf;
+      rt := if closingByStep then pre(stepResponse.riseTime) else stepResponse.riseTime;
+      dl := if closingByStep then pre(stepResponse.delayTime) else stepResponse.delayTime;
+      st := if closingByStep then pre(stepResponse.settlingTime) else stepResponse.settlingTime;
+      er := if closingByStep then pre(stepResponse.error) else stepResponse.error;
+      ib := if closingByStep then pre(stepResponse.inBand) else stepResponse.inBand;
+      nb := if closingByStep then pre(stepResponse.noBase) else stepResponse.noBase;
+      ts := if closingByStep then pre(stepResponse.tStep) else stepResponse.tStep;
+      ne := if closingByStep then pre(stepResponse.nExtrema) else stepResponse.nExtrema;
+      aa1 := if closingByStep then pre(stepResponse.a1) else stepResponse.a1;
+      aa2 := if closingByStep then pre(stepResponse.a2) else stepResponse.a2;
+      aa3 := if closingByStep then pre(stepResponse.a3) else stepResponse.a3;
+      oa := if closingByStep then pre(stepResponse.openAmplitude) else stepResponse.openAmplitude;
+      os := if closingByStep then pre(stepResponse.openSign) else stepResponse.openSign;
+      // the extrema closed so far decide early; the open one counts for the running value
+      // and at the window's close (as step_checks.py counts every segment of the window)
+      neClosed := ne;
+      zetaClosed := if ne >= 2 and aa2 > 0 then 2*log(aa1/aa2)/sqrt(4*Modelica.Constants.pi^2 + (2*log(aa1/aa2))^2) else 1;
+      decayClosed := if ne >= 3 and aa1 > 0 then aa3/aa1 else 0;
+      if os <> 0 then
+        ne := ne + 1;
+        if ne == 1 then
+          aa1 := oa;
+        elseif ne == 2 then
+          aa2 := oa;
+        elseif ne == 3 then
+          aa3 := oa;
+        end if;
+      end if;
+      // -- the metric, its robustness and whether it is decided before the window closes
+      early := false;
+      if metric == StepMetric.Overshoot or metric == StepMetric.Undershoot then
+        val := if boundIsPercent then (if abs(dy) > 0 then 100*(if metric == StepMetric.Overshoot then ov else us)/abs(dy) else 0)
+               else (if metric == StepMetric.Overshoot then ov else us);
+        rho := bound - val;
+        early := rho < 0;
+      elseif metric == StepMetric.RiseTime then
+        val := rt;
+        rho := bound - val;
+        early := tl2 >= 0 or rho < 0;
+      elseif metric == StepMetric.DelayTime then
+        val := dl;
+        rho := bound - val;
+        early := th >= 0 or rho < 0;
+      elseif metric == StepMetric.SettlingTime then
+        val := st;
+        rho := bound - val;
+        early := time > ts + bound and not ib;
+      elseif metric == StepMetric.SteadyStateError then
+        val := if boundIsPercent then (if abs(dy) > 0 then 100*er/abs(dy) else 0) else er;
+        rho := bound - val;
+      elseif metric == StepMetric.DampingRatio then
+        if ne >= 2 and aa2 > 0 then
+          val := 2*log(aa1/aa2)/sqrt(4*Modelica.Constants.pi^2 + (2*log(aa1/aa2))^2);
+        elseif ne == 1 and not nb and abs(dy) > 0 then
+          val := if aa1/abs(dy) >= 1 then 0 else -log(aa1/abs(dy))/sqrt(Modelica.Constants.pi^2 + log(aa1/abs(dy))^2);
+        else
+          val := 1;
+        end if;
+        rho := val - bound;
+        early := neClosed >= 2 and zetaClosed - bound < 0;
+      else
+        val := if ne >= 3 and aa1 > 0 then aa3/aa1 else 0;
+        rho := bound - val;
+        early := neClosed >= 3 and bound - decayClosed < 0;
+      end if;
+      // -- the property
+      yNew := pre(y);
+      if pendingStart then
+        // the window that opened at the last sample: Undecided from now
+        yNew := Property.Undecided;
+        pendingStart := false;
+        decided := false;
+      end if;
+      if stepResponse.closed then
+        // the window being judged closes: its decision, unless decided already
+        if not pre(decided) then
+          if boundIsPercent and nb and (metric == StepMetric.Overshoot or metric == StepMetric.Undershoot or metric == StepMetric.SteadyStateError) then
+            yNew := Property.Undefined;          // a percent metric on a disturbance: no base (never applicable)
+          else
+            yNew := if rho >= 0 then Property.Satisfied else Property.Violated;
+          end if;
+        end if;
+        decided := false;
+        pendingStart := closingByStep;           // a new window opens at this sample: Undecided from the next
+        if not closingByStep then
+          decided := true;                        // hold the decision until the next step
+        end if;
+      elseif stepResponse.nSteps > pre(stepResponse.nSteps) then
+        // the first window (or one after a closed-and-held window) opens
+        yNew := Property.Undecided;
+        decided := false;
+      elseif stepResponse.active and not pre(decided) and early then
+        // decided before the window closes
+        if boundIsPercent and nb and (metric == StepMetric.Overshoot or metric == StepMetric.Undershoot) then
+          yNew := Property.Undefined;
+        else
+          yNew := if rho >= 0 then Property.Satisfied else Property.Violated;
+        end if;
+        decided := true;
+      end if;
+      y := yNew;
+      // the robustness follows the running metric while the window is open -- after an early
+      // decision too, so a violated overshoot's margin reaches the eventual peak's, as
+      // step_checks.py reports it -- and holds the final value after the close
+      if stepResponse.active or stepResponse.closed then
+        robustness := rho;
+      end if;
+    end when;
+  initial equation
+    y = Property.Undefined;
+    yNew = Property.Undefined;
+    robustness = 0;
+    decided = false;
+    pendingStart = false;
+    closingByStep = false;
+    val = 0;
+    rho = 0;
+    early = false;
+    ov = 0; us = 0; dy = 0; tl1 = -1; tl2 = -1; th = -1; rt = 0; dl = 0; st = 0; er = 0; oa = 0; aa1 = 0; aa2 = 0; aa3 = 0; ts = -1;
+    ne = 0; os = 0; neClosed = 0; zetaClosed = 1; decayClosed = 0;
+    ib = true; nb = false;
+  equation
+    value = val;
+    annotation (defaultComponentName="stepCheck1",
+      Icon(coordinateSystem(preserveAspectRatio=false, extent={{-200,-100},{200,100}}), graphics={
+          Rectangle(extent={{-200,100},{200,-100}}, lineColor={0,0,0}, lineThickness=5.0, fillColor={210,210,210},
+            fillPattern=FillPattern.Solid, borderPattern=BorderPattern.Raised),
+          Rectangle(extent={{-190,0},{190,-90}}, lineColor={0,0,0}, lineThickness=5.0, fillColor={245,245,245},
+            fillPattern=FillPattern.Solid, borderPattern=BorderPattern.Sunken),
+          Line(points={{-170,-70},{-110,-70},{-110,-30},{-80,-8},{-50,-26},{-20,-18},{40,-22},{170,-22}}, color={0,0,255}, thickness=0.5),
+          Line(points={{-110,-22},{170,-22}}, color={0,140,72}, pattern=LinePattern.Dash),
+          Text(extent={{-190,90},{190,10}}, textColor={0,0,0}, textString="%metric <= %bound")}),
+      Documentation(info="<html>
+<h4>Syntax</h4>
+<blockquote><p>
+property = <b>StepResponseCheck</b>(u=..., r=..., metric=..., bound=...).y;
+</p></blockquote>
+
+<h4>Description</h4>
+<p>
+One metric of the step response of <b>u</b> after a step of <b>r</b>, bounded (ModCheck's requirements plan,
+section 21.2): the metric is computed by an inner
+<a href=\"modelica://Requirements.SignalAnalysis.StepResponse\">SignalAnalysis.StepResponse</a> at every
+<b>samplePeriod</b>, and the Property output <b>y</b> is Undefined before the first step, Undecided from a step
+to the earliest sample at which the bound is provably met or broken -- an overshoot exceeding its bound, a
+level not reached <b>bound</b> after the lower level (rise time) or after the step (delay time), the band left
+after the deadline (settling time), a damping or decay ratio known from two or three extrema -- and decided
+at the window's close otherwise (the peak is only known then; the steady-state error is read there). The
+window closes at the next step of r or <b>T_window</b> after the step; a window that runs to the end of the
+run stays Undecided, its running <b>value</b> and margin the evidence. A window closed by the next step is
+judged on the previous sample's metrics (the step resets them) and the new window is Undecided from the
+sample after.
+</p>
+<p>
+The bound of an overshoot, undershoot or steady-state error is a percent of the change |deltaY| when
+<b>boundIsPercent</b> (a disturbance step, whose change is below a quarter of its deviation, has no base:
+the property is Undefined), else in u's unit; the bound of a time is in seconds; the damping ratio must be
+<em>at least</em> the bound, every other metric <em>at most</em>.
+</p>
+<h4>Margin</h4>
+<p>
+Output <b>margin</b> (present if <b>computeMargin</b> = true) is the signed distance of the running metric to
+its bound -- <code>bound - value</code>, <code>zeta - bound</code> for the damping ratio -- divided by
+<b>scale</b>, followed while the window is open (after an early decision too, so a violated overshoot's
+margin reaches the eventual peak's) and held after the close: at every decided sample margin &ge; 0 exactly
+when the check holds, and at the window's close it is the margin <code>step_checks.py</code> reports. Set
+<b>scale</b> to the requirement's tolerance (the ModCheck plan's section 18.5).
+</p>
+<p>
+The reported verdict of a step-response requirement is ModCheck's <code>step_checks.py</code> on the stored
+trajectory (rule R7); this block is the development aid in a Modelica tool and the cross-check the
+orchestrator runs beside it: the decided Property and the margin agree to one sampling period in time and a
+hundredth of the tolerance. The target <em>the response's final value</em> is Python's alone.
+</p>
+<h4>Example</h4>
+<p>
+<a href=\"modelica://Requirements.Examples.Elementary.StepResponse\">Examples.Elementary.StepResponse</a>.
+</p>
+</html>"));
+  end StepResponseCheck;
+
   annotation (Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,
             -100},{100,100}}), graphics={
         Line(

@@ -761,6 +761,331 @@ results in
 </html>"));
   end CrossingMonitoring;
 
+  block StepResponse
+    "Running step-response metrics of u after a step of r, sampled: the peak, the level crossings, the last exit from the settling band, the extrema (ModCheck's requirements plan, section 21)"
+    import Modelica.Units.SI;
+    import Requirements.Types.StepTarget;
+
+    Modelica.Blocks.Interfaces.RealInput u "The response"
+      annotation (Placement(transformation(extent={{-140,40},{-100,80}})));
+    Modelica.Blocks.Interfaces.RealInput r "The stepping signal (the setpoint or the disturbance)"
+      annotation (Placement(transformation(extent={{-140,-20},{-100,20}})));
+    parameter StepTarget target = StepTarget.Stepping
+      "The target the metrics measure u against: the stepping signal after the step, or the yRef input"
+      annotation(Evaluate=true);
+    Modelica.Blocks.Interfaces.RealInput yRef if target == StepTarget.Reference
+      "The reference the response is measured against (target = Reference)"
+      annotation (Placement(transformation(extent={{-140,-80},{-100,-40}})));
+    parameter Real threshold(min=0) = 0
+      "A step is a change of r between two samples of at least this (0: any change)";
+    parameter SI.Time samplePeriod(min=Modelica.Constants.eps) = 1e-3
+      "The metrics are evaluated at this period (at the half-periods, off a result grid of the same period); a level crossing is interpolated between two samples";
+    parameter Real level1(min=0, max=1) = 0.1 "Lower level of the rise time, a fraction of the change";
+    parameter Real level2(min=0, max=1) = 0.9 "Upper level of the rise time, a fraction of the change";
+    parameter Real band(min=0) = 0.02 "Settling band around the target: a fraction of the change (bandIsFraction) or an absolute value";
+    parameter Boolean bandIsFraction = true "= true: band is a fraction of |deltaY|; false: in u's unit";
+    parameter SI.Time T_window(min=0) = 0
+      "0: a step's window runs to the next step of r; > 0: it closes T_window after the step";
+    parameter Real peakFraction(min=0) = 0.001
+      "An extremum beyond the target counts when its amplitude exceeds this fraction of the base (|deltaY|, or the largest deviation)";
+
+    Modelica.Blocks.Interfaces.BooleanOutput active "= true while a step's window is open"
+      annotation (Placement(transformation(extent={{100,80},{120,100}})));
+    Modelica.Blocks.Interfaces.BooleanOutput closed "= true at the sample that closes a window (the next step, or T_window after the step)"
+      annotation (Placement(transformation(extent={{100,60},{120,80}})));
+    Modelica.Blocks.Interfaces.IntegerOutput nSteps "Number of steps seen so far"
+      annotation (Placement(transformation(extent={{100,40},{120,60}})));
+    Modelica.Blocks.Interfaces.RealOutput tStep(unit="s") "Instant of the last step (-1 before the first)"
+      annotation (Placement(transformation(extent={{100,20},{120,40}})));
+    Modelica.Blocks.Interfaces.RealOutput y0 "The response before the step"
+      annotation (Placement(transformation(extent={{100,0},{120,20}})));
+    Modelica.Blocks.Interfaces.RealOutput yInf "The target"
+      annotation (Placement(transformation(extent={{100,-20},{120,0}})));
+    Modelica.Blocks.Interfaces.RealOutput deltaY "The change yInf - y0, the base of every percent"
+      annotation (Placement(transformation(extent={{100,-40},{120,-20}})));
+    Modelica.Blocks.Interfaces.RealOutput overshoot "The largest excursion beyond the target in the direction of the change, in u's unit (never negative)"
+      annotation (Placement(transformation(extent={{100,-60},{120,-40}})));
+    Modelica.Blocks.Interfaces.RealOutput undershoot "The largest excursion opposite to the change, beyond y0, in u's unit"
+      annotation (Placement(transformation(extent={{100,-80},{120,-60}})));
+    Modelica.Blocks.Interfaces.RealOutput tPeak(unit="s") "Instant of the overshoot"
+      annotation (Placement(transformation(extent={{100,-100},{120,-80}})));
+    Modelica.Blocks.Interfaces.RealOutput tLevel1(unit="s") "Instant the lower level is first reached (-1 until then)";
+    Modelica.Blocks.Interfaces.RealOutput tLevel2(unit="s") "Instant the upper level is first reached (-1 until then)";
+    Modelica.Blocks.Interfaces.RealOutput tHalf(unit="s") "Instant half the change is first reached (-1 until then)";
+    Modelica.Blocks.Interfaces.RealOutput riseTime(unit="s") "The rise time: tLevel2 - tLevel1 once both are reached, else the time since tLevel1 (or the step) so far -- a lower bound";
+    Modelica.Blocks.Interfaces.RealOutput delayTime(unit="s") "The delay time: tHalf - tStep once reached, else the time since the step so far";
+    Modelica.Blocks.Interfaces.RealOutput settlingTime(unit="s") "The last exit from the settling band so far, relative to the step (the time since the step while outside)";
+    Modelica.Blocks.Interfaces.BooleanOutput inBand "= true while |u - yInf| <= the band";
+    Modelica.Blocks.Interfaces.RealOutput error "|u - yInf| now: the steady-state error when the window closes";
+    Modelica.Blocks.Interfaces.IntegerOutput nExtrema "Extrema beyond the target closed so far (alternating in sign)";
+    Modelica.Blocks.Interfaces.RealOutput a1 "Amplitude of the first extremum (0 until it closes)";
+    Modelica.Blocks.Interfaces.RealOutput a2 "Amplitude of the second extremum";
+    Modelica.Blocks.Interfaces.RealOutput a3 "Amplitude of the third extremum";
+    Modelica.Blocks.Interfaces.RealOutput zeta "The damping ratio: from the log decrement of a1 and a2, from the overshoot alone, or 1 (monotone); provisional until the window closes";
+    Modelica.Blocks.Interfaces.RealOutput decayRatio "a3 / a1 (0 until a third extremum closes)";
+    Modelica.Blocks.Interfaces.RealOutput openAmplitude "Amplitude of the extremum segment still open (0: none) -- the last extremum when the window closes at a step";
+    Modelica.Blocks.Interfaces.IntegerOutput openSign "Sign of the open segment (0: none)";
+    Modelica.Blocks.Interfaces.BooleanOutput noBase "= true when the response's change over the step is below a quarter of its largest deviation (a disturbance): no base for a percent";
+  protected
+    Modelica.Blocks.Interfaces.RealInput yRefInternal "yRef, or 0 without a reference input";
+    discrete Real rS "r at the last sample";
+    discrete Real uS "u at the last sample";
+    discrete Real s "Orientation of the excursion: sign(deltaY), or the side of the largest deviation for a disturbance";
+    discrete Real e "The excursion s (u - yInf) at the last sample";
+    discrete Real eS "The excursion at the sample before";
+    discrete Boolean reached "The response has reached its target since the step";
+    discrete Boolean stepNow "A step was seen at this sample";
+    discrete Real rAfter "r after the step";
+    discrete Real maxDev "The largest |u - yInf| since the step";
+    discrete Integer segSign "Sign of the open extremum segment (0: none)";
+    discrete Real segMax "Amplitude of the open segment";
+    discrete Boolean wasOutside "Outside the band at the sample before";
+    discrete Real base "The base of the extremum threshold: |deltaY| or the largest deviation";
+    discrete Real yInfS "The target at the last sample";
+  equation
+    connect(yRef, yRefInternal);
+    if target <> StepTarget.Reference then
+      yRefInternal = 0;
+    end if;
+  algorithm
+    when sample(samplePeriod/2, samplePeriod) then
+      // -- the step: a change of r between two samples
+      stepNow := abs(r - pre(rS)) > (if threshold > 0 then threshold*(1 - 1e-12) else 0);
+      // -- closing the open window: at the next step or T_window after the step
+      closed := pre(active) and (stepNow or (T_window > 0 and time >= pre(tStep) + T_window - 1e-9*samplePeriod));
+      if pre(active) and closed and not stepNow and pre(segSign) <> 0 then
+        // the window closes T_window after the step: the open extremum segment closes with it
+        // (a window closed by the next step keeps its open segment in openAmplitude / openSign,
+        // read with pre() by a check block at that sample, since the step resets the metrics)
+        nExtrema := pre(nExtrema) + 1;
+        if nExtrema == 1 then
+          a1 := pre(segMax);
+        elseif nExtrema == 2 then
+          a2 := pre(segMax);
+        elseif nExtrema == 3 then
+          a3 := pre(segMax);
+        end if;
+        segSign := 0;
+        segMax := 0;
+      end if;
+      if stepNow then
+        nSteps := pre(nSteps) + 1;
+        active := true;
+        tStep := time;
+        y0 := pre(uS);
+        rAfter := r;
+        reached := false;
+        maxDev := 0;
+        overshoot := 0;
+        undershoot := 0;
+        tPeak := time;
+        tLevel1 := -1;
+        tLevel2 := -1;
+        tHalf := -1;
+        settlingTime := 0;
+        wasOutside := false;
+        nExtrema := 0;
+        a1 := 0;
+        a2 := 0;
+        a3 := 0;
+        segSign := 0;
+        segMax := 0;
+        eS := 0;
+      elseif pre(active) and closed then
+        active := false;
+      end if;
+      // -- the target and the orientation
+      if active then
+        yInf := if target == StepTarget.Reference then yRefInternal else rAfter;
+        deltaY := yInf - y0;
+        maxDev := max(pre(maxDev), abs(u - yInf));
+        if abs(deltaY) > max(1e-12, 0.25*maxDev) then
+          s := if deltaY > 0 then 1 else -1;
+        elseif not stepNow and pre(active) then
+          // a disturbance: the side of the largest deviation so far
+          s := if abs(u - yInf) >= pre(maxDev) then (if u - yInf >= 0 then 1 else -1) else pre(s);
+        else
+          s := 1;
+        end if;
+        base := max(abs(deltaY), maxDev);
+        noBase := abs(deltaY) <= max(1e-12, 0.25*maxDev);
+        e := s*(u - yInf);
+        eS := if stepNow then s*(pre(uS) - yInf) else pre(e);
+        // -- the peaks
+        if e > pre(overshoot) then
+          overshoot := e;
+          tPeak := time;
+        end if;
+        undershoot := max(pre(undershoot), -s*(u - y0));
+        // -- the level crossings, interpolated between the two samples
+        if tLevel1 < 0 and s*(u - (y0 + level1*deltaY)) >= 0 then
+          tLevel1 := if stepNow or s*(pre(uS) - (y0 + level1*deltaY)) >= 0 then time else
+            time - samplePeriod*(s*(u - (y0 + level1*deltaY)))/(s*(u - pre(uS)));
+        end if;
+        if tLevel2 < 0 and s*(u - (y0 + level2*deltaY)) >= 0 then
+          tLevel2 := if stepNow or s*(pre(uS) - (y0 + level2*deltaY)) >= 0 then time else
+            time - samplePeriod*(s*(u - (y0 + level2*deltaY)))/(s*(u - pre(uS)));
+        end if;
+        if tHalf < 0 and s*(u - (y0 + 0.5*deltaY)) >= 0 then
+          tHalf := if stepNow or s*(pre(uS) - (y0 + 0.5*deltaY)) >= 0 then time else
+            time - samplePeriod*(s*(u - (y0 + 0.5*deltaY)))/(s*(u - pre(uS)));
+        end if;
+        riseTime := if tLevel2 >= 0 then tLevel2 - (if tLevel1 >= 0 then tLevel1 else tStep) else
+          time - (if tLevel1 >= 0 then tLevel1 else tStep);
+        delayTime := if tHalf >= 0 then tHalf - tStep else time - tStep;
+        // -- the settling band: the last exit
+        inBand := abs(u - yInf) <= (if bandIsFraction then band*abs(deltaY) else band);
+        if not inBand then
+          settlingTime := time - tStep;
+        elseif pre(wasOutside) and not stepNow then
+          // back inside: the crossing between the two samples
+          settlingTime := time - tStep - samplePeriod*((if bandIsFraction then band*abs(deltaY) else band) - abs(u - yInf))
+            /max(1e-300, abs(pre(uS) - yInfS) - abs(u - yInf));
+        end if;
+        wasOutside := not inBand;
+        error := abs(u - yInf);
+        // -- the extrema beyond the target, counted from the first reach
+        reached := pre(reached) or e >= 0;
+        if reached then
+          if e > peakFraction*base and pre(segSign) <> 1 or e < -peakFraction*base and pre(segSign) <> -1 then
+            // a new segment on the other side: the previous one closes
+            if pre(segSign) <> 0 then
+              nExtrema := pre(nExtrema) + 1;
+              if nExtrema == 1 then
+                a1 := pre(segMax);
+              elseif nExtrema == 2 then
+                a2 := pre(segMax);
+              elseif nExtrema == 3 then
+                a3 := pre(segMax);
+              end if;
+            end if;
+            segSign := if e > 0 then 1 else -1;
+            segMax := abs(e);
+          elseif segSign <> 0 then
+            segMax := max(pre(segMax), if (e > 0) == (segSign > 0) then abs(e) else 0);
+          end if;
+        end if;
+      else
+        yInf := pre(yInf);
+        deltaY := pre(deltaY);
+        s := pre(s);
+        base := pre(base);
+        e := pre(e);
+        inBand := pre(inBand);
+        error := pre(error);
+      end if;
+      // -- the damping and decay ratios from the closed extrema
+      if nExtrema >= 2 and a2 > 0 then
+        zeta := 2*log(a1/a2)/sqrt(4*Modelica.Constants.pi^2 + (2*log(a1/a2))^2);
+      elseif nExtrema == 1 and not noBase and abs(deltaY) > 0 then
+        zeta := if a1/abs(deltaY) >= 1 then 0 else -log(a1/abs(deltaY))/sqrt(Modelica.Constants.pi^2 + log(a1/abs(deltaY))^2);
+      else
+        zeta := 1;
+      end if;
+      decayRatio := if nExtrema >= 3 and a1 > 0 then a3/a1 else 0;
+      openAmplitude := segMax;
+      openSign := segSign;
+      rS := r;
+      uS := u;
+      yInfS := yInf;
+    end when;
+  initial equation
+    rS = r;
+    uS = u;
+    yInfS = 0;
+    active = false;
+    closed = false;
+    stepNow = false;
+    nSteps = 0;
+    tStep = -1;
+    y0 = 0;
+    yInf = 0;
+    deltaY = 0;
+    s = 1;
+    e = 0;
+    eS = 0;
+    reached = false;
+    rAfter = 0;
+    maxDev = 0;
+    overshoot = 0;
+    undershoot = 0;
+    tPeak = -1;
+    tLevel1 = -1;
+    tLevel2 = -1;
+    tHalf = -1;
+    riseTime = 0;
+    delayTime = 0;
+    settlingTime = 0;
+    inBand = true;
+    wasOutside = false;
+    error = 0;
+    nExtrema = 0;
+    a1 = 0;
+    a2 = 0;
+    a3 = 0;
+    segSign = 0;
+    segMax = 0;
+    base = 0;
+    zeta = 1;
+    decayRatio = 0;
+    openAmplitude = 0;
+    openSign = 0;
+    noBase = false;
+    annotation (defaultComponentName="stepResponse1",
+      Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},{100,100}}), graphics={
+          Rectangle(extent={{-100,100},{100,-100}}, lineColor={0,0,0}, lineThickness=5.0, fillColor={210,210,210},
+            fillPattern=FillPattern.Solid, borderPattern=BorderPattern.Raised),
+          Line(points={{-80,-60},{-40,-60},{-40,20},{-20,50},{0,30},{20,42},{40,36},{80,38}}, color={0,0,255}, thickness=0.5),
+          Line(points={{-40,38},{80,38}}, color={0,140,72}, pattern=LinePattern.Dash),
+          Text(extent={{-100,-70},{100,-100}}, textColor={0,0,0}, textString="step response")}),
+      Documentation(info="<html>
+<h4>Syntax</h4>
+<blockquote><p>
+metrics = <b>StepResponse</b>(u=..., r=..., target=..., samplePeriod=...);
+</p></blockquote>
+
+<h4>Description</h4>
+<p>
+The running metrics of the step response of <b>u</b> after a step of <b>r</b>, evaluated at every
+<b>samplePeriod</b> (ModCheck's requirements plan, section 21.2, the R3 layer of section 21.7):
+a step is a change of r between two samples of at least <b>threshold</b> (any change with the default 0);
+its window runs to the next step of r, or closes <b>T_window</b> after it when that is set; the target
+<b>yInf</b> is r after the step (<b>target</b> = Stepping) or the current value of the <b>yRef</b> input
+(Reference); <code>y0</code> is u at the sample before the step, <code>deltaY = yInf - y0</code> the base
+of every percent, and the excursion <code>e = s (u - yInf)</code> is oriented by the sign of the change
+-- for a disturbance (the response starts and ends at the target, its change below a quarter of its
+largest deviation) by the side of that deviation, so <b>overshoot</b> is the peak deviation.
+</p>
+<p>
+Outputs: <b>overshoot</b> and <b>undershoot</b> with <b>tPeak</b>; the level crossings <b>tLevel1</b>,
+<b>tLevel2</b>, <b>tHalf</b> interpolated between the two samples around them, and from them
+<b>riseTime</b> (a lower bound -- the time since the lower level -- until the upper level is reached)
+and <b>delayTime</b>; <b>settlingTime</b> the last exit from the <b>band</b> around the target so far
+(the time since the step while outside, the interpolated re-entry once inside); <b>error</b> the current
+deviation from the target (the steady-state error when the window closes); the extrema beyond the
+target, counted from the first reach of the target, each a maximal segment of one sign beyond
+<b>peakFraction</b> of the base, closed when the other side is entered or the window closes
+(<b>nExtrema</b>, <b>a1</b>, <b>a2</b>, <b>a3</b>); <b>zeta</b> the damping ratio from the log decrement
+<code>2 ln(a1/a2)</code>, from the overshoot alone when only one extremum has closed, or 1 (monotone);
+<b>decayRatio</b> = a3/a1.
+</p>
+<p>
+The metrics are sampled: an instant is known to one <b>samplePeriod</b>, a peak read low by the
+curvature over one period. The reported verdict of a step-response requirement is computed by
+ModCheck's <code>step_checks.py</code> on the stored trajectory (rule R7); this block is the
+development aid in a Modelica tool and its cross-check, and
+<a href=\"modelica://Requirements.ChecksInFixedWindow.StepResponseCheck\">StepResponseCheck</a>
+turns one of its metrics into a Property. The post-processing target <em>the response's final
+value</em> has no running form and is not offered here.
+</p>
+<h4>Example</h4>
+<p>
+<a href=\"modelica://Requirements.Examples.Elementary.StepResponse\">Examples.Elementary.StepResponse</a>:
+the second-order system's closed forms asserted against the block's outputs.
+</p>
+</html>"));
+  end StepResponse;
+
   annotation (Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,-100},
             {100,100}}),
                    graphics={Line(

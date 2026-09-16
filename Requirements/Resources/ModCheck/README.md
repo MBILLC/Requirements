@@ -55,6 +55,18 @@ with the new `Examples.Elementary.LogicalBlocks.PropertyTable4` as a case in the
 (omc, Dymola and the composite carry its reference). The numbers below are the 0.7.1
 measurement and stand as history.
 
+**Version 0.10.0, 2026-09-16** (the step-response blocks, ModCheck plan phase 15b): the two examples of
+`Examples.Elementary.StepResponse` are cases in the three lists with `variables: [time, "*.y", "*.margin", "*.value"]`,
+so the blocks' running metrics are references too. Stored on OpenModelica (both) and Dymola (`Disturbance`;
+`SecondOrder`'s ten check blocks make 759 unknowns and the license refuses it, as it refuses the other eight), the
+composite carrying Dymola's `Disturbance` and OpenModelica's `SecondOrder` (81 entries). Measured on the way: the
+sampled blocks restart OpenModelica's cvode at every millisecond sample and its accumulated error reads the
+second-order example's peak 0.2 % low (16.27 % for 16.30) and moves with the tolerance, where dassl and ida reproduce
+the closed form at 1e-6 and 1e-8 alike -- the OpenModelica list runs the two cases with `solver: dassl`, a per-case
+override the ModCheck harness gained for it; and a sampled block whose period equals the result grid makes omc's
+cvode runtime stall on a sample and an output point 1e-14 s apart, so the blocks sample at the half-periods. No
+existing reference changed (no existing block changed).
+
 **Version 0.9.0, 2026-09-15** (the margin outputs, ModCheck plan phase 12): the eight examples of
 `Examples.Elementary.Margin` are cases in the three lists with `variables: [time, "*.y", "*.margin"]`, so the
 margins are references too. Stored on OpenModelica (7: the FFT example does not build there, as the other FFT

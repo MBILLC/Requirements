@@ -1,5 +1,5 @@
 within ;
-package Requirements "Requirements (Version 0.9.1) - Defining requirements formally and checking them when simulating"
+package Requirements "Requirements (Version 0.10.0) - Defining requirements formally and checking them when simulating"
   extends Modelica.Icons.Package;
 
 
@@ -8,6 +8,49 @@ package UsersGuide "User's Guide"
 
 package ReleaseNotes "Release notes"
   extends Modelica.Icons.ReleaseNotes;
+
+  class Version_0_10_0 "Version 0.10.0 (Sept. 16, 2026)"
+  extends Modelica.Icons.ReleaseNotes;
+
+    annotation (Documentation(info="<html>
+<p>
+<b>Step-response metrics.</b> The classic control requirements -- overshoot, undershoot, rise time, delay
+time, settling time, steady-state error, damping ratio, decay ratio -- as blocks (ModCheck's requirements
+plan, section 21, the R3 layer of its section 21.7):
+<a href=\"modelica://Requirements.SignalAnalysis.StepResponse\">SignalAnalysis.StepResponse</a> computes the
+running metrics of a response <code>u</code> after a step of a signal <code>r</code>, sampled at
+<code>samplePeriod</code> (at the half-periods, off a result grid of the same period): the step as a change of
+<code>r</code> between two samples (of at least <code>threshold</code>), its window to the next step or
+<code>T_window</code> after it, the target the stepping signal after the step or a reference input
+(<code>Types.StepTarget</code>), the peak and its instant, the level crossings interpolated between samples,
+the last exit from the settling band, the current deviation, the extrema beyond the target and the damping
+and decay ratios from them;
+<a href=\"modelica://Requirements.ChecksInFixedWindow.StepResponseCheck\">ChecksInFixedWindow.StepResponseCheck</a>
+bounds one metric (<code>Types.StepMetric</code>) and emits <code>Property</code> and <code>margin</code>:
+Undefined before the first step, Undecided from the step to the earliest sample the bound is provably met or
+broken, decided at the window's close otherwise, the margin following the running metric. The reported
+verdict of a step-response requirement is ModCheck's <code>step_checks.py</code> on the stored trajectory
+(rule R7); the blocks are the development aid in a Modelica tool and the cross-check ModCheck's orchestrator
+runs beside it (agreement on every corpus item, to one sampling period).
+<a href=\"modelica://Requirements.Examples.Elementary.StepResponse\">Examples.Elementary.StepResponse</a>
+asserts the blocks against the closed forms of a second-order step response and a disturbance.
+</p>
+<p>
+Measured on the way: a sampled block whose period equals the result grid makes OpenModelica's CVODE runtime
+stall on an event and an output point 1e-14 s apart (an endless <em>desired step too small</em>); the blocks
+therefore sample at the half-periods. The 6000 sample events of a 6 s run restart the solver every
+millisecond and its accumulated error is what the sampled block sees: the second-order example's peak reads
+0.2 % low against the closed form (rule R1's point, measured; the tolerance of its assert says so).
+</p>
+<h4>Changes</h4>
+<ul>
+<li> <code>Types.StepTarget</code>, <code>Types.StepMetric</code>: new enumerations.</li>
+<li> <code>SignalAnalysis.StepResponse</code>, <code>ChecksInFixedWindow.StepResponseCheck</code>: new blocks.</li>
+<li> <code>Examples.Elementary.StepResponse</code>: <code>SecondOrder</code>, <code>Disturbance</code>.</li>
+<li> <code>conversion(noneFromVersion=\"0.9.1\")</code>: no model needs conversion; no existing block changed.</li>
+</ul>
+</html>"));
+  end Version_0_10_0;
 
   class Version_0_9_1 "Version 0.9.1 (Sept. 15, 2026)"
   extends Modelica.Icons.ReleaseNotes;
@@ -474,10 +517,10 @@ end UsersGuide;
 
   annotation (preferredView="info",
   uses(Modelica(version="4.1.0")),
-version="0.9.1",
-versionDate="2026-09-15",
-dateModified = "2026-09-15",
-conversion(noneFromVersion="0.7.1", noneFromVersion="0.8.0", noneFromVersion="0.9.0"),
+version="0.10.0",
+versionDate="2026-09-16",
+dateModified = "2026-09-16",
+conversion(noneFromVersion="0.7.1", noneFromVersion="0.8.0", noneFromVersion="0.9.0", noneFromVersion="0.9.1"),
 revisionId="$Id:: package.mo 9390 2016-06-21 06:35:11Z #$",
 Documentation(info="<html>
 <p>

@@ -3542,6 +3542,161 @@ example per block family; each is a case in the regression lists beside this lib
 <p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
 </html>"));
   end Margin;
+
+  package StepResponse "Library of examples asserting the step-response blocks against the closed forms of a second-order system (ModCheck's requirements plan, section 21)"
+    extends Modelica.Icons.ExamplesPackage;
+
+    model SecondOrder "A 0.1 m step into a second-order system (D = 0.5, w = 5 rad/s): every metric against its closed form, every check against its verdict"
+      extends Modelica.Icons.Example;
+      import Requirements.Types.Property;
+      import Requirements.Types.StepMetric;
+      Modelica.Blocks.Sources.Step step(height=0.1, startTime=1) "the reference"
+        annotation (Placement(transformation(extent={{-90,10},{-70,30}})));
+      Modelica.Blocks.Continuous.SecondOrder sys(k=1, w=5, D=0.5, initType=Modelica.Blocks.Types.Init.InitialState) "the response"
+        annotation (Placement(transformation(extent={{-50,10},{-30,30}})));
+      Requirements.SignalAnalysis.StepResponse metrics(T_window=4) "the running metrics, the window closing 4 s after the step"
+        annotation (Placement(transformation(extent={{0,40},{40,80}})));
+      Requirements.ChecksInFixedWindow.StepResponseCheck overshoot20(metric=StepMetric.Overshoot, bound=20, T_window=4, scale=1)
+        "the overshoot shall be at most 20 %, tolerance 1 %: satisfied at the close by 3.70 tolerances"
+        annotation (Placement(transformation(extent={{0,-10},{40,10}})));
+      Requirements.ChecksInFixedWindow.StepResponseCheck overshoot10(metric=StepMetric.Overshoot, bound=10, T_window=4, scale=1)
+        "at most 10 %: violated at the first sample the excursion exceeds 10 % (1.52 s)"
+        annotation (Placement(transformation(extent={{0,-40},{40,-20}})));
+      Requirements.ChecksInFixedWindow.StepResponseCheck rise(metric=StepMetric.RiseTime, bound=0.5, T_window=4, scale=0.05)
+        "the 10-90 % rise time shall be at most 0.5 s: satisfied at the 90 % crossing (1.43 s)"
+        annotation (Placement(transformation(extent={{0,-70},{40,-50}})));
+      Requirements.ChecksInFixedWindow.StepResponseCheck delay(metric=StepMetric.DelayTime, bound=0.3, T_window=4, scale=0.05)
+        "the delay time shall be at most 0.3 s: satisfied at the 50 % crossing (1.26 s)"
+        annotation (Placement(transformation(extent={{60,40},{100,60}})));
+      Requirements.ChecksInFixedWindow.StepResponseCheck settle(metric=StepMetric.SettlingTime, bound=2, band=0.02, T_window=4, scale=0.1)
+        "settled to within 2 % within 2 s: satisfied at the close (the last exit at 1.615 s)"
+        annotation (Placement(transformation(extent={{60,10},{100,30}})));
+      Requirements.ChecksInFixedWindow.StepResponseCheck settle1(metric=StepMetric.SettlingTime, bound=1, band=0.02, T_window=4, scale=0.1)
+        "within 1 s: violated at the first sample after the deadline outside the band"
+        annotation (Placement(transformation(extent={{60,-20},{100,0}})));
+      Requirements.ChecksInFixedWindow.StepResponseCheck damping(metric=StepMetric.DampingRatio, bound=0.4, T_window=4, scale=0.05)
+        "the damping ratio shall be at least 0.4: 0.5 from the log decrement, satisfied at the close"
+        annotation (Placement(transformation(extent={{60,-50},{100,-30}})));
+      Requirements.ChecksInFixedWindow.StepResponseCheck decay(metric=StepMetric.DecayRatio, bound=0.25, T_window=4, scale=0.05)
+        "the decay ratio shall be at most 0.25: 0.0266"
+        annotation (Placement(transformation(extent={{60,-80},{100,-60}})));
+      Requirements.ChecksInFixedWindow.StepResponseCheck error(metric=StepMetric.SteadyStateError, bound=1, T_window=4, scale=0.5)
+        "the steady-state error 4 s after the step shall be at most 1 %"
+        annotation (Placement(transformation(extent={{-50,-80},{-10,-60}})));
+    equation
+      connect(step.y, sys.u) annotation (Line(points={{-69,20},{-52,20}}, color={0,0,127}));
+      connect(sys.y, metrics.u) annotation (Line(points={{-29,20},{-20,20},{-20,72},{-4,72}}, color={0,0,127}));
+      connect(step.y, metrics.r) annotation (Line(points={{-69,20},{-60,20},{-60,60},{-4,60}}, color={0,0,127}));
+      connect(sys.y, overshoot20.u); connect(step.y, overshoot20.r);
+      connect(sys.y, overshoot10.u); connect(step.y, overshoot10.r);
+      connect(sys.y, rise.u); connect(step.y, rise.r);
+      connect(sys.y, delay.u); connect(step.y, delay.r);
+      connect(sys.y, settle.u); connect(step.y, settle.r);
+      connect(sys.y, settle1.u); connect(step.y, settle1.r);
+      connect(sys.y, damping.u); connect(step.y, damping.r);
+      connect(sys.y, decay.u); connect(step.y, decay.r);
+      connect(sys.y, error.u); connect(step.y, error.r);
+      when time >= 5.5 then
+        // the closed forms of the second-order step response at D = 0.5, w = 5 (ModCheck's steps_acceptance.py)
+        // the peak is 0.2 % low here: the 6000 sample events restart the solver every millisecond and
+        // its accumulated error is what the sampled block sees (rule R1's point, measured)
+        assert(noEvent(abs(metrics.overshoot - 0.0163033) < 1e-4), "StepResponse: the overshoot is not 16.303 % of 0.1 m");
+        assert(noEvent(abs(metrics.tPeak - 1.7255) < 0.0015), "StepResponse: the peak is not at 1 + pi / (w sqrt(1 - D^2)) = 1.7255 s");
+        assert(noEvent(abs(metrics.riseTime - 0.32752) < 0.0015), "StepResponse: the 10-90 % rise time is not 0.3275 s");
+        assert(noEvent(abs(metrics.delayTime - 0.25881) < 0.0015), "StepResponse: the delay time is not 0.2588 s");
+        assert(noEvent(abs(metrics.settlingTime - 1.61527) < 0.0015), "StepResponse: the 2 % settling time is not 1.615 s");
+        assert(noEvent(abs(metrics.zeta - 0.5) < 0.005), "StepResponse: the damping ratio from the log decrement is not 0.5");
+        assert(noEvent(abs(metrics.decayRatio - 0.026580) < 0.001), "StepResponse: the decay ratio is not exp(-2 pi D / sqrt(1 - D^2))");
+        assert(noEvent(overshoot20.y == Property.Satisfied and abs(overshoot20.margin - 3.6967) < 0.1), "overshoot20: satisfied by 3.70 tolerances at the close");
+        assert(noEvent(overshoot10.y == Property.Violated and abs(overshoot10.margin + 6.3033) < 0.1), "overshoot10: violated by 6.30 tolerances (the margin follows the peak after the early decision)");
+        assert(noEvent(rise.y == Property.Satisfied and abs(rise.margin - 3.4497) < 0.05), "rise: satisfied by 3.45 tolerances");
+        assert(noEvent(delay.y == Property.Satisfied and abs(delay.margin - 0.8238) < 0.05), "delay: satisfied by 0.82 tolerances");
+        assert(noEvent(settle.y == Property.Satisfied and abs(settle.margin - 3.8473) < 0.03), "settle: satisfied by 3.85 tolerances");
+        assert(noEvent(settle1.y == Property.Violated and abs(settle1.margin + 6.1527) < 0.03), "settle1: violated by 6.15 tolerances");
+        assert(noEvent(damping.y == Property.Satisfied and abs(damping.margin - 2.0) < 0.1), "damping: satisfied by 2 tolerances");
+        assert(noEvent(decay.y == Property.Satisfied and abs(decay.margin - 4.4684) < 0.03), "decay: satisfied by 4.47 tolerances");
+        assert(noEvent(error.y == Property.Satisfied and error.margin > 1.9), "error: satisfied by two tolerances");
+      end when;
+      when time >= 2.0 then
+        assert(noEvent(overshoot10.y == Property.Violated), "overshoot10: not yet violated at 2 s (the excursion passed 10 % at 1.52 s)");
+        assert(noEvent(rise.y == Property.Satisfied and delay.y == Property.Satisfied), "rise / delay: not decided at their crossings");
+        assert(noEvent(overshoot20.y == Property.Undecided and settle.y == Property.Undecided), "overshoot20 / settle: decided before the window closed");
+      end when;
+      when time >= 3.5 then
+        assert(noEvent(settle1.y == Property.Violated), "settle1: not violated after the 1 s deadline while outside the band");
+      end when;
+      annotation (experiment(StopTime=6, Interval=0.001), Documentation(info="<html>
+<p>The textbook step response, <code>y'' + 2 D w y' + w&sup2; y = w&sup2; r</code> with r stepping 0.1 m at 1 s,
+D = 0.5, w = 5 rad/s, under <a href=\"modelica://Requirements.SignalAnalysis.StepResponse\">StepResponse</a>
+and one <a href=\"modelica://Requirements.ChecksInFixedWindow.StepResponseCheck\">StepResponseCheck</a> per
+metric, the window closing 4 s after the step. Every metric is asserted against its closed form
+(the overshoot <code>exp(-D pi / sqrt(1 - D&sup2;))</code> = 16.30 %, the peak time
+<code>pi / (w sqrt(1 - D&sup2;))</code>, the rise, delay and settling times by root finding on the analytic
+solution, the damping ratio recovered from the log decrement, the decay ratio
+<code>exp(-2 pi D / sqrt(1 - D&sup2;))</code>), and every check against its verdict and margin: the early
+decisions (an overshoot bound broken at 1.52 s, a settling deadline missed, a level reached) and the
+decisions at the close. The same numbers hold ModCheck's <code>step_checks.py</code>
+(<code>steps_acceptance.py</code>, plan section 21.8).</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+    end SecondOrder;
+
+    model Disturbance "A load step with the response returning to its setpoint: the peak deviation is the overshoot, a percent bound has no base"
+      extends Modelica.Icons.Example;
+      import Requirements.Types.Property;
+      import Requirements.Types.StepMetric;
+      import Requirements.Types.StepTarget;
+      Modelica.Blocks.Sources.Step load(height=-5, offset=-10, startTime=2.5) "the load torque, stepping at 2.5 s"
+        annotation (Placement(transformation(extent={{-90,10},{-70,30}})));
+      Modelica.Blocks.Sources.ExpSine response(amplitude=-0.1, f=4/(2*Modelica.Constants.pi), damping=3, startTime=2.5, offset=1)
+        "the speed: 1 - 0.1 exp(-3 (t - 2.5)) sin(4 (t - 2.5)) after the load step -- a dip and a damped return"
+        annotation (Placement(transformation(extent={{-90,-30},{-70,-10}})));
+      Modelica.Blocks.Sources.Constant setpoint(k=1) "the speed setpoint"
+        annotation (Placement(transformation(extent={{-90,-70},{-70,-50}})));
+      Requirements.ChecksInFixedWindow.StepResponseCheck dip(metric=StepMetric.Overshoot, boundIsPercent=false, bound=0.03, target=StepTarget.Reference, scale=0.01)
+        "the deviation from the setpoint shall be at most 0.03: the dip of 0.040 violates it (the overshoot of a disturbance is the peak deviation)"
+        annotation (Placement(transformation(extent={{0,40},{40,60}})));
+      Requirements.ChecksInFixedWindow.StepResponseCheck dipPercent(metric=StepMetric.Overshoot, boundIsPercent=true, bound=5, target=StepTarget.Reference, T_window=3)
+        "the same in percent: no base (the speed starts and ends at the setpoint), Undefined at the close"
+        annotation (Placement(transformation(extent={{0,0},{40,20}})));
+      Requirements.ChecksInFixedWindow.StepResponseCheck recovery(metric=StepMetric.SettlingTime, bound=1.5, band=0.01, bandIsFraction=false, target=StepTarget.Reference, T_window=3, scale=0.1)
+        "back within 0.01 of the setpoint within 1.5 s: satisfied at the close"
+        annotation (Placement(transformation(extent={{0,-40},{40,-20}})));
+      Requirements.ChecksInFixedWindow.StepResponseCheck damping(metric=StepMetric.DampingRatio, bound=0.3, target=StepTarget.Reference, T_window=3, scale=0.1)
+        "the damping ratio from the dip and its return"
+        annotation (Placement(transformation(extent={{0,-80},{40,-60}})));
+    equation
+      connect(response.y, dip.u); connect(load.y, dip.r); connect(setpoint.y, dip.yRef);
+      connect(response.y, dipPercent.u); connect(load.y, dipPercent.r); connect(setpoint.y, dipPercent.yRef);
+      connect(response.y, recovery.u); connect(load.y, recovery.r); connect(setpoint.y, recovery.yRef);
+      connect(response.y, damping.u); connect(load.y, damping.r); connect(setpoint.y, damping.yRef);
+      when time >= 3.0 then
+        assert(noEvent(dip.y == Property.Violated and dip.value > 0.039 and dip.value < 0.041), "dip: the peak deviation of 0.040 must violate the 0.03 bound early");
+      end when;
+      when time >= 5.6 then
+        assert(noEvent(dipPercent.y == Property.Undefined), "dipPercent: a percent bound on a disturbance has no base and must be Undefined");
+        assert(noEvent(recovery.y == Property.Satisfied and recovery.value < 1.5), "recovery: settled within 1.5 s");
+        assert(noEvent(damping.y == Property.Satisfied and damping.value > 0.3 and damping.value < 1), "damping: the log decrement of the dip and its return");
+      end when;
+      annotation (experiment(StopTime=6, Interval=0.001), Documentation(info="<html>
+<p>A disturbance step: the load steps at 2.5 s and the speed dips by 0.040 and returns to its setpoint of 1 as a
+damped oscillation. With <code>target = Reference</code> the metrics are measured against the setpoint input:
+the response's change over the step is zero, so the excursion is oriented by its largest deviation and the
+<em>overshoot</em> is the peak deviation (0.040, violating an absolute bound of 0.03 as soon as it is passed);
+a percent bound has no base and its property is Undefined; the settling time is the return to within 0.01 of the
+setpoint; the damping ratio comes from the dip and the return overshoot. ModCheck's plan, section 21.2, the
+owner's call 3.</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+    end Disturbance;
+    annotation (Documentation(info="<html>
+<p>The step-response blocks of ModCheck's requirements plan, section 21 (the R3 layer): the running metrics of
+<a href=\"modelica://Requirements.SignalAnalysis.StepResponse\">SignalAnalysis.StepResponse</a> and the
+Property of <a href=\"modelica://Requirements.ChecksInFixedWindow.StepResponseCheck\">ChecksInFixedWindow.StepResponseCheck</a>,
+asserted against the closed forms of a second-order step response and a disturbance.</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+  end StepResponse;
   annotation (Documentation(info="<html>
 <p>
 This package contains example models to demonstrate all components of library
