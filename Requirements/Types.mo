@@ -101,6 +101,21 @@ step-response requirements, the response's own final value, is only known when t
 no running form: <code>step_checks.py</code> evaluates it, the blocks refuse it.</p>
 </html>"));
 
+  type EigenMetric = enumeration(
+      RealPart "Every mode's real part below the bound [1/s]",
+      Damping "Every mode's damping ratio -Re/|lambda| at least the bound",
+      FrequencyMin "Every mode's frequency |lambda|/2 pi [Hz] at least the bound",
+      FrequencyMax "Every mode's frequency [Hz] at most the bound",
+      TimeConstant "Every decaying mode's time constant -1/Re [s] at most the bound; a non-decaying mode violates it")
+    "The eigenvalue predicates of ModCheck's requirements plan, section 22.2"
+    annotation (Documentation(info="<html>
+<p>The eigenvalue predicates of ModCheck's linear-analysis requirements (its requirements plan, section 22.2), as
+<a href=\"modelica://Requirements.LinearAnalysis.EigenvalueCheck\">LinearAnalysis.EigenvalueCheck</a> evaluates them
+over the modes of a state matrix; the pole region is
+<a href=\"modelica://Requirements.LinearAnalysis.EigenvaluesWithinRegion\">EigenvaluesWithinRegion</a>.</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+
   type StepMetric = enumeration(
       Overshoot "The excursion beyond the target, in the direction of the change",
       Undershoot "The excursion opposite to the change, beyond the starting value",

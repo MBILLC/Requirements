@@ -3702,6 +3702,64 @@ asserted against the closed forms of a second-order step response and a disturba
 <p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
 </html>"));
   end StepResponse;
+
+  package LinearAnalysis "Library of examples asserting the eigenvalue blocks on a shipped second-order state matrix (ModCheck's requirements plan, section 22)"
+    extends Modelica.Icons.ExamplesPackage;
+
+    model SecondOrder "The state matrix of a second-order system (w0 = 2 rad/s, D = 0.2) read from a MATLAB v4 file: every predicate against its closed form"
+      extends Modelica.Icons.Example;
+      import Requirements.Types.Property;
+      import Requirements.Types.EigenMetric;
+      parameter String fileName = "modelica://Requirements/Resources/Data/SecondOrderLinearization.mat"
+        "A = [0, 1; -4, -0.8] (w0 = 2, D = 0.2): eigenvalues -0.4 +- 1.9596j, damping 0.2, 0.3183 Hz, time constant 2.5 s";
+      parameter String filePath = Modelica.Utilities.Files.loadResource(fileName) "the URI resolved (folded at translation)";
+      parameter Real A[2, 2](each fixed=false) "the state matrix from the file, read at initialization (an impure read cannot be evaluated when the model is translated: OCT refuses it at flattening)";
+      Requirements.LinearAnalysis.EigenvalueCheck realPart(nx=2, A=A, metric=EigenMetric.RealPart, bound=-0.1, scale=0.1)
+        "every real part below -0.1 1/s: satisfied, margin (0.4 - 0.1) / 0.1 = 3"
+        annotation (Placement(transformation(extent={{-40,40},{0,60}})));
+      Requirements.LinearAnalysis.EigenvalueCheck damping(nx=2, A=A, metric=EigenMetric.Damping, bound=0.5, scale=0.1)
+        "every mode damped to at least 0.5: violated, margin (0.2 - 0.5) / 0.1 = -3"
+        annotation (Placement(transformation(extent={{-40,10},{0,30}})));
+      Requirements.LinearAnalysis.EigenvalueCheck frequency(nx=2, A=A, metric=EigenMetric.FrequencyMax, bound=1, fBandLo=0.1, scale=0.1)
+        "every mode above 0.1 Hz at most 1 Hz: satisfied, margin (1 - 0.3183) / 0.1 = 6.817"
+        annotation (Placement(transformation(extent={{-40,-20},{0,0}})));
+      Requirements.LinearAnalysis.EigenvalueCheck outsideBand(nx=2, A=A, metric=EigenMetric.Damping, bound=0.5, fBandLo=10, scale=0.1)
+        "no mode above 10 Hz: Undefined (untested), margin 0"
+        annotation (Placement(transformation(extent={{-40,-50},{0,-30}})));
+      Requirements.LinearAnalysis.EigenvalueCheck timeConstant(nx=2, A=A, metric=EigenMetric.TimeConstant, bound=3, scale=0.5)
+        "the slowest mode within 3 s: satisfied (2.5 s), margin 0.5 / 0.5 = 1"
+        annotation (Placement(transformation(extent={{-40,-80},{0,-60}})));
+      Requirements.LinearAnalysis.EigenvaluesWithinRegion region(nx=2, A=A, polygon=[-100, -100; -0.1, -100; -0.1, 100; -100, 100], scale=0.1)
+        "the half-plane Re < -0.1 as a polygon: satisfied, margin 0.3 / 0.1 = 3"
+        annotation (Placement(transformation(extent={{40,40},{80,60}})));
+    initial equation
+      A = Requirements.LinearAnalysis.readStateMatrix(filePath, 2);
+    equation
+      assert(abs(A[2, 1] + 4) < 1e-12 and abs(A[2, 2] + 0.8) < 1e-12, "the file did not give A = [0, 1; -4, -0.8]");
+      assert(realPart.n == 1 and abs(realPart.re[1] + 0.4) < 1e-9 and abs(realPart.im[1] - 2*sqrt(1 - 0.04)) < 1e-9, "the mode is not -0.4 + 1.9596j");
+      assert(realPart.y == Property.Satisfied and abs(realPart.margin - 3) < 1e-9, "realPart: expected Satisfied with margin 3");
+      assert(damping.y == Property.Violated and abs(damping.margin + 3) < 1e-9, "damping: expected Violated with margin -3");
+      assert(frequency.y == Property.Satisfied and abs(frequency.margin - (1 - 1/Modelica.Constants.pi)/0.1) < 1e-9, "frequency: expected Satisfied with margin 6.817");
+      assert(outsideBand.y == Property.Undefined and abs(outsideBand.margin) < 1e-12, "outsideBand: expected Undefined");
+      assert(timeConstant.y == Property.Satisfied and abs(timeConstant.margin - 1) < 1e-9, "timeConstant: expected Satisfied with margin 1");
+      assert(region.y == Property.Satisfied and abs(region.margin - 3) < 1e-9, "region: expected Satisfied with margin 3");
+      annotation (experiment(StopTime=1), Documentation(info="<html>
+<p>The eigenvalue blocks of <a href=\"modelica://Requirements.LinearAnalysis\">LinearAnalysis</a> on a state
+matrix read from a shipped MATLAB v4 file (<code>Resources/Data/SecondOrderLinearization.mat</code>, written by
+ModCheck's <code>linear_checks.Linearization.save_mat</code>): the second-order system with
+<code>w0 = 2 rad/s</code> and <code>D = 0.2</code>, whose mode is <code>-0.4 &plusmn; 1.9596j</code> --
+damping 0.2, 0.3183 Hz, a 2.5 s time constant. Every block's <code>Property</code> and <code>margin</code> is
+asserted against the closed form, including the Undefined of an empty band. What ModCheck's generated
+<code>EigenCheckFromFile</code> models do for the corpus's linearisations.</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+    end SecondOrder;
+
+    annotation (Documentation(info="<html>
+<p>The eigenvalue blocks asserted on a shipped state matrix (ModCheck's requirements plan, section 22.7).</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+  end LinearAnalysis;
   annotation (Documentation(info="<html>
 <p>
 This package contains example models to demonstrate all components of library

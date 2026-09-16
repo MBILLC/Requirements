@@ -1,5 +1,5 @@
 within ;
-package Requirements "Requirements (Version 0.10.0) - Defining requirements formally and checking them when simulating"
+package Requirements "Requirements (Version 0.11.0) - Defining requirements formally and checking them when simulating"
   extends Modelica.Icons.Package;
 
 
@@ -8,6 +8,41 @@ package UsersGuide "User's Guide"
 
 package ReleaseNotes "Release notes"
   extends Modelica.Icons.ReleaseNotes;
+
+  class Version_0_11_0 "Version 0.11.0 (Sept. 16, 2026)"
+  extends Modelica.Icons.ReleaseNotes;
+
+    annotation (Documentation(info="<html>
+<p>
+<b>Eigenvalue predicates over a linearisation.</b> The Modelica side of ModCheck's linear-analysis
+requirements (its requirements plan, section 22.7): a linearisation is a tool operation, not a simulation,
+so no check model computes a plant's eigenvalues inside the run that produces them; the new package
+<a href=\"modelica://Requirements.LinearAnalysis\">LinearAnalysis</a> reads the state matrix from the MATLAB v4
+file ModCheck's orchestrator writes beside every linearisation (<code>readStateMatrix</code>, through
+<code>Modelica.Utilities.Streams.readRealMatrix</code>), folds its eigenvalues into modes with the same
+integrator rule and parasitic cut as <code>linear_checks.py</code> (<code>modes</code>, the test case's
+TIME_CONSTANTS), and evaluates the predicates as constants over a nominal run:
+<a href=\"modelica://Requirements.LinearAnalysis.EigenvalueCheck\">EigenvalueCheck</a> (a real-part, damping,
+frequency or time-constant bound over every mode, optionally in a frequency band;
+<code>Types.EigenMetric</code>) and
+<a href=\"modelica://Requirements.LinearAnalysis.EigenvaluesWithinRegion\">EigenvaluesWithinRegion</a> (a polygon of
+the (Re, Im) plane), each with <code>Property</code> and <code>margin</code>. ModCheck's generated
+<code>EigenCheckFromFile</code> models carry one block per eigenvalue requirement and the orchestrator compares
+their outputs with the Python record: the R3 cross-check, never the reported verdict. The frequency-response
+family has no Modelica side, by decision (see the package's documentation).
+<a href=\"modelica://Requirements.Examples.Elementary.LinearAnalysis\">Examples.Elementary.LinearAnalysis</a> asserts
+the blocks on a shipped second-order matrix against its closed forms.
+</p>
+<h4>Changes</h4>
+<ul>
+<li> <code>Types.EigenMetric</code>: new enumeration.</li>
+<li> <code>LinearAnalysis</code>: new package (<code>readStateMatrix</code>, <code>modes</code>, <code>EigenvalueCheck</code>,
+     <code>EigenvaluesWithinRegion</code> and their functions).</li>
+<li> <code>Examples.Elementary.LinearAnalysis</code>: <code>SecondOrder</code>; <code>Resources/Data/SecondOrderLinearization.mat</code>.</li>
+<li> <code>conversion(noneFromVersion=\"0.10.0\")</code>: no model needs conversion; no existing block changed.</li>
+</ul>
+</html>"));
+  end Version_0_11_0;
 
   class Version_0_10_0 "Version 0.10.0 (Sept. 16, 2026)"
   extends Modelica.Icons.ReleaseNotes;
@@ -523,10 +558,10 @@ end UsersGuide;
 
   annotation (preferredView="info",
   uses(Modelica(version="4.1.0")),
-version="0.10.0",
+version="0.11.0",
 versionDate="2026-09-16",
 dateModified = "2026-09-16",
-conversion(noneFromVersion="0.7.1", noneFromVersion="0.8.0", noneFromVersion="0.9.0", noneFromVersion="0.9.1"),
+conversion(noneFromVersion="0.7.1", noneFromVersion="0.8.0", noneFromVersion="0.9.0", noneFromVersion="0.9.1", noneFromVersion="0.10.0"),
 revisionId="$Id:: package.mo 9390 2016-06-21 06:35:11Z #$",
 Documentation(info="<html>
 <p>

@@ -6,6 +6,7 @@ ChecksInFixedWindow
 ChecksInFixedWindow_withFFT
 ChecksInSlidingWindow
 SignalAnalysis
+LinearAnalysis
 LogicalFunctions
 LogicalBlocks
 Sources
