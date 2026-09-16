@@ -2024,9 +2024,11 @@ over a run and the instant it occurs are taken from the stored trajectory (ModCh
         // the first window (or one after a closed-and-held window) opens
         yNew := Property.Undecided;
         decided := false;
-      elseif stepResponse.active and not pre(decided) and early then
-        // decided before the window closes
-        if boundIsPercent and nb and (metric == StepMetric.Overshoot or metric == StepMetric.Undershoot) then
+      elseif stepResponse.active and not pre(decided) and (early or (boundIsPercent and nb and
+             (metric == StepMetric.Overshoot or metric == StepMetric.Undershoot or metric == StepMetric.SteadyStateError))) then
+        // decided before the window closes; a percent metric on a disturbance (no base) is
+        // Undefined as soon as that is known, as step_checks.py reports it never applicable
+        if boundIsPercent and nb and (metric == StepMetric.Overshoot or metric == StepMetric.Undershoot or metric == StepMetric.SteadyStateError) then
           yNew := Property.Undefined;
         else
           yNew := if rho >= 0 then Property.Satisfied else Property.Violated;

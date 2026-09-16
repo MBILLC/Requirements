@@ -64,8 +64,13 @@ sampled blocks restart OpenModelica's cvode at every millisecond sample and its 
 second-order example's peak 0.2 % low (16.27 % for 16.30) and moves with the tolerance, where dassl and ida reproduce
 the closed form at 1e-6 and 1e-8 alike -- the OpenModelica list runs the two cases with `solver: dassl`, a per-case
 override the ModCheck harness gained for it; and a sampled block whose period equals the result grid makes omc's
-cvode runtime stall on a sample and an output point 1e-14 s apart, so the blocks sample at the half-periods. No
-existing reference changed (no existing block changed).
+cvode runtime stall on a sample and an output point 1e-14 s apart, so the blocks sample at the half-periods. On
+Modelon Impact OCT's cvode has the same restart error (the peak 0.3 % low at 1e-6, 0.9 % at the comparison run's
+1e-4) and no other solver can be chosen through the dynamic custom function, so `SecondOrder` is disabled in the
+Impact list with that reason (28/44 checks against the dassl reference); `Disturbance` (a pure function of time)
+passes there. Impact's evidence for the blocks is ModCheck's corpus cross-check, where the block reads the plant's
+stored file with no solver between them: 100/100 agreements with `step_checks.py`. No existing reference changed
+(no existing block changed).
 
 **Version 0.9.0, 2026-09-15** (the margin outputs, ModCheck plan phase 12): the eight examples of
 `Examples.Elementary.Margin` are cases in the three lists with `variables: [time, "*.y", "*.margin"]`, so the

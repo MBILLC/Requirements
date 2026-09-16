@@ -1088,7 +1088,13 @@ cases:
     # phase 15b): the running metrics and the checks' Property and margin asserted
     # against the closed forms inside the example; the stored `*.y`, `*.margin` and
     # `*.value` trajectories are the reference.
-    enabled: true
+    # DISABLED -- the sampled blocks restart OCT's cvode at every millisecond sample and its
+    # accumulated error moves the metrics with the tolerance (the peak 0.3 % low at rtol 1e-6,
+    # 0.9 % low at the comparison run's 1e-4; the time metrics up to 3 ms), beyond this list's
+    # funnel against the dassl reference (measured 2026-09-16: 28/44 checks). Impact's evidence
+    # for the blocks is the corpus's R3 cross-check, where the block reads the plant's stored
+    # file and no solver sits between them: 100/100 agreements with step_checks.py.
+    enabled: false
     model: Requirements.Examples.Elementary.StepResponse.SecondOrder
     start_time: 0.0
     final_time: 6.0

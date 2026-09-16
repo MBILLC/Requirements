@@ -3598,21 +3598,24 @@ example per block family; each is a case in the regression lists beside this lib
       connect(sys.y, error.u); connect(step.y, error.r);
       when time >= 5.5 then
         // the closed forms of the second-order step response at D = 0.5, w = 5 (ModCheck's steps_acceptance.py)
-        // the peak is 0.2 % low here: the 6000 sample events restart the solver every millisecond and
-        // its accumulated error is what the sampled block sees (rule R1's point, measured)
-        assert(noEvent(abs(metrics.overshoot - 0.0163033) < 1e-4), "StepResponse: the overshoot is not 16.303 % of 0.1 m");
-        assert(noEvent(abs(metrics.tPeak - 1.7255) < 0.0015), "StepResponse: the peak is not at 1 + pi / (w sqrt(1 - D^2)) = 1.7255 s");
-        assert(noEvent(abs(metrics.riseTime - 0.32752) < 0.0015), "StepResponse: the 10-90 % rise time is not 0.3275 s");
-        assert(noEvent(abs(metrics.delayTime - 0.25881) < 0.0015), "StepResponse: the delay time is not 0.2588 s");
-        assert(noEvent(abs(metrics.settlingTime - 1.61527) < 0.0015), "StepResponse: the 2 % settling time is not 1.615 s");
-        assert(noEvent(abs(metrics.zeta - 0.5) < 0.005), "StepResponse: the damping ratio from the log decrement is not 0.5");
-        assert(noEvent(abs(metrics.decayRatio - 0.026580) < 0.001), "StepResponse: the decay ratio is not exp(-2 pi D / sqrt(1 - D^2))");
-        assert(noEvent(overshoot20.y == Property.Satisfied and abs(overshoot20.margin - 3.6967) < 0.1), "overshoot20: satisfied by 3.70 tolerances at the close");
-        assert(noEvent(overshoot10.y == Property.Violated and abs(overshoot10.margin + 6.3033) < 0.1), "overshoot10: violated by 6.30 tolerances (the margin follows the peak after the early decision)");
-        assert(noEvent(rise.y == Property.Satisfied and abs(rise.margin - 3.4497) < 0.05), "rise: satisfied by 3.45 tolerances");
-        assert(noEvent(delay.y == Property.Satisfied and abs(delay.margin - 0.8238) < 0.05), "delay: satisfied by 0.82 tolerances");
-        assert(noEvent(settle.y == Property.Satisfied and abs(settle.margin - 3.8473) < 0.03), "settle: satisfied by 3.85 tolerances");
-        assert(noEvent(settle1.y == Property.Violated and abs(settle1.margin + 6.1527) < 0.03), "settle1: violated by 6.15 tolerances");
+        // The tolerances below are the solver's, not the block's: the 6000 sample events restart the
+        // solver every millisecond and its accumulated error is what the sampled block sees (rule R1's
+        // point, measured 2026-09-16) -- dassl and ida reproduce the closed form to 1e-6, OpenModelica's
+        // cvode reads the peak 0.2 % low at rtol 1e-6, Modelon Impact's cvode 0.3 % low at 1e-6 and
+        // 0.9 % low at 1e-4 (the regression suites' comparison runs), the time metrics up to 3 ms off.
+        assert(noEvent(abs(metrics.overshoot - 0.0163033) < 2.5e-4), "StepResponse: the overshoot is not 16.303 % of 0.1 m");
+        assert(noEvent(abs(metrics.tPeak - 1.7255) < 0.005), "StepResponse: the peak is not at 1 + pi / (w sqrt(1 - D^2)) = 1.7255 s");
+        assert(noEvent(abs(metrics.riseTime - 0.32752) < 0.005), "StepResponse: the 10-90 % rise time is not 0.3275 s");
+        assert(noEvent(abs(metrics.delayTime - 0.25881) < 0.005), "StepResponse: the delay time is not 0.2588 s");
+        assert(noEvent(abs(metrics.settlingTime - 1.61527) < 0.005), "StepResponse: the 2 % settling time is not 1.615 s");
+        assert(noEvent(abs(metrics.zeta - 0.5) < 0.01), "StepResponse: the damping ratio from the log decrement is not 0.5");
+        assert(noEvent(abs(metrics.decayRatio - 0.026580) < 0.002), "StepResponse: the decay ratio is not exp(-2 pi D / sqrt(1 - D^2))");
+        assert(noEvent(overshoot20.y == Property.Satisfied and abs(overshoot20.margin - 3.6967) < 0.25), "overshoot20: satisfied by 3.70 tolerances at the close");
+        assert(noEvent(overshoot10.y == Property.Violated and abs(overshoot10.margin + 6.3033) < 0.25), "overshoot10: violated by 6.30 tolerances (the margin follows the peak after the early decision)");
+        assert(noEvent(rise.y == Property.Satisfied and abs(rise.margin - 3.4497) < 0.1), "rise: satisfied by 3.45 tolerances");
+        assert(noEvent(delay.y == Property.Satisfied and abs(delay.margin - 0.8238) < 0.1), "delay: satisfied by 0.82 tolerances");
+        assert(noEvent(settle.y == Property.Satisfied and abs(settle.margin - 3.8473) < 0.05), "settle: satisfied by 3.85 tolerances");
+        assert(noEvent(settle1.y == Property.Violated and abs(settle1.margin + 6.1527) < 0.05), "settle1: violated by 6.15 tolerances");
         assert(noEvent(damping.y == Property.Satisfied and abs(damping.margin - 2.0) < 0.1), "damping: satisfied by 2 tolerances");
         assert(noEvent(decay.y == Property.Satisfied and abs(decay.margin - 4.4684) < 0.03), "decay: satisfied by 4.47 tolerances");
         assert(noEvent(error.y == Property.Satisfied and error.margin > 1.9), "error: satisfied by two tolerances");
