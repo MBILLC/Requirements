@@ -17,6 +17,12 @@ sub-library contains one component and demonstrates the fine details of this com
 </li>
 
 <li>
+In sub-library <a href=\"modelica://Requirements.Examples.SteadyState\">SteadyState</a>
+models are run to their steady state with their inputs as parameters; their requirements are checked over
+a point cloud (a parameter sweep) by ModCheck, not over a trajectory (ModCheck's requirements plan, section 19).
+</li>
+
+<li>
 In sub-library <a href=\"modelica://Requirements.Examples.AircraftRequirements\">AircraftRequirements</a>
 it is shown how typical requirements appearing in aircraft design can be formulated with the
 Requirements library. These examples have been provided by the aircraft
