@@ -40,11 +40,13 @@ Measured on the way: a sampled block whose period equals the result grid makes O
 stall on an event and an output point 1e-14 s apart (an endless <em>desired step too small</em>); the blocks
 therefore sample at the half-periods. The 6000 sample events of a 6 s run restart the solver every
 millisecond and its accumulated error is what the sampled block sees: the second-order example's peak reads
-0.2 % low against the closed form under OpenModelica's cvode and 0.3 % low under Modelon Impact's (0.9 % at
-rtol 1e-4), where dassl and ida reproduce it (rule R1's point, measured; the tolerances of the example's asserts
-say so, and the regression lists run it under dassl on OpenModelica and not at all on Impact, whose dynamic
-custom function offers no other solver). ModCheck's corpus cross-check, where the block reads the plant's stored
-trajectory with no solver between them, agrees with <code>step_checks.py</code> on every item on both tools.
+0.2 % low against the closed form under OpenModelica's cvode and 0.3 % low under Modelon Impact's CVode (0.9 % at
+rtol 1e-4), where dassl, ida and Impact's Radau5ODE reproduce it at every tolerance (rule R1's point, measured; the
+tolerances of the example's asserts say so, and the regression lists run it under dassl on OpenModelica and under
+Radau5ODE on Impact -- a simulation option of the dynamic custom function). The example's two states carry
+<code>nominal</code> values (0.1 and 0.5) so the absolute tolerance is scaled to the 0.1 m step; it helps CVode a
+little at 1e-6 and not at 1e-4. ModCheck's corpus cross-check, where the block reads the plant's stored trajectory
+with no solver between them, agrees with <code>step_checks.py</code> on every item on both tools.
 </p>
 <h4>Changes</h4>
 <ul>

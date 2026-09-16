@@ -3552,7 +3552,9 @@ example per block family; each is a case in the regression lists beside this lib
       import Requirements.Types.StepMetric;
       Modelica.Blocks.Sources.Step step(height=0.1, startTime=1) "the reference"
         annotation (Placement(transformation(extent={{-90,10},{-70,30}})));
-      Modelica.Blocks.Continuous.SecondOrder sys(k=1, w=5, D=0.5, initType=Modelica.Blocks.Types.Init.InitialState) "the response"
+      Modelica.Blocks.Continuous.SecondOrder sys(k=1, w=5, D=0.5, initType=Modelica.Blocks.Types.Init.InitialState,
+        y(nominal=0.1), yd(nominal=0.5))
+        "the response; the states' nominal values scale the solver's absolute tolerance to the 0.1 m step (the owner's call)"
         annotation (Placement(transformation(extent={{-50,10},{-30,30}})));
       Requirements.SignalAnalysis.StepResponse metrics(T_window=4) "the running metrics, the window closing 4 s after the step"
         annotation (Placement(transformation(extent={{0,40},{40,80}})));
