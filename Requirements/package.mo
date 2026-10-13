@@ -9,6 +9,258 @@ package UsersGuide "User's Guide"
 package ReleaseNotes "Release notes"
   extends Modelica.Icons.ReleaseNotes;
 
+  class Summary2026 "Summary of changes and additions in 2026"
+  extends Modelica.Icons.ReleaseNotes;
+
+    annotation (Documentation(info="<html>
+<p>
+In 2026 the library went from version 0.7.0 (Feb. 2025) to <b>0.11.0</b> (2026-09-16) in six
+releases. This page summarizes them; the release note of each version has the details.
+The same summary is kept as Markdown in
+<a href=\"https://github.com/MBILLC/Requirements/blob/HEAD/CHANGES_2026.md\">CHANGES_2026.md</a>
+at the top level of the library's repository (beside the <code>Requirements</code> package folder).
+The regression baselines and the tool-by-tool measurements are kept in
+<code>Resources/ModCheck/</code> (<code>README.md</code>, <code>DEVMI_DIFFERENCES.md</code>).
+</p>
+
+<table border=1 cellspacing=0 cellpadding=2>
+<tr><th>Version</th><th>Date</th><th>Theme</th></tr>
+<tr><td><a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Version_0_7_1\">0.7.1</a></td><td>2026-09-14</td>
+    <td>Rename, MSL 4.1.0, runs in Modelon Impact, three-tool comparison, MA-HS-CSV reader</td></tr>
+<tr><td><a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Version_0_8_0\">0.8.0</a></td><td>2026-09-15</td>
+    <td>Four-valued logic (<code>Undefined</code> added to <code>Property</code>)</td></tr>
+<tr><td><a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Version_0_9_0\">0.9.0</a></td><td>2026-09-15</td>
+    <td><code>margin</code> output on every check block</td></tr>
+<tr><td><a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Version_0_9_1\">0.9.1</a></td><td>2026-09-15</td>
+    <td>Bug fix: CSV reader derivative at the file's last row</td></tr>
+<tr><td><a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Version_0_10_0\">0.10.0</a></td><td>2026-09-16</td>
+    <td>Step-response metrics (overshoot, rise time, settling time, ...)</td></tr>
+<tr><td><a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Version_0_11_0\">0.11.0</a></td><td>2026-09-16</td>
+    <td>Eigenvalue checks over a linearization (<code>LinearAnalysis</code>)</td></tr>
+</table>
+
+<p>
+No release needs a model conversion. Each one declares <code>conversion(noneFromVersion=...)</code> for the
+version before it. One exception: from 0.8.0 on, code that reads a stored <code>Property</code> result
+has to accept the value 4.
+</p>
+
+<h4>Origin and rename (2026-09-14)</h4>
+<ul>
+<li> The library was renamed from <code>Modelica_Requirements</code> to <b>Requirements</b>. It is Model
+     Based Innovation LLC's derivative of upstream
+     <a href=\"https://github.com/modelica-3rdparty/Modelica_Requirements\">Modelica_Requirements</a> 0.7.1
+     (BSD 3-Clause) and now lives in the private repo <code>MBILLC/Requirements</code>.</li>
+<li> It is the base for the requirements-verification tooling of
+     <a href=\"https://github.com/MBILLC/ModCheck\">ModCheck</a>. The license and the original authors'
+     copyright notices are unchanged.</li>
+<li> The additions serve a <b>two-run verification</b> workflow. First the plant is simulated on its own
+     and its signals are stored in an MA-HS-CSV file. Then the requirement checks run on the stored
+     signals in a second run.</li>
+</ul>
+
+<h4>0.7.1 &mdash; Maintenance and multi-tool support</h4>
+<p>
+The release made the library run in Modelon Impact. None of its changes alter requirement semantics.
+</p>
+<ul>
+<li> <code>uses(Modelica(version=\"4.1.0\"))</code>. The library needed no change for MSL 4.1.0.</li>
+<li> <a href=\"modelica://Requirements.Verify.PrintViolations\">PrintViolations</a> has two new Advanced
+     parameters, <code>useEvaluationTime</code> and <code>evaluationTime</code>. Impact evaluates
+     <code>terminal()</code> to <code>false</code>, so it never printed the verdict. Every example now sets
+     <code>evaluationTime = StopTime</code>.</li>
+<li> <a href=\"modelica://Requirements.LogicalBlocks.FallingEdgeTerminate\">FallingEdgeTerminate</a> has a new
+     <code>delay</code> parameter (default 0). At a <code>terminate()</code> instant Impact stores only the
+     pre-event state, so without a delay the final verdict was missing from the result.</li>
+<li> <a href=\"modelica://Requirements.ChecksInFixedWindow_withFFT\">ChecksInFixedWindow_withFFT</a> now runs
+     in Impact. Four separate fixes were needed:
+     <ul>
+     <li>The local arrays in <code>Internal.checkDomain</code> now have explicit sizes.</li>
+     <li>The FFT sampling start is now explicit:
+         <code>(condition and not pre(condition)) or (initial() and condition)</code>.</li>
+     <li>The FFT examples use the new terminate delay.</li>
+     <li>The when-clause chains of <code>WithinRelativeDomain</code> and <code>MaxTotalHarmonicDistortion</code>
+         were replaced by single function calls, <code>Internal.checkRelativeDomain</code> and
+         <code>Internal.checkTHD</code>.</li>
+     </ul></li>
+<li> The <code>LogicalFunctions.card*</code> reductions are now written over indices, because Impact
+     failed to scalarize the element form.</li>
+<li> No more model instances passed to functions. <code>Examples.MotorsWithLosses</code> and
+     <code>SimplePumpingSystem.CheckPumpingSystem</code> now build their observation records with explicit
+     record constructors.
+     <ul>
+     <li>The reason: the record cast <code>R(m)</code> allowed by MLS 3.6 &sect;12.6.1 is implemented only by Dymola.</li>
+     <li><code>MotorData</code> and <code>InertiaData</code> were made public.</li>
+     <li><code>SourceObservation_from_PartialSource</code> and <code>Records.PartialSource</code> were removed.</li>
+     </ul></li>
+<li> New: <a href=\"modelica://Requirements.Sources.PartialSignalsFromFile\">Sources.PartialSignalsFromFile</a>
+     reads MA-HS-CSV files: Real, Boolean and Integer columns by name, with a time event at every change of
+     a discrete column.
+     <ul>
+     <li>It is built on <a href=\"modelica://Requirements.Internal.CSV\">Internal.CSV</a> and a header-only
+         C89 reader, <code>Resources/Include/RequirementsCsv.h</code>.</li>
+     <li>The reader is tested against a Python reader in <code>Resources/C-Sources/test/</code>.</li>
+     <li>Example: <a href=\"modelica://Requirements.Examples.Elementary.Sources.SignalsFromFile\">Examples.Elementary.Sources.SignalsFromFile</a>.</li>
+     </ul></li>
+<li> Three tools compared (68 examples, every <code>*.y</code> output):
+     <table border=1 cellspacing=0 cellpadding=2>
+     <tr><th>Tool</th><th>Simulated</th><th>Not simulated</th></tr>
+     <tr><td>Dymola 2026x</td><td>60</td><td>8 refused by the license</td></tr>
+     <tr><td>OpenModelica 1.27.1</td><td>48</td><td>20 don't build (14 sliding-window, 6 FFT)</td></tr>
+     <tr><td>Modelon Impact (Sept. 2026)</td><td>68</td><td>&mdash;</td></tr>
+     </table>
+     <ul>
+     <li>Impact vs. Dymola/OpenModelica: all 296 signal checks pass.</li>
+     <li>OpenModelica vs. Dymola: continuous signals agree to better than 1e-4 of their range, and
+         discrete signals switch at identical instants.</li>
+     </ul></li>
+</ul>
+
+<h4>0.8.0 &mdash; Four-valued logic</h4>
+<p>
+This release changes requirement semantics.
+</p>
+<ul>
+<li> <a href=\"modelica://Requirements.Types.Property\">Types.Property</a> =
+     <code>enumeration(Violated, Undecided, Satisfied, Undefined)</code>.
+     <ul>
+     <li><code>Undefined</code> (value 4) means <em>not applicable</em>. <code>Undecided</code> now means
+         <em>applicable but not yet decided</em>.</li>
+     <li>The new value is appended at the end, so the stored values 1&ndash;3 stay valid.</li>
+     <li><code>Types.Boolean4</code> is an alias, using CRML's name.</li>
+     </ul></li>
+<li> <a href=\"modelica://Requirements.LogicalFunctions\">LogicalFunctions</a>: new <code>and4</code>,
+     <code>or4</code>, <code>not4</code> (truth tables taken from CRML/ETL), <code>and4All</code>,
+     <code>or4All</code> and <code>cardUndefined</code>.
+     <ul>
+     <li><code>Undefined</code> is the neutral element of <em>and</em> and <em>or</em>.</li>
+     <li><code>forall3</code> delegates to <code>and4All</code>.</li>
+     <li><code>during</code> and <code>during3</code> return <code>Undefined</code> while their condition is false.</li>
+     </ul></li>
+<li> <a href=\"modelica://Requirements.LogicalBlocks\">LogicalBlocks</a>: <code>PropertyAnd</code>,
+     <code>PropertyOr</code> and <code>PropertyNot</code> delegate to the new functions.
+     <ul>
+     <li>An unconnected <code>PropertyAnd</code>/<code>PropertyOr</code> now gives <code>Undefined</code>.</li>
+     <li><code>PropertyToBoolean</code> has a new <code>undefined</code> parameter.</li>
+     <li><code>PropertyConstant</code> and <code>PropertyTable</code> accept the fourth value.</li>
+     </ul></li>
+<li> Every <a href=\"modelica://Requirements.ChecksInFixedWindow\">ChecksInFixedWindow</a> block outputs
+     <code>Undefined</code> while its condition is false. The FFT checks output <code>Undefined</code> before
+     their first rising edge and <code>Undecided</code> until the first FFT is computed.</li>
+<li> <a href=\"modelica://Requirements.Verify.Requirement\">Verify.Requirement</a> and
+     <a href=\"modelica://Requirements.Verify.PrintViolations\">PrintViolations</a> still reduce everything to
+     three verdicts.
+     <ul>
+     <li>They report the new count <b>attempts</b>: the number of phases in which the property was applicable.</li>
+     <li>The log file and the HTML report gain an attempts column.</li>
+     </ul></li>
+<li> New example <a href=\"modelica://Requirements.Examples.Elementary.LogicalBlocks.PropertyTable4\">Examples.Elementary.LogicalBlocks.PropertyTable4</a>
+     tests all 16 pairs of each truth table, plus the laws that hold and the laws that fail.
+     <ul>
+     <li>Absorption and distributivity fail wherever <code>Undefined</code> is involved.</li>
+     <li>Never simplify <code>Property</code> expressions with Boolean rewriting.</li>
+     </ul></li>
+<li> The regression baselines were re-stored on OpenModelica, Dymola and Impact. The only differences were
+     Undecided &rarr; Undefined.</li>
+</ul>
+
+<h4>0.9.0 &mdash; Margins</h4>
+<ul>
+<li> Every check block has a new output <b>margin</b> = robustness / <code>scale</code>.
+     <ul>
+     <li>Robustness is the signed distance to the limit; it is &ge; 0 exactly when the check holds.</li>
+     <li><code>scale</code> is the requirement's tolerance (default 1).</li>
+     <li>The connector type is the new <a href=\"modelica://Requirements.Interfaces.MarginOutput\">Interfaces.MarginOutput</a>
+         (<code>unit=\"1\"</code>).</li>
+     </ul></li>
+<li> <a href=\"modelica://Requirements.Interfaces.PartialCheck\">PartialCheck</a> and the sliding-window partials
+     have two new parameters, <code>scale</code> and <code>computeMargin</code>.</li>
+<li> How each block family gets its robustness:
+     <ul>
+     <li><code>During</code> and <code>When*</code>: from a new input <code>rho</code>.</li>
+     <li>Duration blocks: from the new output <code>duration</code>.</li>
+     <li>Count blocks: from the count difference. <code>countRising</code> is now an output.</li>
+     <li><code>MaxRisingFrequency</code>, <code>WithinDomain</code>, sliding-window and FFT blocks: from the
+         quantity each block already computes.</li>
+     </ul></li>
+<li> <a href=\"modelica://Requirements.LogicalFunctions.marginAnd\">LogicalFunctions.marginAnd</a> and
+     <a href=\"modelica://Requirements.LogicalFunctions.marginOr\">marginOr</a> give the minimum and maximum
+     margin over the elements that are not <code>Undefined</code>.</li>
+<li> The blocks have no accumulators. The worst margin over a run is taken from the stored trajectory.</li>
+<li> New examples <a href=\"modelica://Requirements.Examples.Elementary.Margin\">Examples.Elementary.Margin</a>:
+     eight of them, one per block family. Each checks the margins against closed-form values and checks
+     the sign invariant.</li>
+<li> No existing output changed. Regression results: OpenModelica 316/316, Dymola 336/336, Impact 371/371.</li>
+</ul>
+
+<h4>0.9.1 &mdash; CSV reader fix</h4>
+<ul>
+<li> <a href=\"modelica://Requirements.Internal.CSV.getRealDer\">Internal.CSV.getRealDer</a> returned 0 at the
+     file's last row. Derived signals therefore dropped to 0 at the final stored row, which produced a
+     spurious edge (seen in ModCheck's <code>TC-AC-CabinAltitudeRate-ShortExcursion</code>).</li>
+<li> At the last row it now returns the slope of the final segment. Beyond the end of the file it still
+     returns 0.</li>
+<li> No stored reference changed.</li>
+</ul>
+
+<h4>0.10.0 &mdash; Step-response metrics</h4>
+<ul>
+<li> New block <a href=\"modelica://Requirements.SignalAnalysis.StepResponse\">SignalAnalysis.StepResponse</a>
+     computes the running step-response metrics: overshoot, undershoot, rise time, delay time, settling
+     time, steady-state error, damping ratio and decay ratio.
+     <ul>
+     <li>It detects steps, windows them, and interpolates level crossings between samples.</li>
+     <li>It samples at half-periods. When the sample period equals the result grid, OpenModelica's CVODE stalls.</li>
+     </ul></li>
+<li> New block <a href=\"modelica://Requirements.ChecksInFixedWindow.StepResponseCheck\">ChecksInFixedWindow.StepResponseCheck</a>
+     bounds one metric and outputs <code>Property</code> and <code>margin</code>.</li>
+<li> New enumerations <code>Types.StepTarget</code> and <code>Types.StepMetric</code>.</li>
+<li> New examples <a href=\"modelica://Requirements.Examples.Elementary.StepResponse\">Examples.Elementary.StepResponse</a>
+     (<code>SecondOrder</code>, <code>Disturbance</code>), checked against closed forms.</li>
+<li> The reported verdict comes from ModCheck's <code>step_checks.py</code>. The blocks serve as a
+     development aid and as a cross-check, and they agree with it on every item in the corpus.</li>
+<li> Solver choice: the millisecond sample events make CVode read the peak about 0.2&ndash;0.3 % low. The
+     regression lists therefore use dassl on OpenModelica and Radau5ODE on Impact.</li>
+</ul>
+
+<h4>0.11.0 &mdash; Eigenvalue checks over a linearization</h4>
+<ul>
+<li> New package <a href=\"modelica://Requirements.LinearAnalysis\">LinearAnalysis</a>:
+     <ul>
+     <li><code>readStateMatrix</code> reads the A matrix from the MATLAB v4 file that ModCheck writes for each
+         linearization.</li>
+     <li><code>modes</code> groups the eigenvalues into modes, using the same rules as ModCheck's
+         <code>linear_checks.py</code>.</li>
+     <li><a href=\"modelica://Requirements.LinearAnalysis.EigenvalueCheck\">EigenvalueCheck</a> bounds real part,
+         damping, frequency or time constant over every mode, with an optional frequency band.</li>
+     <li><a href=\"modelica://Requirements.LinearAnalysis.EigenvaluesWithinRegion\">EigenvaluesWithinRegion</a>
+         checks that every eigenvalue lies inside a polygon in the (Re, Im) plane.</li>
+     <li>Both blocks output <code>Property</code> and <code>margin</code>.</li>
+     </ul></li>
+<li> New enumeration <code>Types.EigenMetric</code>.</li>
+<li> New example <a href=\"modelica://Requirements.Examples.Elementary.LinearAnalysis\">Examples.Elementary.LinearAnalysis</a>
+     (<code>SecondOrder</code>), with the data file <code>Resources/Data/SecondOrderLinearization.mat</code>.</li>
+<li> These blocks are used as a cross-check (ModCheck rule R3). The reported verdict comes from Python.</li>
+<li> By decision, the frequency-response requirements have no Modelica side.</li>
+</ul>
+
+<h4>Regression baselines (<code>Resources/ModCheck/</code>)</h4>
+<ul>
+<li> Case lists generated from the examples' <code>experiment()</code> annotations:
+     <ul>
+     <li>Dymola 2026x: <code>regression_cases_requirements.yaml</code></li>
+     <li>OpenModelica 1.27.1: <code>regression_cases_requirements_openmodelica.yaml</code></li>
+     <li>Modelon Impact: <code>Impact/regression_cases_requirements_impact.yaml</code></li>
+     </ul></li>
+<li> The Impact list compares against a composite reference: Dymola's results, with OpenModelica's filling
+     the gaps. Since 2026-09-15, the 5 cases that neither of those tools can run use Impact's own results as
+     reference. The full Impact suite then passed <b>434/434</b> with nothing skipped.</li>
+<li> Every new example from 0.8.0&ndash;0.11.0 was added as a case. The margin and step-metric outputs are
+     stored as references.</li>
+</ul>
+</html>"));
+  end Summary2026;
+
   class Version_0_11_0 "Version 0.11.0 (Sept. 16, 2026)"
   extends Modelica.Icons.ReleaseNotes;
 
@@ -462,7 +714,9 @@ First version of the library provided to the public.
 
 <p>
 This section summarizes the changes that have been performed
-on package Requirements.
+on package Requirements. An overview of all changes and additions made in 2026
+(versions 0.7.1 to 0.11.0) is given in
+<a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Summary2026\">Summary of 2026</a>.
 </p>
 </html>"));
 end ReleaseNotes;
