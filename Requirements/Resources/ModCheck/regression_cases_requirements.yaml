@@ -1109,3 +1109,21 @@ cases:
     rtol: 1.0e-06
     modifiers: {}
     variables: [time, "*.y", "*.margin", "*.value"]
+
+  - name: MR_Examples_SteadyState_CheckHeatExchanger
+    # Added 2026-10-16 with the example (library 0.11.1): the steady-state requirements of the
+    # MSL heat exchanger at its nominal point, checked in a plain simulation. The requirement
+    # properties are Undefined until the run has settled (t = 450 s) and Satisfied after; the
+    # outlet and wall temperatures and the filtered rates that define "settled" are stored with
+    # them, so a change in the plant shows up beside the change in the verdict.
+    # Variables listed by name: a "*.y" glob would sweep in the heat exchanger's internals.
+    # DISABLED until its reference is stored on Dymola 2026x (not available where the case was added):
+    #   python3 regression_testing.py --config <this file> --store --case <this case>, then enable.
+    enabled: false
+    model: Requirements.Examples.SteadyState.CheckHeatExchanger
+    start_time: 0.0
+    final_time: 600.0
+    ncp: 600
+    rtol: 1.0e-06
+    modifiers: {}
+    variables: [time, "R*_*.property", T_out1, T_out2, T_wall_max, Q_transferred, derT_out1.y, derT_out2.y, printViolations.satisfaction]

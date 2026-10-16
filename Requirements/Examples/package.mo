@@ -18,8 +18,8 @@ sub-library contains one component and demonstrates the fine details of this com
 
 <li>
 In sub-library <a href=\"modelica://Requirements.Examples.SteadyState\">SteadyState</a>
-models are run to their steady state with their inputs as parameters; their requirements are checked over
-a point cloud (a parameter sweep) by ModCheck, not over a trajectory (ModCheck's requirements plan, section 19).
+models are run to their steady state with their inputs as parameters; their requirements are stated over the
+settled operating point, not over the trajectory, and a parameter sweep checks a whole map of operating points.
 </li>
 
 <li>

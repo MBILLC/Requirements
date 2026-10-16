@@ -6,7 +6,7 @@ Defining requirements formally and checking them when simulating
 [Modelica_Requirements](https://github.com/modelica-3rdparty/Modelica_Requirements)
 version 0.7.1 (BSD 3-Clause; LICENSE and the original authors' copyright
 notices unchanged), renamed `Requirements` on 2026-09-14 and developed in this
-private repository as the base for the requirements-verification tooling of
+public repository as the base for the requirements-verification tooling of
 [ModCheck](https://github.com/MBILLC/ModCheck) (see its
 `ModCheck/Resources/Planning/REQUIREMENTS_REDESIGN_PLAN.md`). The changes
 that are meant for upstream are kept, under the original name, on the

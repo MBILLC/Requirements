@@ -1,6 +1,6 @@
 # ModCheck baselines for Requirements
 
-> The library was `Modelica_Requirements` until 2026-09-14, when it was renamed `Requirements` and moved to the private repo `MBILLC/Requirements`; the case names below keep their `MR_` prefix, only the `model:` paths changed.
+> The library was `Modelica_Requirements` until 2026-09-14, when it was renamed `Requirements` and moved to the repo [MBILLC/Requirements](https://github.com/MBILLC/Requirements) (public); the case names below keep their `MR_` prefix, only the `model:` paths changed.
 
 Regression baselines for the library's `Examples`, established with
 [ModCheck](https://github.com/MBILLC/ModCheck) on 2026-09-13 by two Modelica
@@ -54,6 +54,16 @@ baselines were then re-stored (omc, Dymola, the composite refreshed from both, I
 with the new `Examples.Elementary.LogicalBlocks.PropertyTable4` as a case in the three lists
 (omc, Dymola and the composite carry its reference). The numbers below are the 0.7.1
 measurement and stand as history.
+
+**Version 0.11.1, 2026-10-16** (steady-state check example, printing fix): `Examples.SteadyState.CheckHeatExchanger`
+is a case in the three lists with its variables named one by one (the three requirement properties, the outlet and
+wall temperatures, the transferred heat, the two filtered rates that define "settled", `printViolations.satisfaction`):
+a `"*.y"` glob would sweep in the heat exchanger's internals. Its reference is stored on Impact only
+(`reference_from: impact`, 11 variables, 27 kB); the Dymola and OpenModelica cases are `enabled: false` until their
+references are stored there. The printing fix (`Internal.printViolationsToLogFile` and `printViolationsToOutput`
+made idempotent, because Impact evaluates the verdict's when-equations twice at the event) moves no stored signal:
+the full Impact suite passed **488/488** checks over 82 cases afterwards, nothing skipped (the CPU warnings are
+against the references' CPU times, recorded on other tools).
 
 **Version 0.10.0, 2026-09-16** (the step-response blocks, ModCheck plan phase 15b): the two examples of
 `Examples.Elementary.StepResponse` are cases in the three lists with `variables: [time, "*.y", "*.margin", "*.value"]`,

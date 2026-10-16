@@ -11,13 +11,17 @@ package Internal "Library of internal components (should not be directly used)"
   end SortingPort;
 
   impure function initializeLogFile
-    "Initialize log file (remove existing file and add a blank line"
+    "Initialize log file (remove existing file and add a blank line; remove the html report of an earlier run)"
      input String logFile;
      input Real dummyInput;
+     input String htmlFile = "" "Html report of an earlier run, removed so that it marks this run's summary as printed once it exists (\"\" = none)";
      output Real dummy "Dummy value to control sorting of equations";
   algorithm
-     // Remove file, if it exists
+     // Remove files, if they exist
      Modelica.Utilities.Files.removeFile(logFile);
+     if htmlFile <> "" then
+        Modelica.Utilities.Files.removeFile(htmlFile);
+     end if;
 
      // Generate log file and store an empty line
      Modelica.Utilities.Streams.print(" ", logFile);
@@ -43,7 +47,25 @@ package Internal "Library of internal components (should not be directly used)"
      output Real ok "Dummy variable needed for sorting";
   protected
      String text = Modelica.Utilities.Strings.replace(requirementText,"\n"," ");
+     String key = "," + checkedComponentName + "," + requirementName + ",";
+     Integer nLines = Modelica.Utilities.Streams.countLines(logFile);
+     Boolean logged = false;
   algorithm
+     // A tool may evaluate the when-equation that calls this function more than once at the
+     // same event instant (Modelon Impact does): write the requirement's line only once.
+     for i in 2:nLines loop
+        if not logged then
+           logged := Modelica.Utilities.Strings.find(Modelica.Utilities.Streams.readLine(logFile, i), key) > 0;
+        end if;
+     end for;
+     if nLines > 0 then
+        Modelica.Utilities.Streams.close(logFile);
+     end if;
+     ok := 1.0;
+     if logged then
+        return;
+     end if;
+
      // One line per requirement: <verdict>,<observation>,<requirement>[,<first failure time>],<attempts>,<text>
      if atLeastOneFailure then
         print("Violated," + checkedComponentName +
@@ -111,6 +133,13 @@ package Internal "Library of internal components (should not be directly used)"
      Integer index;
      String  fullHtmlFile=Modelica.Utilities.Files.fullPathName(htmlFile);
   algorithm
+     // A tool may evaluate the when-equation that calls this function more than once at the
+     // same event instant (Modelon Impact does). The html report is removed at initialization
+     // (initializeLogFile), so its existence means this run's summary is already printed.
+     if Modelica.Utilities.Files.exist(htmlFile) then
+        return;
+     end if;
+
      // Parse file
      for i in  2:nLines loop
         // Read next line
@@ -981,7 +1010,7 @@ otherwise the slope of the segment starting at the last row at or before <code>t
 <a href=\"modelica://Requirements.Sources.PartialSignalsFromFile\">Sources.PartialSignalsFromFile</a> and the blocks extending it call.
 The C implementation is header-only, <code>Resources/Include/RequirementsCsv.h</code> (C89, external linkage, no dependency beyond libc and
 <code>ModelicaUtilities.h</code>), pulled in through the <code>Include</code> annotation of every function; <code>Resources/C-Sources/RequirementsCsv.c</code>
-is the same code as a compilation unit for a <code>Library=</code> build. <code>Resources/C-Sources/test/</code> tests the C reader against ModCheck's Python reader.</p>
+is the same code as a compilation unit for a <code>Library=</code> build. <code>Resources/C-Sources/test/</code> tests the C reader against an independent Python reader.</p>
 <p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
 </html>"));
   end CSV;

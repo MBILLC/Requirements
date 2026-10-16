@@ -762,7 +762,7 @@ results in
   end CrossingMonitoring;
 
   block StepResponse
-    "Running step-response metrics of u after a step of r, sampled: the peak, the level crossings, the last exit from the settling band, the extrema (ModCheck's requirements plan, section 21)"
+    "Running step-response metrics of u after a step of r, sampled: the peak, the level crossings, the last exit from the settling band, the extrema"
     import Modelica.Units.SI;
     import Requirements.Types.StepTarget;
 
@@ -1047,7 +1047,7 @@ metrics = <b>StepResponse</b>(u=..., r=..., target=..., samplePeriod=...);
 <h4>Description</h4>
 <p>
 The running metrics of the step response of <b>u</b> after a step of <b>r</b>, evaluated at every
-<b>samplePeriod</b> (ModCheck's requirements plan, section 21.2, the R3 layer of section 21.7):
+<b>samplePeriod</b>:
 a step is a change of r between two samples of at least <b>threshold</b> (any change with the default 0);
 its window runs to the next step of r, or closes <b>T_window</b> after it when that is set; the target
 <b>yInf</b> is r after the step (<b>target</b> = Stepping) or the current value of the <b>yRef</b> input
@@ -1071,9 +1071,8 @@ target, counted from the first reach of the target, each a maximal segment of on
 </p>
 <p>
 The metrics are sampled: an instant is known to one <b>samplePeriod</b>, a peak read low by the
-curvature over one period. The reported verdict of a step-response requirement is computed by
-ModCheck's <code>step_checks.py</code> on the stored trajectory (rule R7); this block is the
-development aid in a Modelica tool and its cross-check, and
+curvature over one period; a requirement that needs the full resolution of the result is evaluated on
+the stored trajectory after the run instead, and this block then serves as its cross-check.
 <a href=\"modelica://Requirements.ChecksInFixedWindow.StepResponseCheck\">StepResponseCheck</a>
 turns one of its metrics into a Property. The post-processing target <em>the response's final
 value</em> has no running form and is not offered here.

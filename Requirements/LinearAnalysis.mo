@@ -1,8 +1,8 @@
 within Requirements;
-package LinearAnalysis "Eigenvalue predicates over a state matrix read from a file: the Modelica side of ModCheck's linear-analysis requirements (plan section 22.7)"
+package LinearAnalysis "Eigenvalue predicates over the state matrix of a linearization, read from a file"
   extends Modelica.Icons.Package;
 
-  impure function readStateMatrix "The A matrix of a linearisation from a MATLAB v4 file (as ModCheck's run_requirements.py writes it beside the .npz)"
+  impure function readStateMatrix "The A matrix of a linearization from a MATLAB v4 file"
     extends Modelica.Icons.Function;
     input String filePath "The file's path -- a modelica:// URI resolved by the caller (parameter String filePath = Modelica.Utilities.Files.loadResource(fileName)), so that the compiler folds the URI and leaves this impure read to initialization";
     input Integer nx "The number of states (the matrix is nx x nx; the caller knows it, the file's own size is not a structural parameter)";
@@ -11,14 +11,16 @@ package LinearAnalysis "Eigenvalue predicates over a state matrix read from a fi
   algorithm
     A := Modelica.Utilities.Streams.readRealMatrix(filePath, matrixName, nx, nx);
     annotation(Documentation(info="<html>
-<p><code>Modelica.Utilities.Streams.readRealMatrix</code> on the MATLAB v4 file ModCheck's orchestrator writes
-for every linearisation (<code>lin/&lt;TC&gt;.mat</code>: <code>A</code>, <code>B</code>, <code>C</code>,
-<code>D</code>, the operating point). v4 is the format every tool's ModelicaIO reads without a compression
-library. The number of states is an input, not read from the file: an array dimension must be a
-structural parameter, and the generated check model takes it as a modifier from the orchestrator. The
-path is the caller's <code>loadResource</code> of the URI, in a parameter of its own: Optimica (OCT)
-folds <code>loadResource</code> at translation and refuses to evaluate an impure function that calls it
-there, while the read itself must happen at initialization (the matrix is a parameter with
+<p><code>Modelica.Utilities.Streams.readRealMatrix</code> on a MATLAB v4 file that holds the state matrix
+of a linearization under the name <code>matrixName</code> (default <code>A</code>); other matrices in the
+file (<code>B</code>, <code>C</code>, <code>D</code>, the operating point) are ignored. How to produce such
+a file in different tools is described in <a href=\"modelica://Requirements.LinearAnalysis\">LinearAnalysis</a>.
+v4 is the format every tool's ModelicaIO reads without a compression library.</p>
+<p>The number of states is an input, not read from the file: an array dimension must be a structural
+parameter, so the check model states it (it is the size of the linearized model's state vector). The
+path is the caller's <code>loadResource</code> of the URI, in a parameter of its own: some tools fold
+<code>loadResource</code> at translation and refuse to evaluate an impure function that calls it there,
+while the read itself must happen at initialization (the matrix is a parameter with
 <code>fixed = false</code> and an initial equation).</p>
 <p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
 </html>"));
@@ -106,7 +108,7 @@ there, while the read itself must happen at initialization (the matrix is a para
       im[k] := 0;
     end for;
     annotation(Documentation(info="<html>
-<p>The modes of <code>A</code> as ModCheck's <code>linear_checks.modes_of</code> defines them (plan section 22.2):
+<p>The modes of <code>A</code>:
 LAPACK's <code>dgeev</code> (what <code>Modelica.Math.Matrices.eigenValues</code> wraps), a complex pair folded into one mode represented by
 its <code>Im &ge; 0</code> member, an imaginary or real part below <code>1e-12</code> of the largest eigenvalue's
 magnitude taken as zero, the integrator rule of <code>tauSlow</code> (a mode slower than the plant's slowest
@@ -121,7 +123,7 @@ damping ratio of a mode is <code>-Re/|&lambda;|</code> (1 for a real non-positiv
   block EigenvalueCheck "One eigenvalue predicate over every mode of a state matrix (optionally in a frequency band): Property and margin, constant over the run"
     import Requirements.Types.Property;
     import Requirements.Types.EigenMetric;
-    parameter Integer nx(min=0) "The number of states: the size of A (a plain parameter, so that A itself need not be evaluated when the model is translated -- OCT refuses to evaluate the impure file read at flattening)";
+    parameter Integer nx(min=0) "The number of states: the size of A (a plain parameter, so that A itself need not be evaluated when the model is translated -- some tools refuse to evaluate the impure file read at flattening)";
     parameter Real A[nx, nx] "The state matrix (readStateMatrix on the linearisation file)";
     parameter EigenMetric metric "The predicate";
     parameter Real bound "The bound: a real part [1/s] the modes stay below, a damping ratio [1] they reach, a frequency [Hz] they reach or stay below, a time constant [s] the slowest stays below";
@@ -155,10 +157,8 @@ damping ratio of a mode is <code>-Re/|&lambda;|</code> (1 for a real non-positiv
           Rectangle(extent={{-200,100},{200,-100}}, lineColor={0,0,0}, lineThickness=5.0, fillColor={210,210,210}, fillPattern=FillPattern.Solid, borderPattern=BorderPattern.Raised),
           Text(extent={{-180,60},{180,-60}}, textString="eig(A)", textColor={0,0,0})}),
       Documentation(info="<html>
-<p>One predicate of ModCheck's eigenvalue family (plan section 22.2) over the modes of a state matrix
-read from a linearisation file, evaluated once on parameters and emitted as a constant
-<code>Property</code> and <code>margin</code> -- the R3 cross-check of a requirement whose reported
-verdict is <code>linear_checks.py</code> on the same matrix:</p>
+<p>One eigenvalue predicate over the modes of a state matrix read from a linearization file, evaluated
+once on parameters and emitted as a constant <code>Property</code> and <code>margin</code>:</p>
 <ul>
 <li><code>RealPart</code>: every mode's real part below <code>bound</code> [1/s]; margin <code>bound - Re</code>.</li>
 <li><code>Damping</code>: every mode's damping ratio <code>-Re/|&lambda;|</code> at least <code>bound</code>; margin the difference.</li>
@@ -169,7 +169,11 @@ violates it with no finite margin (<code>-inf</code>).</li>
 <p>A band (<code>fBandLo</code>, <code>fBandHi</code>) selects the modes by frequency, the others being
 Undefined; no mode in the band leaves the fold Undefined (untested). The fold over the modes is
 <code>and4All</code>, the margin the least over the decided modes. <code>tauSlow</code> and <code>tauFast</code>
-are the test case's TIME_CONSTANTS.</p>
+are the slowest and fastest time constants expected of the plant (see
+<a href=\"modelica://Requirements.LinearAnalysis.modes\">modes</a>).</p>
+<p>Connect <code>y</code> to a <a href=\"modelica://Requirements.Verify.Requirement\">Verify.Requirement</a> to have
+the verdict printed by <a href=\"modelica://Requirements.Verify.PrintViolations\">PrintViolations</a> at the end
+of the run.</p>
 <p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
 </html>"));
   end EigenvalueCheck;
@@ -207,11 +211,10 @@ are the test case's TIME_CONSTANTS.</p>
           Rectangle(extent={{-200,100},{200,-100}}, lineColor={0,0,0}, lineThickness=5.0, fillColor={210,210,210}, fillPattern=FillPattern.Solid, borderPattern=BorderPattern.Raised),
           Text(extent={{-180,60},{180,-60}}, textString="eig(A) in D", textColor={0,0,0})}),
       Documentation(info="<html>
-<p>The pole-region predicate of ModCheck's eigenvalue family (plan section 22.2): every mode of the state
-matrix inside the polygon, the margin the least signed distance of any mode (or its conjugate) to it --
+<p>The pole-region predicate: every mode of the state matrix inside the polygon, the margin the least
+signed distance of any mode (or its conjugate) to it --
 <a href=\"modelica://Requirements.Utilities.distancePointToPolygon\">Utilities.distancePointToPolygon</a>,
-positive inside -- over the requirement's scale. Evaluated once on parameters, constant over the run; the
-R3 cross-check of <code>linear_checks.py</code>'s region distance.</p>
+positive inside -- over the requirement's scale. Evaluated once on parameters, constant over the run.</p>
 <p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
 </html>"));
   end EigenvaluesWithinRegion;
@@ -339,19 +342,79 @@ R3 cross-check of <code>linear_checks.py</code>'s region distance.</p>
   end worstMargin;
 
   annotation (Documentation(info="<html>
-<p>The Modelica side of ModCheck's linear-analysis requirements (its requirements plan, section 22.7):
-a linearisation is a tool operation, not a simulation, so no check model can compute a plant's eigenvalues
-inside the run that produces them. What Modelica can do is read the matrices from the file the orchestrator
-wrote (<code>readStateMatrix</code>, MATLAB v4 through <code>Modelica.Utilities.Streams.readRealMatrix</code>),
-take the eigenvalues (LAPACK's <code>dgeev</code>, as <code>Modelica.Math.Matrices.eigenValues</code> does) and evaluate the predicates of the
-eigenvalue family as constants -- <code>EigenvalueCheck</code> (a real-part, damping, frequency or
-time-constant bound over every mode, optionally in a frequency band) and <code>EigenvaluesWithinRegion</code>
-(a polygon of the (Re, Im) plane) -- each with <code>Property</code> and <code>margin</code> outputs, constant
-over a nominal run, which ModCheck's orchestrator compares with <code>linear_checks.py</code>'s per-mode
-result: the R3 cross-check, never the reported verdict. The frequency-response family (gain and phase
-margin, bandwidth, peak, dc and envelope gain, sensitivity peak, delay margin) has no Modelica side, by
-decision: it needs the complex evaluation of the transfer function over a frequency grid and a crossover
-search, which no MSL function provides.</p>
+<p>Requirements on the <b>eigenvalues</b> of a linearized plant: stability margins, damping, natural
+frequencies, time constants, pole regions. A linearization is a tool operation, not a simulation, so no check
+model can compute a plant's eigenvalues inside the run that produces them. The workflow therefore has two
+steps:</p>
+<ol>
+<li><b>Linearize</b> the plant at its operating point in your Modelica tool (or on its FMU) and write the state
+    matrix <code>A</code> to a MATLAB v4 file.</li>
+<li><b>Check</b> it in a small Modelica model:
+    <a href=\"modelica://Requirements.LinearAnalysis.readStateMatrix\">readStateMatrix</a> reads the matrix,
+    <a href=\"modelica://Requirements.LinearAnalysis.modes\">modes</a> takes its eigenvalues (LAPACK's
+    <code>dgeev</code>, as <code>Modelica.Math.Matrices.eigenValues</code> does) and folds them into modes, and the
+    blocks evaluate the predicates as constants over a short nominal run:
+    <a href=\"modelica://Requirements.LinearAnalysis.EigenvalueCheck\">EigenvalueCheck</a> (a real-part, damping,
+    frequency or time-constant bound over every mode, optionally in a frequency band) and
+    <a href=\"modelica://Requirements.LinearAnalysis.EigenvaluesWithinRegion\">EigenvaluesWithinRegion</a> (a
+    polygon of the (Re, Im) plane), each with <code>Property</code> and <code>margin</code> outputs. Connect them to
+    <a href=\"modelica://Requirements.Verify.Requirement\">Verify.Requirement</a> blocks and a
+    <a href=\"modelica://Requirements.Verify.PrintViolations\">PrintViolations</a> as in any other check model.</li>
+</ol>
+
+<h4>Step 1: linearizing in different tools</h4>
+<p>Linearization is available in every Modelica tool, but it is not standardized: the command, the operating
+point it linearizes at, the state selection and the output format all differ. This library does not depend on any of
+them; it only needs a MATLAB v4 file with the state matrix as a matrix named <code>A</code> (or another name passed
+as <code>matrixName</code>). Some common routes (consult your tool's manual for the exact syntax of your version):</p>
+<ul>
+<li><b>Any tool that runs Modelica functions in its scripting</b>: once you have <code>A</code> as a Real matrix,
+    <code>Modelica.Utilities.Streams.writeRealMatrix(\"lin.mat\", \"A\", A, format=\"4\")</code> writes it in the
+    required format.</li>
+<li><b>Dymola</b>: the <code>linearizeModel</code> command writes the linearization to <code>dslin.mat</code>, where
+    the state matrix is the upper-left <code>nx</code> &times; <code>nx</code> block of the matrix <code>ABCD</code>;
+    extract that block and write it as <code>A</code>. The Modelica_LinearSystems2 library returns
+    <code>A</code> directly.</li>
+<li><b>OpenModelica</b>: the <code>linearize</code> scripting command (or <code>ModelicaSystem.linearize()</code> in
+    OMPython) gives <code>A</code>, <code>B</code>, <code>C</code>, <code>D</code>.</li>
+<li><b>Tools with a linearization feature in their GUI or API</b> (e.g. a linearize custom function in Modelon
+    Impact, SimulationX, MapleSim, Wolfram System Modeler): export <code>A</code> and convert it as below.</li>
+<li><b>An FMU</b>, from any exporting tool: FMI 2.0 and 3.0 provide the directional derivatives from which
+    <code>A</code> follows (for instance PyFMI's <code>get_state_space_representation()</code>), or difference
+    the state derivatives numerically.</li>
+<li><b>Python</b>, whatever produced <code>A</code>:
+    <code>scipy.io.savemat(\"lin.mat\", {\"A\": A}, format=\"4\")</code>.</li>
+</ul>
+<p>Two things to keep consistent between the linearization and the check: the <b>operating point</b> (linearize where
+the requirement is stated, e.g. after initialization or at a settled time, not at whatever instant the tool defaults
+to), and the <b>number of states</b> <code>nx</code> given to the check model, which must be the size of the file's
+<code>A</code>. Tools may choose different states for the same model, but the eigenvalues of <code>A</code> do not
+depend on that choice.</p>
+
+<h4>Step 2: a check model</h4>
+<blockquote><pre>
+model CheckPlantEigenvalues
+  parameter String file = Modelica.Utilities.Files.loadResource(\"modelica://MyLib/Resources/lin.mat\");
+  parameter Integer nx = 4;
+  parameter Real A[nx, nx](each fixed=false);
+  inner Requirements.Verify.PrintViolations printViolations(evaluationTime=1);
+  Requirements.LinearAnalysis.EigenvalueCheck damping(nx=nx, A=A,
+    metric=Requirements.Types.EigenMetric.Damping, bound=0.3);
+  Requirements.Verify.Requirement R1(text=\"Every mode shall be damped at least 0.3\",
+    property=damping.y);
+initial equation
+  A = Requirements.LinearAnalysis.readStateMatrix(file, nx);
+  annotation(experiment(StopTime=1));
+end CheckPlantEigenvalues;
+</pre></blockquote>
+<p><a href=\"modelica://Requirements.Examples.Elementary.LinearAnalysis.SecondOrder\">Examples.Elementary.LinearAnalysis.SecondOrder</a>
+is a complete example on a shipped file.</p>
+
+<h4>Not covered</h4>
+<p>The frequency-response family of linear requirements (gain and phase margin, bandwidth, resonance peak, dc and
+envelope gain, sensitivity peak, delay margin) has no blocks here, by decision: it needs the complex evaluation of the
+transfer function over a frequency grid and a crossover search, which no MSL function provides. Evaluate those on the
+linearization outside Modelica.</p>
 <p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
 </html>"));
 end LinearAnalysis;

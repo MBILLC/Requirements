@@ -1076,7 +1076,7 @@ result = <b>marginAnd</b>(m, p);
 <p>
 The margin of <code>and4All(p)</code>: the minimum of the margins m[i] over the elements whose property p[i] is applicable (not Undefined) -- conjunction is the minimum in the robustness semantics, and an inapplicable element drops out of the combination as it does in <a href=\"modelica://Requirements.LogicalFunctions.and4All\">and4All</a>.
 When no element is applicable the result is 0 (the combined property is Undefined then, and a consumer
-masks the margin with it); no NaN is produced. ModCheck plan section 18.4 / 18.5.
+masks the margin with it); no NaN is produced.
 </p>
 </html>", revisions="<html>
 <table border=1 cellspacing=0 cellpadding=2>
@@ -1113,7 +1113,7 @@ result = <b>marginOr</b>(m, p);
 <p>
 The margin of <code>or4All(p)</code>: the maximum of the margins m[i] over the elements whose property p[i] is applicable (not Undefined) -- disjunction is the maximum in the robustness semantics; see <a href=\"modelica://Requirements.LogicalFunctions.marginAnd\">marginAnd</a>.
 When no element is applicable the result is 0 (the combined property is Undefined then, and a consumer
-masks the margin with it); no NaN is produced. ModCheck plan section 18.4 / 18.5.
+masks the margin with it); no NaN is produced.
 </p>
 </html>", revisions="<html>
 <table border=1 cellspacing=0 cellpadding=2>

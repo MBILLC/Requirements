@@ -2,13 +2,12 @@
 
 This file summarizes what changed in the Modelica **Requirements** library
 (package folder [`Requirements/`](Requirements/)) during 2026. The library went from
-**0.7.0** (Feb. 2025) to **0.11.0** (2026-09-16) in six releases.
+**0.7.0** (Feb. 2025) to **0.11.1** (2026-10-16) in seven releases.
 
 The full release notes are in the library itself, under
 `Requirements.UsersGuide.ReleaseNotes`. The same summary is in the library documentation,
 under `Requirements.UsersGuide.ReleaseNotes.Summary2026`. The regression baselines and the
-tool-by-tool measurements are in `Requirements/Resources/ModCheck/`
-(`README.md`, `DEVMI_DIFFERENCES.md`).
+tool-by-tool measurements are kept beside the library (see `Requirements.UsersGuide`).
 
 | Version | Date | Theme |
 |---|---|---|
@@ -18,6 +17,7 @@ tool-by-tool measurements are in `Requirements/Resources/ModCheck/`
 | 0.9.1 | 2026-09-15 | Bug fix: CSV reader derivative at the file's last row |
 | 0.10.0 | 2026-09-16 | Step-response metrics (overshoot, rise time, settling time, …) |
 | 0.11.0 | 2026-09-16 | Eigenvalue checks over a linearization (`LinearAnalysis`) |
+| 0.11.1 | 2026-10-16 | Steady-state check example; the verdict printed once in every tool; self-contained documentation |
 
 No release needs a model conversion. Each one declares `conversion(noneFromVersion=...)`
 for the version before it. One exception: from 0.8.0 on, code that reads a stored
@@ -30,10 +30,9 @@ for the version before it. One exception: from 0.8.0 on, code that reads a store
 - The library was renamed from `Modelica_Requirements` to **`Requirements`**. It is Model
   Based Innovation LLC's derivative of upstream
   [Modelica_Requirements](https://github.com/modelica-3rdparty/Modelica_Requirements) 0.7.1
-  (BSD 3-Clause) and now lives in the private repo `MBILLC/Requirements`.
-- It is the base for the requirements-verification tooling of
-  [ModCheck](https://github.com/MBILLC/ModCheck). The license and the original authors'
-  copyright notices are unchanged.
+  (BSD 3-Clause) and now lives in the public repository
+  [MBILLC/Requirements](https://github.com/MBILLC/Requirements).
+- The license and the original authors' copyright notices are unchanged.
 - The additions serve a **two-run verification** workflow. First the plant is simulated
   on its own and its signals are stored in an MA-HS-CSV file. Then the requirement
   checks run on the stored signals in a second run.
@@ -140,8 +139,7 @@ This release changes requirement semantics.
 ## 0.9.1 — CSV reader fix
 
 - `Internal.CSV.getRealDer` returned 0 at the file's last row. Derived signals therefore
-  dropped to 0 at the final stored row, which produced a spurious edge (seen in ModCheck's
-  `TC-AC-CabinAltitudeRate-ShortExcursion`).
+  dropped to 0 at the final stored row, which produced a spurious edge.
 - At the last row it now returns the slope of the final segment. Beyond the end of the
   file it still returns 0.
 - No stored reference changed.
@@ -159,18 +157,20 @@ This release changes requirement semantics.
 - New enumerations `Types.StepTarget` and `Types.StepMetric`.
 - New examples `Examples.Elementary.StepResponse` (`SecondOrder`, `Disturbance`), checked
   against closed forms.
-- The reported verdict comes from ModCheck's `step_checks.py`. The blocks serve as a
-  development aid and as a cross-check, and they agree with it on every item in the corpus.
+- The blocks decide a step-response requirement in the simulation itself. Where the same
+  metrics are also evaluated on the stored trajectory after the run, the blocks agree with
+  that evaluation to one sampling period.
 - **Solver choice:** the millisecond sample events make CVode read the peak about 0.2–0.3 %
   low. The regression lists therefore use dassl on OpenModelica and Radau5ODE on Impact.
 
 ## 0.11.0 — Eigenvalue checks over a linearization
 
 - **New package `LinearAnalysis`:**
-  - `readStateMatrix` reads the A matrix from the MATLAB v4 file that ModCheck writes for
-    each linearization.
-  - `modes` groups the eigenvalues into modes, using the same rules as ModCheck's
-    `linear_checks.py`.
+  - `readStateMatrix` reads the A matrix of a linearization from a MATLAB v4 file. The
+    linearization itself is done in whatever tool the user has; the package documentation
+    describes the routes.
+  - `modes` groups the eigenvalues into modes (conjugate pairs folded, an integrator rule,
+    a parasitic cut).
   - **`EigenvalueCheck`** bounds real part, damping, frequency or time constant over every
     mode, with an optional frequency band.
   - **`EigenvaluesWithinRegion`** checks that every eigenvalue lies inside a polygon in the
@@ -179,13 +179,30 @@ This release changes requirement semantics.
 - New enumeration `Types.EigenMetric`.
 - New example `Examples.Elementary.LinearAnalysis.SecondOrder`, with the data file
   `Requirements/Resources/Data/SecondOrderLinearization.mat`.
-- These blocks are used as a cross-check (ModCheck rule R3). The reported verdict comes
-  from Python.
+- The verdict is printed by `PrintViolations` like that of any other requirement.
 - By decision, the frequency-response requirements have no Modelica side.
+
+## 0.11.1 — Steady-state check example, printing fix, documentation
+
+- New example **`Examples.SteadyState.CheckHeatExchanger`**: steady-state requirements of the
+  MSL heat exchanger, checked and printed in a plain simulation.
+  - Each requirement is written as `during(steady, check)`, so the transient does not count.
+  - A separate requirement checks that the run has settled.
+- **Bug fix:** `PrintViolations` printed every verdict twice in a tool that evaluates the
+  verdict's when-equations twice at the same event (Modelon Impact with
+  `useEvaluationTime`). The log file and the summary are now written once. The full Impact
+  regression suite passed 488/488 checks afterwards.
+- The documentation no longer depends on any external tooling or on one Modelica tool.
+  - The relation to the verification framework the library is used in is explained once,
+    in the User's Guide.
+  - `LinearAnalysis` describes how to linearize and export the state matrix in different
+    tools.
+- The repository [MBILLC/Requirements](https://github.com/MBILLC/Requirements) is public;
+  the User's Guide and the Contact page link to it.
 
 ---
 
-## Regression baselines (`Requirements/Resources/ModCheck/`)
+## Regression baselines
 
 - Case lists generated from the examples' `experiment()` annotations:
   - Dymola 2026x: `regression_cases_requirements.yaml`
@@ -195,5 +212,5 @@ This release changes requirement semantics.
   OpenModelica's filling the gaps. Since 2026-09-15, the 5 cases that neither of those
   tools can run use Impact's own results as reference.
   - The full Impact suite then passed **434/434** with nothing skipped.
-- Every new example from 0.8.0–0.11.0 was added as a case. The margin and step-metric
+- Every new example from 0.8.0–0.11.1 was added as a case. The margin and step-metric
   outputs are stored as references.

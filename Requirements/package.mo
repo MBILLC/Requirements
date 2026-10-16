@@ -1,5 +1,5 @@
 within ;
-package Requirements "Requirements (Version 0.11.0) - Defining requirements formally and checking them when simulating"
+package Requirements "Requirements (Version 0.11.1) - Defining requirements formally and checking them when simulating"
   extends Modelica.Icons.Package;
 
 
@@ -14,13 +14,13 @@ package ReleaseNotes "Release notes"
 
     annotation (Documentation(info="<html>
 <p>
-In 2026 the library went from version 0.7.0 (Feb. 2025) to <b>0.11.0</b> (2026-09-16) in six
+In 2026 the library went from version 0.7.0 (Feb. 2025) to <b>0.11.1</b> (2026-10-16) in seven
 releases. This page summarizes them; the release note of each version has the details.
 The same summary is kept as Markdown in
 <a href=\"https://github.com/MBILLC/Requirements/blob/HEAD/CHANGES_2026.md\">CHANGES_2026.md</a>
 at the top level of the library's repository (beside the <code>Requirements</code> package folder).
-The regression baselines and the tool-by-tool measurements are kept in
-<code>Resources/ModCheck/</code> (<code>README.md</code>, <code>DEVMI_DIFFERENCES.md</code>).
+The regression baselines and the tool-by-tool measurements are kept beside the library (see the
+<a href=\"modelica://Requirements.UsersGuide\">User's Guide</a>).
 </p>
 
 <table border=1 cellspacing=0 cellpadding=2>
@@ -37,6 +37,8 @@ The regression baselines and the tool-by-tool measurements are kept in
     <td>Step-response metrics (overshoot, rise time, settling time, ...)</td></tr>
 <tr><td><a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Version_0_11_0\">0.11.0</a></td><td>2026-09-16</td>
     <td>Eigenvalue checks over a linearization (<code>LinearAnalysis</code>)</td></tr>
+<tr><td><a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Version_0_11_1\">0.11.1</a></td><td>2026-10-16</td>
+    <td>Steady-state check example; the verdict printed once in every tool; self-contained documentation</td></tr>
 </table>
 
 <p>
@@ -50,10 +52,9 @@ has to accept the value 4.
 <li> The library was renamed from <code>Modelica_Requirements</code> to <b>Requirements</b>. It is Model
      Based Innovation LLC's derivative of upstream
      <a href=\"https://github.com/modelica-3rdparty/Modelica_Requirements\">Modelica_Requirements</a> 0.7.1
-     (BSD 3-Clause) and now lives in the private repo <code>MBILLC/Requirements</code>.</li>
-<li> It is the base for the requirements-verification tooling of
-     <a href=\"https://github.com/MBILLC/ModCheck\">ModCheck</a>. The license and the original authors'
-     copyright notices are unchanged.</li>
+     (BSD 3-Clause) and now lives in the public repository
+     <a href=\"https://github.com/MBILLC/Requirements\">MBILLC/Requirements</a>.</li>
+<li> The license and the original authors' copyright notices are unchanged.</li>
 <li> The additions serve a <b>two-run verification</b> workflow. First the plant is simulated on its own
      and its signals are stored in an MA-HS-CSV file. Then the requirement checks run on the stored
      signals in a second run.</li>
@@ -197,7 +198,7 @@ This release changes requirement semantics.
 <ul>
 <li> <a href=\"modelica://Requirements.Internal.CSV.getRealDer\">Internal.CSV.getRealDer</a> returned 0 at the
      file's last row. Derived signals therefore dropped to 0 at the final stored row, which produced a
-     spurious edge (seen in ModCheck's <code>TC-AC-CabinAltitudeRate-ShortExcursion</code>).</li>
+     spurious edge.</li>
 <li> At the last row it now returns the slope of the final segment. Beyond the end of the file it still
      returns 0.</li>
 <li> No stored reference changed.</li>
@@ -217,8 +218,9 @@ This release changes requirement semantics.
 <li> New enumerations <code>Types.StepTarget</code> and <code>Types.StepMetric</code>.</li>
 <li> New examples <a href=\"modelica://Requirements.Examples.Elementary.StepResponse\">Examples.Elementary.StepResponse</a>
      (<code>SecondOrder</code>, <code>Disturbance</code>), checked against closed forms.</li>
-<li> The reported verdict comes from ModCheck's <code>step_checks.py</code>. The blocks serve as a
-     development aid and as a cross-check, and they agree with it on every item in the corpus.</li>
+<li> The blocks decide a step-response requirement in the simulation itself. Where the same metrics are
+     also evaluated on the stored trajectory after the run, the blocks agree with that evaluation to one
+     sampling period.</li>
 <li> Solver choice: the millisecond sample events make CVode read the peak about 0.2&ndash;0.3 % low. The
      regression lists therefore use dassl on OpenModelica and Radau5ODE on Impact.</li>
 </ul>
@@ -227,10 +229,11 @@ This release changes requirement semantics.
 <ul>
 <li> New package <a href=\"modelica://Requirements.LinearAnalysis\">LinearAnalysis</a>:
      <ul>
-     <li><code>readStateMatrix</code> reads the A matrix from the MATLAB v4 file that ModCheck writes for each
-         linearization.</li>
-     <li><code>modes</code> groups the eigenvalues into modes, using the same rules as ModCheck's
-         <code>linear_checks.py</code>.</li>
+     <li><code>readStateMatrix</code> reads the A matrix of a linearization from a MATLAB v4 file. The
+         linearization itself is done in whatever tool the user has; the package documentation describes
+         the routes.</li>
+     <li><code>modes</code> groups the eigenvalues into modes (conjugate pairs folded, an integrator rule, a
+         parasitic cut).</li>
      <li><a href=\"modelica://Requirements.LinearAnalysis.EigenvalueCheck\">EigenvalueCheck</a> bounds real part,
          damping, frequency or time constant over every mode, with an optional frequency band.</li>
      <li><a href=\"modelica://Requirements.LinearAnalysis.EigenvaluesWithinRegion\">EigenvaluesWithinRegion</a>
@@ -240,11 +243,32 @@ This release changes requirement semantics.
 <li> New enumeration <code>Types.EigenMetric</code>.</li>
 <li> New example <a href=\"modelica://Requirements.Examples.Elementary.LinearAnalysis\">Examples.Elementary.LinearAnalysis</a>
      (<code>SecondOrder</code>), with the data file <code>Resources/Data/SecondOrderLinearization.mat</code>.</li>
-<li> These blocks are used as a cross-check (ModCheck rule R3). The reported verdict comes from Python.</li>
+<li> The verdict is printed by <code>PrintViolations</code> like that of any other requirement.</li>
 <li> By decision, the frequency-response requirements have no Modelica side.</li>
 </ul>
 
-<h4>Regression baselines (<code>Resources/ModCheck/</code>)</h4>
+<h4>0.11.1 &mdash; Steady-state check example, printing fix, documentation</h4>
+<ul>
+<li> New example <a href=\"modelica://Requirements.Examples.SteadyState.CheckHeatExchanger\">Examples.SteadyState.CheckHeatExchanger</a>:
+     steady-state requirements of the MSL heat exchanger, checked and printed in a plain simulation.
+     <ul>
+     <li>Each requirement is written as <code>during(steady, check)</code>, so the transient does not count.</li>
+     <li>A separate requirement checks that the run has settled.</li>
+     </ul></li>
+<li> Bug fix: <code>PrintViolations</code> printed every verdict twice in a tool that evaluates the
+     verdict's when-equations twice at the same event (Modelon Impact with <code>useEvaluationTime</code>).
+     The log file and the summary are now written once. The full Impact regression suite passed 488/488
+     checks afterwards.</li>
+<li> The documentation no longer depends on any external tooling or on one Modelica tool.
+     <ul>
+     <li>The relation to the verification framework the library is used in is explained once, in the
+         <a href=\"modelica://Requirements.UsersGuide\">User's Guide</a>.</li>
+     <li><a href=\"modelica://Requirements.LinearAnalysis\">LinearAnalysis</a> describes how to linearize and export the state matrix
+         in different tools.</li>
+     </ul></li>
+</ul>
+
+<h4>Regression baselines</h4>
 <ul>
 <li> Case lists generated from the examples' <code>experiment()</code> annotations:
      <ul>
@@ -255,33 +279,96 @@ This release changes requirement semantics.
 <li> The Impact list compares against a composite reference: Dymola's results, with OpenModelica's filling
      the gaps. Since 2026-09-15, the 5 cases that neither of those tools can run use Impact's own results as
      reference. The full Impact suite then passed <b>434/434</b> with nothing skipped.</li>
-<li> Every new example from 0.8.0&ndash;0.11.0 was added as a case. The margin and step-metric outputs are
+<li> Every new example from 0.8.0&ndash;0.11.1 was added as a case. The margin and step-metric outputs are
      stored as references.</li>
 </ul>
 </html>"));
   end Summary2026;
+
+  class Version_0_11_1 "Version 0.11.1 (Oct. 16, 2026)"
+  extends Modelica.Icons.ReleaseNotes;
+
+    annotation (Documentation(info="<html>
+<p>
+<b>A steady-state check example, the verdict printed once, self-contained documentation.</b>
+No requirement semantics changed.
+</p>
+<h4>New example</h4>
+<p>
+<a href=\"modelica://Requirements.Examples.SteadyState.CheckHeatExchanger\">Examples.SteadyState.CheckHeatExchanger</a> checks the
+steady-state requirements of the MSL heat exchanger in a plain simulation and prints them with
+<a href=\"modelica://Requirements.Verify.PrintViolations\">PrintViolations</a>, in any Modelica tool. It extends
+<code>HeatExchangerSimulation</code>, which stays a plant without requirement blocks.
+</p>
+<ul>
+<li> A requirement block reports a violation if its property is <code>Violated</code> at any instant, but a
+     steady-state requirement is about the settled operating point. Each requirement is therefore written as
+     <code>during(steady, check)</code>: <code>Undefined</code> (not applicable) while the run is still moving.</li>
+<li> <code>steady</code> holds in the last quarter of the run while both outlet temperatures change by less than
+     <code>dTdtMax</code>; the rates come from <code>SignalAnalysis.ApproximateDerivativeWithFilter</code>.</li>
+<li> <code>R0_settled</code> checks that the run has settled. If it has not, R0 is violated and the other
+     requirements stay untested instead of being judged on a transient value.</li>
+<li> The standard <code>PrintViolations</code> suffices: a steady-state verdict is taken at the end of the run
+     like any other.</li>
+</ul>
+<h4>Bug fix: the verdict printed twice</h4>
+<p>
+Modelon Impact evaluates the when-equations that take the verdict twice at the event instant (with
+<code>useEvaluationTime = true</code>, at <code>evaluationTime</code>; measured 2026-10-16, also with
+<code>evaluationTime</code> before the stop time). Every requirement then wrote its line to the log file twice and
+<code>PrintViolations</code> printed the summary twice, the second time with every requirement counted double
+(\"2 of 6\" for three requirements). The satisfaction percentage was not affected. Both writes are now idempotent:
+</p>
+<ul>
+<li> <code>Internal.printViolationsToLogFile</code> skips a requirement whose line is already in the log file.</li>
+<li> <code>Internal.initializeLogFile</code> also removes the HTML report of an earlier run (new input
+     <code>htmlFile</code>, default <code>\"\"</code> = none), and <code>Internal.printViolationsToOutput</code>
+     returns at once when the report already exists: the summary is printed once per run.</li>
+</ul>
+<p>
+A tool that evaluates the when-equations once (Dymola, OpenModelica, and every tool at <code>terminal()</code>)
+behaves as before. No stored regression signal moved: the full Impact suite passed 488/488 checks afterwards.
+</p>
+<h4>Documentation</h4>
+<ul>
+<li> The documentation is self-contained. The relation to the verification framework the library is used in is
+     explained once, in the <a href=\"modelica://Requirements.UsersGuide\">User's Guide</a>; the rest of the documentation does not refer to it.</li>
+<li> <a href=\"modelica://Requirements.LinearAnalysis\">LinearAnalysis</a> explains the two steps of a linear-analysis requirement
+     (linearize in a tool, check in Modelica), the routes for producing the state-matrix file in different Modelica
+     tools, from an FMU and from Python, and gives a template check model.</li>
+<li> The repository <a href=\"https://github.com/MBILLC/Requirements\">MBILLC/Requirements</a> is public; the
+     User's Guide and the Contact page link to it.</li>
+</ul>
+<h4>Changes</h4>
+<ul>
+<li> <code>Examples.SteadyState.CheckHeatExchanger</code>: new example.</li>
+<li> <code>Internal.initializeLogFile</code>: new input <code>htmlFile</code> (default <code>\"\"</code>);
+     <code>Verify.PrintViolations</code> passes its <code>htmlFile</code>.</li>
+<li> <code>Internal.printViolationsToLogFile</code>, <code>Internal.printViolationsToOutput</code>: idempotent.</li>
+<li> <code>conversion(noneFromVersion=\"0.11.0\")</code>: no model needs conversion.</li>
+</ul>
+</html>"));
+  end Version_0_11_1;
 
   class Version_0_11_0 "Version 0.11.0 (Sept. 16, 2026)"
   extends Modelica.Icons.ReleaseNotes;
 
     annotation (Documentation(info="<html>
 <p>
-<b>Eigenvalue predicates over a linearisation.</b> The Modelica side of ModCheck's linear-analysis
-requirements (its requirements plan, section 22.7): a linearisation is a tool operation, not a simulation,
-so no check model computes a plant's eigenvalues inside the run that produces them; the new package
-<a href=\"modelica://Requirements.LinearAnalysis\">LinearAnalysis</a> reads the state matrix from the MATLAB v4
-file ModCheck's orchestrator writes beside every linearisation (<code>readStateMatrix</code>, through
-<code>Modelica.Utilities.Streams.readRealMatrix</code>), folds its eigenvalues into modes with the same
-integrator rule and parasitic cut as <code>linear_checks.py</code> (<code>modes</code>, the test case's
-TIME_CONSTANTS), and evaluates the predicates as constants over a nominal run:
+<b>Eigenvalue predicates over a linearization.</b> A linearization is a tool operation, not a simulation,
+so no check model computes a plant's eigenvalues inside the run that produces them. The new package
+<a href=\"modelica://Requirements.LinearAnalysis\">LinearAnalysis</a> therefore reads the state matrix from a MATLAB v4
+file written after the linearization (<code>readStateMatrix</code>, through
+<code>Modelica.Utilities.Streams.readRealMatrix</code>), folds its eigenvalues into modes with an integrator rule and
+a parasitic cut (<code>modes</code>, the plant's expected slowest and fastest time constants), and evaluates the
+predicates as constants over a nominal run:
 <a href=\"modelica://Requirements.LinearAnalysis.EigenvalueCheck\">EigenvalueCheck</a> (a real-part, damping,
 frequency or time-constant bound over every mode, optionally in a frequency band;
 <code>Types.EigenMetric</code>) and
 <a href=\"modelica://Requirements.LinearAnalysis.EigenvaluesWithinRegion\">EigenvaluesWithinRegion</a> (a polygon of
-the (Re, Im) plane), each with <code>Property</code> and <code>margin</code>. ModCheck's generated
-<code>EigenCheckFromFile</code> models carry one block per eigenvalue requirement and the orchestrator compares
-their outputs with the Python record: the R3 cross-check, never the reported verdict. The frequency-response
-family has no Modelica side, by decision (see the package's documentation).
+the (Re, Im) plane), each with <code>Property</code> and <code>margin</code>. The package documentation describes how
+to produce the file in different Modelica tools, from an FMU, or from Python. The frequency-response family has no
+Modelica side, by decision (see the package's documentation).
 <a href=\"modelica://Requirements.Examples.Elementary.LinearAnalysis\">Examples.Elementary.LinearAnalysis</a> asserts
 the blocks on a shipped second-order matrix against its closed forms.
 </p>
@@ -302,8 +389,7 @@ the blocks on a shipped second-order matrix against its closed forms.
     annotation (Documentation(info="<html>
 <p>
 <b>Step-response metrics.</b> The classic control requirements -- overshoot, undershoot, rise time, delay
-time, settling time, steady-state error, damping ratio, decay ratio -- as blocks (ModCheck's requirements
-plan, section 21, the R3 layer of its section 21.7):
+time, settling time, steady-state error, damping ratio, decay ratio -- as blocks:
 <a href=\"modelica://Requirements.SignalAnalysis.StepResponse\">SignalAnalysis.StepResponse</a> computes the
 running metrics of a response <code>u</code> after a step of a signal <code>r</code>, sampled at
 <code>samplePeriod</code> (at the half-periods, off a result grid of the same period): the step as a change of
@@ -315,10 +401,9 @@ and decay ratios from them;
 <a href=\"modelica://Requirements.ChecksInFixedWindow.StepResponseCheck\">ChecksInFixedWindow.StepResponseCheck</a>
 bounds one metric (<code>Types.StepMetric</code>) and emits <code>Property</code> and <code>margin</code>:
 Undefined before the first step, Undecided from the step to the earliest sample the bound is provably met or
-broken, decided at the window's close otherwise, the margin following the running metric. The reported
-verdict of a step-response requirement is ModCheck's <code>step_checks.py</code> on the stored trajectory
-(rule R7); the blocks are the development aid in a Modelica tool and the cross-check ModCheck's orchestrator
-runs beside it (agreement on every corpus item, to one sampling period).
+broken, decided at the window's close otherwise, the margin following the running metric. Where the same metrics are
+also evaluated on the stored trajectory after the run, the blocks agree with that evaluation to one sampling
+period.
 <a href=\"modelica://Requirements.Examples.Elementary.StepResponse\">Examples.Elementary.StepResponse</a>
 asserts the blocks against the closed forms of a second-order step response and a disturbance.
 </p>
@@ -328,12 +413,13 @@ stall on an event and an output point 1e-14 s apart (an endless <em>desired step
 therefore sample at the half-periods. The 6000 sample events of a 6 s run restart the solver every
 millisecond and its accumulated error is what the sampled block sees: the second-order example's peak reads
 0.2 % low against the closed form under OpenModelica's cvode and 0.3 % low under Modelon Impact's CVode (0.9 % at
-rtol 1e-4), where dassl, ida and Impact's Radau5ODE reproduce it at every tolerance (rule R1's point, measured; the
+rtol 1e-4), where dassl, ida and Impact's Radau5ODE reproduce it at every tolerance (measured; the
 tolerances of the example's asserts say so, and the regression lists run it under dassl on OpenModelica and under
-Radau5ODE on Impact -- a simulation option of the dynamic custom function). The example's two states carry
+Radau5ODE on Impact). Choose a solver that is not degraded by frequent sample events when the peak matters. The example's two states carry
 <code>nominal</code> values (0.1 and 0.5) so the absolute tolerance is scaled to the 0.1 m step; it helps CVode a
-little at 1e-6 and not at 1e-4. ModCheck's corpus cross-check, where the block reads the plant's stored trajectory
-with no solver between them, agrees with <code>step_checks.py</code> on every item on both tools.
+little at 1e-6 and not at 1e-4. When the block reads a plant's stored trajectory in a second run (through
+<code>Sources.PartialSignalsFromFile</code>, with no solver error between plant and check), it agrees with an
+evaluation on that trajectory on both tools.
 </p>
 <h4>Changes</h4>
 <ul>
@@ -356,8 +442,7 @@ annotation of <code>getReal</code>, in <code>Resources/Include/RequirementsCsv.h
 row, as it does beyond the file's range where the last row is held. A check model that reads a file to its end is
 evaluated at exactly that instant, so every derived signal (<code>SignalAnalysis.ExactDerivative</code> on a reader
 output) dropped to 0 in the run's final stored row and a check on a derivative could read a spurious edge there
-(seen on ModCheck's <code>TC-AC-CabinAltitudeRate-ShortExcursion</code>: a zero-length excursion out of the altitude-rate
-envelope at the stop time). At the last row the function now returns the slope of the segment ending at it (at the
+(a zero-length excursion out of an altitude-rate envelope at the stop time, for instance). At the last row the function now returns the slope of the segment ending at it (at the
 first row of a final event group), as the left side of an event does; beyond the file's range it is still 0. The
 ctypes test (<code>Resources/C-Sources/test</code>) probes every row instant, the last included, against the Python
 reader, which changed the same way. No other behaviour changes; no stored reference of this library moves.
@@ -375,9 +460,7 @@ reader, which changed the same way. No other behaviour changes; no stored refere
 quantity's unit (&ge; 0 exactly when the check holds) and <b>scale</b> a new parameter, the requirement's
 tolerance (default 1: the raw robustness). A margin of 1 is one tolerance of headroom, &lt; 0 a violation by that
 many tolerances; margins of different requirements compare only when their scales are set. The block emits the
-instantaneous value; the worst value over a run and its instant are taken from the stored trajectory (ModCheck's
-plan, section 18.5, rule R2) -- there are no accumulators in the library, by design. Phase 12 of ModCheck's
-requirements plan.
+instantaneous value; the worst value over a run and its instant are taken from the stored trajectory -- there are no accumulators in the library, by design.
 </p>
 
 <h4>Changes</h4>
@@ -511,7 +594,7 @@ of requirement semantics; the library's version is raised accordingly.
 Wherever a check block's condition is false, its output moves from Undecided (2) to Undefined (4); the
 Satisfied and Violated phases, and the Undecided phases inside a true condition, are unchanged, and so
 is every verdict printed by PrintViolations. The regression baselines beside this library
-(<code>Resources/ModCheck</code>) were re-established on OpenModelica, Dymola and Modelon Impact for this
+were re-established on OpenModelica, Dymola and Modelon Impact for this
 version, with the changed references explained as Undecided &rarr; Undefined.
 </p>
 </html>"));
@@ -616,9 +699,8 @@ All 68 example models under <a href=\"modelica://Requirements.Examples\">Example
 Interval, CVode, a relative tolerance of 1e-6 (the annotation's Tolerance where it has one), and every
 block output <code>*.y</code> was compared between tools on the output grid (an absolute
 tolerance of 1e-3 of each signal's range, or its switching instants for a Boolean or Property
-signal). The regression harness used is
-<a href=\"https://github.com/MBILLC/ModCheck\">ModCheck</a>; the case lists, the stored results of
-the three tools and the reports are kept beside it, not in this library.
+signal). The case lists, the stored results of the three tools and the reports belong to the
+regression baselines, not to the library's packages.
 </p>
 
 <table border=1 cellspacing=0 cellpadding=2>
@@ -715,7 +797,7 @@ First version of the library provided to the public.
 <p>
 This section summarizes the changes that have been performed
 on package Requirements. An overview of all changes and additions made in 2026
-(versions 0.7.1 to 0.11.0) is given in
+(versions 0.7.1 to 0.11.1) is given in
 <a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Summary2026\">Summary of 2026</a>.
 </p>
 </html>"));
@@ -726,7 +808,7 @@ class Contact "Contact"
 
  annotation (Documentation(info="<html>
 <dl>
-<dt><b>Main Author</b></dt>
+<dt><strong>Main Author</strong></dt>
 <dd>Martin Otter<br>
     German Aerospace Center (DLR)<br>
     Robotics and Mechatronics Center<br>
@@ -734,13 +816,13 @@ class Contact "Contact"
     Postfach 1116<br>
     D-82230 Wessling<br>
     Germany<br>
-    email: <a href=\"mailto:Martin.Otter@dlr.de\">Martin.Otter@dlr.de</a><br></dd>
+    email: <a href=\"mailto:Martin.Otter@dlr.de\">Martin.Otter@dlr.de</a><br></dd><p><strong>Current Maintainer and Author of Redesign</strong>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <br>&nbsp; &nbsp; Hubertus Tummescheit<br>&nbsp; &nbsp; Model Based Innovation LLC<br>&nbsp; &nbsp;&nbsp;<a href=\"https:www.modelbased.cloud\">www.modelbased.cloud</a><br>&nbsp; &nbsp; email:<a href=\"mailto:hubertus.tummescheit@modelbased.cloud\">hubertus.tummescheit@modelbased.cloud</a>&nbsp;<br>&nbsp; &nbsp; Source and issues: <a href=\"https://github.com/MBILLC/Requirements\">github.com/MBILLC/Requirements</a><br></p><p><br></p>
 </dl>
-<p><b>Acknowledgements:</b></p>
+<p><strong>Acknowledgements:</strong></p>
 
 <ul>
 <li> The structuring and most operators/models of this library are based on
-     the informally defined <b>FORM-L</b> language by Nguyen Thuy from EDF.
+     the informally defined <strong>FORM-L</strong> language by Nguyen Thuy from EDF.
      The backup-power-supply example is based on a description by
      Nguyen Thuy from EDF.</li>
 
@@ -753,7 +835,7 @@ class Contact "Contact"
      </li>
 
 <li> The functions \"card\", \"forall\" and \"exists\" are based on a design
-     by Hilding Elmqvist from Dassault Syst&egrave;mes Lund.</li>
+     by Hilding Elmqvist from Dassault Systèmes Lund.</li>
 
 <li> The functions \"first\", \"last\", \"oneTrue\"
      and the blocks \"WhenFalling\", \"WhenChanging\" are from Andrea Tunis (UNICAL).</li>
@@ -786,16 +868,15 @@ is simulated.
 <p>
 <b>Origin.</b> Requirements is Model Based Innovation LLC's derivative of
 <a href=\"https://github.com/modelica-3rdparty/Modelica_Requirements\">Modelica_Requirements</a>
-version 0.7.1 (BSD 3-Clause), renamed on 2026-09-14 as the base for the
-requirements-verification tooling of <a href=\"https://github.com/MBILLC/ModCheck\">ModCheck</a>.
+version 0.7.1 (BSD 3-Clause), renamed on 2026-09-14. Its source, releases and issue tracker are
+in the public repository <a href=\"https://github.com/MBILLC/Requirements\">https://github.com/MBILLC/Requirements</a>.
 The license and the copyright notices of the original authors are unchanged;
 see the <a href=\"modelica://Requirements.UsersGuide.Contact\">Contact</a> page and the
 LICENSE file. Additions made here (a MA-HS-CSV signal reader and what builds on it)
 are not part of the upstream library.
 </p>
 <p>
-<b>Two runs, one file.</b> The additions serve a signal-based, two-run verification
-(ModCheck's requirements plan, rule R1): the plant is simulated <em>alone</em>, with no
+<b>Two runs, one file.</b> The additions serve a signal-based, two-run verification: the plant is simulated <em>alone</em>, with no
 requirement block in it, its glossary signals are stored in one MA-HS-CSV file, and the
 check blocks of this library run on that file in a second run through
 <a href=\"modelica://Requirements.Sources.PartialSignalsFromFile\">Sources.PartialSignalsFromFile</a>.
@@ -807,15 +888,36 @@ or a Python evaluation of the stored trajectories) is a separate tool that never
 simulation it judges. Separating the simulation from the checking engine is what opens the
 library to tools it was never written for.
 </p>
+<p>
+<b>Self-contained.</b> Everything in the library works in a plain Modelica tool: a check model holds
+the requirement blocks and one <a href=\"modelica://Requirements.Verify.PrintViolations\">Verify.PrintViolations</a>,
+and a simulation prints which requirements are violated, untested or satisfied. That holds for transient
+requirements, for steady-state requirements
+(<a href=\"modelica://Requirements.Examples.SteadyState.CheckHeatExchanger\">Examples.SteadyState.CheckHeatExchanger</a>)
+and for eigenvalue requirements over a linearization
+(<a href=\"modelica://Requirements.LinearAnalysis\">LinearAnalysis</a>; the linearization itself is done with
+whichever tool the user has).
+</p>
+<p>
+<b>Relation to ModCheck.</b> The library is also the Modelica checking engine of
+<a href=\"https://github.com/MBILLC/ModCheck\">ModCheck</a>, a regression-testing and
+requirements-verification framework. ModCheck generates check models from requirement statements, runs the
+two-run workflow above, parameter sweeps and linearizations across Modelica tools, and evaluates some
+requirement families (step-response metrics, eigenvalue predicates) on the stored trajectories in Python as
+well, with this library's blocks as an independent cross-check. The regression baselines of the library's
+examples on Dymola, OpenModelica and Modelon Impact were produced with it and are kept in
+<code>Resources/ModCheck/</code>. Nothing in the library depends on ModCheck, and the rest of this
+documentation does not refer to it.
+</p>
 </html>"));
 end UsersGuide;
 
   annotation (preferredView="info",
   uses(Modelica(version="4.1.0")),
-version="0.11.0",
-versionDate="2026-09-16",
-dateModified = "2026-09-16",
-conversion(noneFromVersion="0.7.1", noneFromVersion="0.8.0", noneFromVersion="0.9.0", noneFromVersion="0.9.1", noneFromVersion="0.10.0"),
+version="0.11.1",
+versionDate="2026-10-16",
+dateModified = "2026-10-16",
+conversion(noneFromVersion="0.7.1", noneFromVersion="0.8.0", noneFromVersion="0.9.0", noneFromVersion="0.9.1", noneFromVersion="0.10.0", noneFromVersion="0.11.0"),
 revisionId="$Id:: package.mo 9390 2016-06-21 06:35:11Z #$",
 Documentation(info="<html>
 <p>

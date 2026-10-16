@@ -82,7 +82,7 @@ to its limit, <em>the input <b>rho</b> (the caller writes it from the check's ex
 margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
 requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
 is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
-over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+over a run and the instant it occurs are taken from the stored trajectory.
 </p>
 </html>"));
   end During;
@@ -230,7 +230,7 @@ to its limit, <em><code>duration - durationMin</code> with output <b>duration</b
 margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
 requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
 is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
-over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+over a run and the instant it occurs are taken from the stored trajectory.
 During a phase in which the property is still Undecided the margin is provisional (the duration is still accumulating); a consumer takes the worst value over the decided points only.</p>
 </html>"));
   end MinDuration;
@@ -380,7 +380,7 @@ to its limit, <em><code>durationMax - duration</code> with output <b>duration</b
 margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
 requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
 is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
-over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+over a run and the instant it occurs are taken from the stored trajectory.
 During a phase in which the property is still Undecided the margin is provisional (the duration is still accumulating); a consumer takes the worst value over the decided points only.</p>
 </html>"));
   end MaxDuration;
@@ -552,7 +552,7 @@ to its limit, <em><code>min(duration - durationMin, durationMax - duration)</cod
 margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
 requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
 is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
-over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+over a run and the instant it occurs are taken from the stored trajectory.
 During a phase in which the property is still Undecided the margin is provisional (the duration is still accumulating); a consumer takes the worst value over the decided points only.</p>
 </html>"));
   end BandDuration;
@@ -655,7 +655,7 @@ to its limit, <em><code>-countRising</code> with output <b>countRising</b> the n
 margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
 requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
 is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
-over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+over a run and the instant it occurs are taken from the stored trajectory.
 </p>
 </html>"));
   end NoRising;
@@ -776,7 +776,7 @@ to its limit, <em><code>-abs(countRising - nRising)</code> with output <b>countR
 margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
 requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
 is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
-over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+over a run and the instant it occurs are taken from the stored trajectory.
 The margin of an exact count is 0 when satisfied and negative otherwise: it carries the sign, not headroom.</p>
 </html>"));
   end FixedRising;
@@ -895,7 +895,7 @@ to its limit, <em><code>countRising - nRisingMin</code> with output <b>countRisi
 margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
 requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
 is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
-over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+over a run and the instant it occurs are taken from the stored trajectory.
 </p>
 </html>"));
   end MinRising;
@@ -1014,7 +1014,7 @@ to its limit, <em><code>nRisingMax - countRising</code> with output <b>countRisi
 margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
 requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
 is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
-over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+over a run and the instant it occurs are taken from the stored trajectory.
 </p>
 </html>"));
   end MaxRising;
@@ -1147,7 +1147,7 @@ to its limit, <em><code>min(countRising - nRisingMin, nRisingMax - countRising)<
 margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
 requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
 is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
-over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+over a run and the instant it occurs are taken from the stored trajectory.
 </p>
 </html>"),
       Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-200,-100},{
@@ -1318,7 +1318,7 @@ to its limit, <em><code>freqHzMax - freqHz</code></em>, divided by parameter <b>
 margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
 requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
 is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
-over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+over a run and the instant it occurs are taken from the stored trajectory.
 </p>
 </html>"));
   end MaxRisingFrequency;
@@ -1396,7 +1396,7 @@ to its limit, <em>the input <b>rho</b> sampled at the edge that decides the prop
 margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
 requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
 is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
-over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+over a run and the instant it occurs are taken from the stored trajectory.
 </p>
 </html>"),   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-200,-100},
               {200,100}}), graphics={
@@ -1500,7 +1500,7 @@ to its limit, <em>the input <b>rho</b> sampled at the edge that decides the prop
 margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
 requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
 is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
-over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+over a run and the instant it occurs are taken from the stored trajectory.
 </p>
 </html>
 </html>"),   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-200,-100},
@@ -1604,7 +1604,7 @@ to its limit, <em>the input <b>rho</b> sampled at the edge that decides the prop
 margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
 requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
 is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
-over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+over a run and the instant it occurs are taken from the stored trajectory.
 </p>
 </html>"),   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-200,-100},
               {200,100}}), graphics={
@@ -1683,7 +1683,7 @@ over a run and the instant it occurs are taken from the stored trajectory (ModCh
     parameter Boolean computeMargin = true "= true, if the normalized margin output is provided"
       annotation(Dialog(tab="Margin"), choices(checkBox=true), Evaluate=true);
     Requirements.Interfaces.MarginOutput margin = distance/scale if computeMargin
-      "Normalized margin of the check: >= 0 exactly when the point is inside, in units of scale (phase 12 of the ModCheck plan)"
+      "Normalized margin of the check: >= 0 exactly when the point is inside, in units of scale"
       annotation (Placement(transformation(extent={{200,-150},{220,-130}}),
           iconTransformation(extent={{200,-150},{220,-130}})));
     output Real polygonPoint[2] "Point on polygon that is closest to point";
@@ -1860,12 +1860,12 @@ to its limit, <em>the output <b>distance</b></em>, divided by parameter <b>scale
 margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
 requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
 is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
-over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+over a run and the instant it occurs are taken from the stored trajectory.
 </p>
 </html>"));
   end WithinDomain;
   block StepResponseCheck
-    "One step-response metric of u after a step of r, bounded: Property and margin (ModCheck's requirements plan, section 21; the R3 layer of step_checks.py)"
+    "One step-response metric of u after a step of r, bounded: Property and margin"
     import Modelica.Units.SI;
     import Requirements.Types.Property;
     import Requirements.Types.StepMetric;
@@ -1947,7 +1947,7 @@ over a run and the instant it occurs are taken from the stored trajectory (ModCh
       oa := if closingByStep then pre(stepResponse.openAmplitude) else stepResponse.openAmplitude;
       os := if closingByStep then pre(stepResponse.openSign) else stepResponse.openSign;
       // the extrema closed so far decide early; the open one counts for the running value
-      // and at the window's close (as step_checks.py counts every segment of the window)
+      // and at the window's close (every segment of the window counts)
       neClosed := ne;
       zetaClosed := if ne >= 2 and aa2 > 0 then 2*log(aa1/aa2)/sqrt(4*Modelica.Constants.pi^2 + (2*log(aa1/aa2))^2) else 1;
       decayClosed := if ne >= 3 and aa1 > 0 then aa3/aa1 else 0;
@@ -2027,7 +2027,7 @@ over a run and the instant it occurs are taken from the stored trajectory (ModCh
       elseif stepResponse.active and not pre(decided) and (early or (boundIsPercent and nb and
              (metric == StepMetric.Overshoot or metric == StepMetric.Undershoot or metric == StepMetric.SteadyStateError))) then
         // decided before the window closes; a percent metric on a disturbance (no base) is
-        // Undefined as soon as that is known, as step_checks.py reports it never applicable
+        // Undefined as soon as that is known: it is never applicable
         if boundIsPercent and nb and (metric == StepMetric.Overshoot or metric == StepMetric.Undershoot or metric == StepMetric.SteadyStateError) then
           yNew := Property.Undefined;
         else
@@ -2037,8 +2037,8 @@ over a run and the instant it occurs are taken from the stored trajectory (ModCh
       end if;
       y := yNew;
       // the robustness follows the running metric while the window is open -- after an early
-      // decision too, so a violated overshoot's margin reaches the eventual peak's, as
-      // step_checks.py reports it -- and holds the final value after the close
+      // decision too, so a violated overshoot's margin reaches the eventual peak's -- and
+      // holds the final value after the close
       if stepResponse.active or stepResponse.closed then
         robustness := rho;
       end if;
@@ -2075,8 +2075,7 @@ property = <b>StepResponseCheck</b>(u=..., r=..., metric=..., bound=...).y;
 
 <h4>Description</h4>
 <p>
-One metric of the step response of <b>u</b> after a step of <b>r</b>, bounded (ModCheck's requirements plan,
-section 21.2): the metric is computed by an inner
+One metric of the step response of <b>u</b> after a step of <b>r</b>, bounded: the metric is computed by an inner
 <a href=\"modelica://Requirements.SignalAnalysis.StepResponse\">SignalAnalysis.StepResponse</a> at every
 <b>samplePeriod</b>, and the Property output <b>y</b> is Undefined before the first step, Undecided from a step
 to the earliest sample at which the bound is provably met or broken -- an overshoot exceeding its bound, a
@@ -2100,14 +2099,14 @@ Output <b>margin</b> (present if <b>computeMargin</b> = true) is the signed dist
 its bound -- <code>bound - value</code>, <code>zeta - bound</code> for the damping ratio -- divided by
 <b>scale</b>, followed while the window is open (after an early decision too, so a violated overshoot's
 margin reaches the eventual peak's) and held after the close: at every decided sample margin &ge; 0 exactly
-when the check holds, and at the window's close it is the margin <code>step_checks.py</code> reports. Set
-<b>scale</b> to the requirement's tolerance (the ModCheck plan's section 18.5).
+when the check holds, and at the window's close it is the margin of the closed window. Set
+<b>scale</b> to the requirement's tolerance.
 </p>
 <p>
-The reported verdict of a step-response requirement is ModCheck's <code>step_checks.py</code> on the stored
-trajectory (rule R7); this block is the development aid in a Modelica tool and the cross-check the
-orchestrator runs beside it: the decided Property and the margin agree to one sampling period in time and a
-hundredth of the tolerance. The target <em>the response's final value</em> is Python's alone.
+The metrics are sampled, so an instant is known to one <b>samplePeriod</b>. Where a step-response requirement
+is also evaluated on the stored trajectory after the run (at the full resolution of the result), the decided
+Property and the margin of this block agree with that evaluation to one sampling period in time. A target
+<em>the response's final value</em> is only known after the run and is not offered here.
 </p>
 <h4>Example</h4>
 <p>

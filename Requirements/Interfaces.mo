@@ -86,7 +86,7 @@ check, the signed distance of the check to its limit divided by the check block'
 (the requirement's tolerance). The margin is &ge; 0 exactly when the check holds, 1 is one tolerance of
 headroom, &lt; 0 a violation by that many tolerances. Its own connector type keeps a margin from being
 connected to a physical-unit signal by mistake, and lets a report find every margin of a model by type.
-The extremum over a run is not the block's business (ModCheck plan section 18.5, rule R2): a block emits
+The extremum over a run is not the block's business: a block emits
 the instantaneous value, the worst value and its instant are taken from the stored trajectory.
 </p>
 </html>"));
@@ -494,7 +494,7 @@ as well as a 3D icon (e.g., used in Blocks.Logical library).
     parameter Boolean computeMargin = true "= true, if the normalized margin output is provided"
       annotation(Dialog(tab="Margin"), choices(checkBox=true), Evaluate=true);
     Requirements.Interfaces.MarginOutput margin = robustness/scale if computeMargin
-      "Normalized margin of the check: >= 0 exactly when the check holds, in units of scale (phase 12 of the ModCheck plan)"
+      "Normalized margin of the check: >= 0 exactly when the check holds, in units of scale"
       annotation (Placement(transformation(extent={{200,-100},{220,-80}})));
   protected
     Real robustness
@@ -551,7 +551,7 @@ as well as a 3D icon (e.g., used in Blocks.Logical library).
     parameter Boolean computeMargin = true "= true, if the normalized margin output is provided"
       annotation(Dialog(tab="Margin"), choices(checkBox=true), Evaluate=true);
     Requirements.Interfaces.MarginOutput margin = robustness/scale if computeMargin
-      "Normalized margin of the check: >= 0 exactly when the check holds, in units of scale (phase 12 of the ModCheck plan)"
+      "Normalized margin of the check: >= 0 exactly when the check holds, in units of scale"
       annotation (Placement(transformation(extent={{200,-100},{220,-80}})));
   protected
     Real robustness
@@ -645,7 +645,7 @@ as well as a 3D icon (e.g., used in Blocks.Logical library).
     parameter Boolean computeMargin = true "= true, if the normalized margin output is provided"
       annotation(Dialog(tab="Margin"), choices(checkBox=true), Evaluate=true);
     Requirements.Interfaces.MarginOutput margin = robustness/scale if computeMargin
-      "Normalized margin of the check: >= 0 exactly when the check holds, in units of scale (phase 12 of the ModCheck plan)"
+      "Normalized margin of the check: >= 0 exactly when the check holds, in units of scale"
       annotation (Placement(transformation(extent={{200,-100},{220,-80}})));
   protected
     Real robustness

@@ -3214,7 +3214,7 @@ when the pack is switched off while the flight phase is still 2 (until 250 s).
       assert(abs(C.to_kW(C.from_kW(7)) - 7) < eps*7, "kW round trip");
       assert(abs(C.to_kJ(C.from_kJ(7)) - 7) < eps*7, "kJ round trip");
       annotation (experiment(StopTime=1), Documentation(info="<html>
-<p>Asserts every factor of <a href=\"modelica://Requirements.Units.Conversions\">Requirements.Units.Conversions</a> (the international foot is 0.3048 m exactly, 1 kft = 304.8 m, 1 kg/min = 1/60 kg/s, ...) and every round trip; a model that translates and runs is the test. The two variables are what ModCheck's generated check models emit for a quantity written in a non-SI unit: <code>from_kft(4.65)</code>, not 1417.32.</p>
+<p>Asserts every factor of <a href=\"modelica://Requirements.Units.Conversions\">Requirements.Units.Conversions</a> (the international foot is 0.3048 m exactly, 1 kft = 304.8 m, 1 kg/min = 1/60 kg/s, ...) and every round trip; a model that translates and runs is the test. The two variables show how a check model writes a quantity stated in a non-SI unit: <code>from_kft(4.65)</code>, not 1417.32.</p>
 <p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
 </html>"));
     end Conversions;
@@ -3251,7 +3251,7 @@ when the pack is switched off while the flight phase is still 2 (until 250 s).
 <code>During(check = u &lt; 8, rho = 8 &minus; u, scale = 0.5)</code>. The margin is <code>(8 &minus; t)/0.5</code>
 at every instant, asserted in closed form; it crosses zero at t = 8 s together with the property, and the
 worst value is &minus;4 at the end: violated by four tolerances. The sign invariant (satisfied &hArr; margin &ge; 0)
-is asserted continuously. Phase 12 of ModCheck's requirements plan (section 18.5).</p>
+is asserted continuously.</p>
 <p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
 </html>"));
     end During;
@@ -3527,15 +3527,14 @@ the family OpenModelica builds.</p>
 <p>The stimulus of <a href=\"modelica://Requirements.Examples.Elementary.ChecksInFixedWindow_withFFT.WithinAbsoluteDomain1\">WithinAbsoluteDomain1</a>
 (5 + 3 sin 2 Hz + 1.5 sin 3 Hz against the limit polygon) with <code>scale = 0.5</code> and without the terminate
 block: the FFT completes at t = 4.975 s, the property is Satisfied and the margin is <code>scaledDistance/scale</code>,
-positive -- the FFT blocks' <code>scaledDistance</code> is their robustness (kept, ModCheck plan section 9 (f)). The
+positive -- the FFT blocks' <code>scaledDistance</code> is their robustness. The
 value itself is not closed-form (leakage); it is the stored reference of this example in the regression lists.
 OpenModelica does not build the FFT checks; the example runs on Dymola and Modelon Impact.</p>
 <p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
 </html>"));
     end FFT;
     annotation (Documentation(info="<html>
-<p>Every check block of the library carries a <code>margin</code> output since version 0.9.0 (ModCheck plan
-section 18.5): the signed distance of the check to its limit divided by the block's <code>scale</code> (the
+<p>Every check block of the library carries a <code>margin</code> output since version 0.9.0: the signed distance of the check to its limit divided by the block's <code>scale</code> (the
 requirement's tolerance), &ge; 0 exactly when the check holds. These examples assert the margins against
 closed-form values at every instant and the sign invariant (satisfied &hArr; margin &ge; 0) continuously, one
 example per block family; each is a case in the regression lists beside this library, with the margins stored.</p>
@@ -3543,7 +3542,7 @@ example per block family; each is a case in the regression lists beside this lib
 </html>"));
   end Margin;
 
-  package StepResponse "Library of examples asserting the step-response blocks against the closed forms of a second-order system (ModCheck's requirements plan, section 21)"
+  package StepResponse "Library of examples asserting the step-response blocks against the closed forms of a second-order system"
     extends Modelica.Icons.ExamplesPackage;
 
     model SecondOrder "A 0.1 m step into a second-order system (D = 0.5, w = 5 rad/s): every metric against its closed form, every check against its verdict"
@@ -3599,10 +3598,10 @@ example per block family; each is a case in the regression lists beside this lib
       connect(sys.y, decay.u); connect(step.y, decay.r);
       connect(sys.y, error.u); connect(step.y, error.r);
       when time >= 5.5 then
-        // the closed forms of the second-order step response at D = 0.5, w = 5 (ModCheck's steps_acceptance.py)
+        // the closed forms of the second-order step response at D = 0.5, w = 5
         // The tolerances below are the solver's, not the block's: the 6000 sample events restart the
-        // solver every millisecond and its accumulated error is what the sampled block sees (rule R1's
-        // point, measured 2026-09-16) -- dassl and ida reproduce the closed form to 1e-6, OpenModelica's
+        // solver every millisecond and its accumulated error is what the sampled block sees (measured
+        // 2026-09-16) -- dassl and ida reproduce the closed form to 1e-6, OpenModelica's
         // cvode reads the peak 0.2 % low at rtol 1e-6, Modelon Impact's cvode 0.3 % low at 1e-6 and
         // 0.9 % low at 1e-4 (the regression suites' comparison runs), the time metrics up to 3 ms off.
         assert(noEvent(abs(metrics.overshoot - 0.0163033) < 2.5e-4), "StepResponse: the overshoot is not 16.303 % of 0.1 m");
@@ -3640,8 +3639,8 @@ metric, the window closing 4 s after the step. Every metric is asserted against 
 solution, the damping ratio recovered from the log decrement, the decay ratio
 <code>exp(-2 pi D / sqrt(1 - D&sup2;))</code>), and every check against its verdict and margin: the early
 decisions (an overshoot bound broken at 1.52 s, a settling deadline missed, a level reached) and the
-decisions at the close. The same numbers hold ModCheck's <code>step_checks.py</code>
-(<code>steps_acceptance.py</code>, plan section 21.8).</p>
+decisions at the close. The same closed-form numbers hold for an evaluation of the metrics on the stored
+trajectory after the run.</p>
 <p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
 </html>"));
     end SecondOrder;
@@ -3689,13 +3688,12 @@ damped oscillation. With <code>target = Reference</code> the metrics are measure
 the response's change over the step is zero, so the excursion is oriented by its largest deviation and the
 <em>overshoot</em> is the peak deviation (0.040, violating an absolute bound of 0.03 as soon as it is passed);
 a percent bound has no base and its property is Undefined; the settling time is the return to within 0.01 of the
-setpoint; the damping ratio comes from the dip and the return overshoot. ModCheck's plan, section 21.2, the
-owner's call 3.</p>
+setpoint; the damping ratio comes from the dip and the return overshoot.</p>
 <p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
 </html>"));
     end Disturbance;
     annotation (Documentation(info="<html>
-<p>The step-response blocks of ModCheck's requirements plan, section 21 (the R3 layer): the running metrics of
+<p>The step-response blocks: the running metrics of
 <a href=\"modelica://Requirements.SignalAnalysis.StepResponse\">SignalAnalysis.StepResponse</a> and the
 Property of <a href=\"modelica://Requirements.ChecksInFixedWindow.StepResponseCheck\">ChecksInFixedWindow.StepResponseCheck</a>,
 asserted against the closed forms of a second-order step response and a disturbance.</p>
@@ -3703,7 +3701,7 @@ asserted against the closed forms of a second-order step response and a disturba
 </html>"));
   end StepResponse;
 
-  package LinearAnalysis "Library of examples asserting the eigenvalue blocks on a shipped second-order state matrix (ModCheck's requirements plan, section 22)"
+  package LinearAnalysis "Library of examples asserting the eigenvalue blocks on a shipped second-order state matrix"
     extends Modelica.Icons.ExamplesPackage;
 
     model SecondOrder "The state matrix of a second-order system (w0 = 2 rad/s, D = 0.2) read from a MATLAB v4 file: every predicate against its closed form"
@@ -3713,7 +3711,7 @@ asserted against the closed forms of a second-order step response and a disturba
       parameter String fileName = "modelica://Requirements/Resources/Data/SecondOrderLinearization.mat"
         "A = [0, 1; -4, -0.8] (w0 = 2, D = 0.2): eigenvalues -0.4 +- 1.9596j, damping 0.2, 0.3183 Hz, time constant 2.5 s";
       parameter String filePath = Modelica.Utilities.Files.loadResource(fileName) "the URI resolved (folded at translation)";
-      parameter Real A[2, 2](each fixed=false) "the state matrix from the file, read at initialization (an impure read cannot be evaluated when the model is translated: OCT refuses it at flattening)";
+      parameter Real A[2, 2](each fixed=false) "the state matrix from the file, read at initialization (an impure read cannot be evaluated when the model is translated: some tools refuse it at flattening)";
       Requirements.LinearAnalysis.EigenvalueCheck realPart(nx=2, A=A, metric=EigenMetric.RealPart, bound=-0.1, scale=0.1)
         "every real part below -0.1 1/s: satisfied, margin (0.4 - 0.1) / 0.1 = 3"
         annotation (Placement(transformation(extent={{-40,40},{0,60}})));
@@ -3745,18 +3743,18 @@ asserted against the closed forms of a second-order step response and a disturba
       assert(region.y == Property.Satisfied and abs(region.margin - 3) < 1e-9, "region: expected Satisfied with margin 3");
       annotation (experiment(StopTime=1), Documentation(info="<html>
 <p>The eigenvalue blocks of <a href=\"modelica://Requirements.LinearAnalysis\">LinearAnalysis</a> on a state
-matrix read from a shipped MATLAB v4 file (<code>Resources/Data/SecondOrderLinearization.mat</code>, written by
-ModCheck's <code>linear_checks.Linearization.save_mat</code>): the second-order system with
+matrix read from a shipped MATLAB v4 file (<code>Resources/Data/SecondOrderLinearization.mat</code>, a matrix named <code>A</code> in MATLAB v4 format,
+the layout <a href=\"modelica://Requirements.LinearAnalysis\">LinearAnalysis</a> describes): the second-order system with
 <code>w0 = 2 rad/s</code> and <code>D = 0.2</code>, whose mode is <code>-0.4 &plusmn; 1.9596j</code> --
 damping 0.2, 0.3183 Hz, a 2.5 s time constant. Every block's <code>Property</code> and <code>margin</code> is
-asserted against the closed form, including the Undefined of an empty band. What ModCheck's generated
-<code>EigenCheckFromFile</code> models do for the corpus's linearisations.</p>
+asserted against the closed form, including the Undefined of an empty band. To check a plant of your own, linearize it in your
+Modelica tool, write its A matrix to such a file, and point <code>readStateMatrix</code> at it.</p>
 <p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
 </html>"));
     end SecondOrder;
 
     annotation (Documentation(info="<html>
-<p>The eigenvalue blocks asserted on a shipped state matrix (ModCheck's requirements plan, section 22.7).</p>
+<p>The eigenvalue blocks asserted on a shipped state matrix.</p>
 <p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
 </html>"));
   end LinearAnalysis;

@@ -92,13 +92,13 @@ the property became applicable, beside it); one that was Violated at any instant
   type StepTarget = enumeration(
       Stepping "The stepping signal after the step (the setpoint of a closed loop)",
       Reference "A reference signal's current value (a disturbance step measured against the setpoint)")
-    "The target a step-response metric measures the response against (ModCheck's requirements plan, section 21.2); the post-processing target 'the response's final value' has no running form and is Python's alone"
+    "The target a step-response metric measures the response against; the response's own final value has no running form and is not offered"
     annotation (Documentation(info="<html>
 <p>The target <code>yInf</code> of a step response's metrics: <b>Stepping</b> -- the stepping signal's
 value after the step, the setpoint of a closed loop; <b>Reference</b> -- a separate reference signal's
-current value, for a disturbance step measured against the setpoint. The third target of ModCheck's
-step-response requirements, the response's own final value, is only known when the window closes and has
-no running form: <code>step_checks.py</code> evaluates it, the blocks refuse it.</p>
+current value, for a disturbance step measured against the setpoint. A third target one might want, the
+response's own final value, is only known when the window closes and has no running form; the blocks do
+not offer it (evaluate it on the stored trajectory after the run).</p>
 </html>"));
 
   type EigenMetric = enumeration(
@@ -107,9 +107,9 @@ no running form: <code>step_checks.py</code> evaluates it, the blocks refuse it.
       FrequencyMin "Every mode's frequency |lambda|/2 pi [Hz] at least the bound",
       FrequencyMax "Every mode's frequency [Hz] at most the bound",
       TimeConstant "Every decaying mode's time constant -1/Re [s] at most the bound; a non-decaying mode violates it")
-    "The eigenvalue predicates of ModCheck's requirements plan, section 22.2"
+    "The eigenvalue predicates over the modes of a state matrix"
     annotation (Documentation(info="<html>
-<p>The eigenvalue predicates of ModCheck's linear-analysis requirements (its requirements plan, section 22.2), as
+<p>The eigenvalue predicates of a linear-analysis requirement, as
 <a href=\"modelica://Requirements.LinearAnalysis.EigenvalueCheck\">LinearAnalysis.EigenvalueCheck</a> evaluates them
 over the modes of a state matrix; the pole region is
 <a href=\"modelica://Requirements.LinearAnalysis.EigenvaluesWithinRegion\">EigenvaluesWithinRegion</a>.</p>
@@ -125,9 +125,9 @@ over the modes of a state matrix; the pole region is
       SteadyStateError "The deviation from the target at the window's end",
       DampingRatio "From the log decrement of the first two extrema beyond the target",
       DecayRatio "The third extremum over the first")
-    "The step-response metrics of ModCheck's requirements plan, section 21.2"
+    "The classic step-response metrics"
     annotation (Documentation(info="<html>
-<p>The eight metrics of a step response (ModCheck's requirements plan, section 21.2), as
+<p>The eight classic metrics of a step response, as
 <a href=\"modelica://Requirements.ChecksInFixedWindow.StepResponseCheck\">StepResponseCheck</a> bounds them.</p>
 </html>"));
 

@@ -802,7 +802,7 @@ As can be seen, the first FFT fulfills the check (THD &lt; THDmax), whereas the 
         parameter Boolean computeMargin = true "= true, if the normalized margin output is provided"
           annotation(Dialog(tab="Margin"), choices(checkBox=true), Evaluate=true);
         Requirements.Interfaces.MarginOutput margin = scaledDistance/scale if computeMargin
-          "Normalized margin of the last FFT check: >= 0 exactly when it holds, in units of scale (phase 12 of the ModCheck plan)"
+          "Normalized margin of the last FFT check: >= 0 exactly when it holds, in units of scale"
           annotation (Placement(transformation(extent={{300,-260},{320,-240}})));
 
         final parameter Integer ns = Internal.get_ns(f_max, f_resolution)

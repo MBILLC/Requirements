@@ -118,7 +118,7 @@ to its limit, <em><code>maxDuration - lowerLimit</code></em>, divided by paramet
 margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
 requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
 is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
-over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+over a run and the instant it occurs are taken from the stored trajectory.
 Before the end of the first window the margin is provisional; a consumer takes the worst value over the decided points only. The sliding buffer holds 20 elements, so a margin over a busier window is approximate, as the property is.</p>
 </html>"),   Icon(coordinateSystem(preserveAspectRatio=false, extent={{-200,
               -100},{200,100}}),
@@ -252,7 +252,7 @@ to its limit, <em><code>accumulatedDuration - lowerLimit</code></em>, divided by
 margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
 requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
 is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
-over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+over a run and the instant it occurs are taken from the stored trajectory.
 Before the end of the first window the margin is provisional; a consumer takes the worst value over the decided points only. The sliding buffer holds 20 elements, so a margin over a busier window is approximate, as the property is.</p>
 </html>"),   Icon(graphics={
           Text(
@@ -371,7 +371,7 @@ to its limit, <em><code>accumulatedDuration - lowerLimit</code></em>, divided by
 margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
 requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
 is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
-over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+over a run and the instant it occurs are taken from the stored trajectory.
 Before the end of the first window the margin is provisional; a consumer takes the worst value over the decided points only. The sliding buffer holds 20 elements, so a margin over a busier window is approximate, as the property is.</p>
 </html>"),   Icon(graphics={
           Text(
@@ -481,7 +481,7 @@ to its limit, <em><code>upperLimit - maxDuration</code></em>, divided by paramet
 margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
 requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
 is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
-over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+over a run and the instant it occurs are taken from the stored trajectory.
 Before the end of the first window the margin is provisional; a consumer takes the worst value over the decided points only. The sliding buffer holds 20 elements, so a margin over a busier window is approximate, as the property is.</p>
 </html>"),   Diagram(coordinateSystem(
           preserveAspectRatio=false,
@@ -602,7 +602,7 @@ to its limit, <em><code>upperLimit - accumulatedDuration</code></em>, divided by
 margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
 requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
 is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
-over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+over a run and the instant it occurs are taken from the stored trajectory.
 Before the end of the first window the margin is provisional; a consumer takes the worst value over the decided points only. The sliding buffer holds 20 elements, so a margin over a busier window is approximate, as the property is.</p>
 </html>"),   Diagram(coordinateSystem(
           preserveAspectRatio=false,
@@ -748,7 +748,7 @@ to its limit, <em><code>min(maxDuration - lowerLimit, upperLimit - maxDuration)<
 margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
 requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
 is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
-over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+over a run and the instant it occurs are taken from the stored trajectory.
 Before the end of the first window the margin is provisional; a consumer takes the worst value over the decided points only. The sliding buffer holds 20 elements, so a margin over a busier window is approximate, as the property is.</p>
 </html>"),   Icon(graphics={
           Text(
@@ -883,7 +883,7 @@ to its limit, <em><code>min(accumulatedDuration - lowerLimit, upperLimit - accum
 margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
 requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
 is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
-over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+over a run and the instant it occurs are taken from the stored trajectory.
 Before the end of the first window the margin is provisional; a consumer takes the worst value over the decided points only. The sliding buffer holds 20 elements, so a margin over a busier window is approximate, as the property is.</p>
 </html>"),   Icon(graphics={
           Text(
@@ -1033,7 +1033,7 @@ to its limit, <em><code>nRising - nRisingMin</code></em>, divided by parameter <
 margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
 requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
 is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
-over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+over a run and the instant it occurs are taken from the stored trajectory.
 Before the end of the first window the margin is provisional; a consumer takes the worst value over the decided points only. The sliding buffer holds 20 elements, so a margin over a busier window is approximate, as the property is.</p>
 </html>"),   Icon(graphics={
           Text(
@@ -1159,7 +1159,7 @@ to its limit, <em><code>nRisingMax - nRising</code></em>, divided by parameter <
 margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
 requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
 is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
-over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+over a run and the instant it occurs are taken from the stored trajectory.
 Before the end of the first window the margin is provisional; a consumer takes the worst value over the decided points only. The sliding buffer holds 20 elements, so a margin over a busier window is approximate, as the property is.</p>
 </html>"),   Icon(graphics={
           Text(
@@ -1312,7 +1312,7 @@ to its limit, <em><code>min(nRising - nRisingMin, nRisingMax - nRising)</code></
 margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
 requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
 is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
-over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+over a run and the instant it occurs are taken from the stored trajectory.
 Before the end of the first window the margin is provisional; a consumer takes the worst value over the decided points only. The sliding buffer holds 20 elements, so a margin over a busier window is approximate, as the property is.</p>
 </html>"),   Icon(graphics={
           Text(
@@ -1472,7 +1472,7 @@ to its limit, <em><code>freqHzMeanMax - freqHzMean</code></em>, divided by param
 margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
 requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
 is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
-over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+over a run and the instant it occurs are taken from the stored trajectory.
 Before the end of the first window the margin is provisional; a consumer takes the worst value over the decided points only. The sliding buffer holds 20 elements, so a margin over a busier window is approximate, as the property is.</p>
 </html>"),   Icon(graphics={
           Text(
@@ -1636,7 +1636,7 @@ to its limit, <em><code>freqHzMeanMax - freqHzMean</code></em>, divided by param
 margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
 requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
 is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
-over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+over a run and the instant it occurs are taken from the stored trajectory.
 Before the end of the first window the margin is provisional; a consumer takes the worst value over the decided points only. The sliding buffer holds 20 elements, so a margin over a busier window is approximate, as the property is.</p>
 </html>"),   Icon(graphics={
           Text(
@@ -1682,7 +1682,7 @@ Before the end of the first window the margin is provisional; a consumer takes t
     parameter Boolean computeMargin = true "= true, if the normalized margin output is provided"
       annotation(Dialog(tab="Margin"), choices(checkBox=true), Evaluate=true);
     Requirements.Interfaces.MarginOutput margin = (upperLimit - increase)/scale if computeMargin
-      "Normalized margin of the check: >= 0 exactly when the check holds, in units of scale (phase 12 of the ModCheck plan)"
+      "Normalized margin of the check: >= 0 exactly when the check holds, in units of scale"
       annotation (Placement(transformation(extent={{100,-100},{120,-80}})));
     Modelica.Blocks.Interfaces.RealInput u "Real input signal"
       annotation (Placement(transformation(extent={{-140,-20},{-100,20}})));
@@ -1811,7 +1811,7 @@ to its limit, <em><code>upperLimit - increase</code></em>, divided by parameter 
 margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
 requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
 is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
-over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+over a run and the instant it occurs are taken from the stored trajectory.
 </p>
 </html>"));
   end MaxIncrease;
@@ -1840,7 +1840,7 @@ over a run and the instant it occurs are taken from the stored trajectory (ModCh
     parameter Boolean computeMargin = true "= true, if the normalized margin output is provided"
       annotation(Dialog(tab="Margin"), choices(checkBox=true), Evaluate=true);
     Requirements.Interfaces.MarginOutput margin = (upperPercentageLimit - percentageIncrease)/scale if computeMargin
-      "Normalized margin of the check: >= 0 exactly when the check holds, in units of scale (phase 12 of the ModCheck plan)"
+      "Normalized margin of the check: >= 0 exactly when the check holds, in units of scale"
       annotation (Placement(transformation(extent={{100,-100},{120,-80}})));
     Modelica.Blocks.Interfaces.RealInput u "Real input signal"
       annotation (Placement(transformation(extent={{-140,-20},{-100,20}})));
@@ -1976,7 +1976,7 @@ to its limit, <em><code>upperPercentageLimit - percentageIncrease</code> (in %)<
 margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. Set <b>scale</b> to the
 requirement's tolerance so that margins of different requirements compare; with the default scale = 1 the margin
 is the raw robustness in the quantity's unit. The block computes the instantaneous value only; the worst value
-over a run and the instant it occurs are taken from the stored trajectory (ModCheck plan section 18.5, rule R2).
+over a run and the instant it occurs are taken from the stored trajectory.
 </p>
 </html>"));
   end MaxPercentageIncrease;

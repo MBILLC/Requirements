@@ -34,7 +34,7 @@ package Verify "Library of components to verify requirements"
     Real ok annotation(HideResult=true);
   equation
     when initial() then
-       ok = Internal.initializeLogFile(logFile, time);
+       ok = Internal.initializeLogFile(logFile, time, htmlFile);
     end when;
 
     // Opt-in for tools without terminal(): evaluate at a fixed instant instead.
@@ -95,12 +95,21 @@ example of this library sets <code>evaluationTime</code> to its StopTime, so tha
 kind of tool once <code>useEvaluationTime</code> is switched on; with the default
 <code>useEvaluationTime = false</code> the parameter has no effect.
 </p>
+
+<p>
+A tool may evaluate the when-equations that take the verdict more than once at the same event instant
+(Modelon Impact does). Each requirement writes its line to the log file only once, and the summary is
+printed only once per run: the HTML report is removed at initialization, and printing stops as soon as
+the report of this run exists.
+</p>
 </html>", revisions="<html>
 <table border=1 cellspacing=0 cellpadding=2>
 <tr><th>Date</th> <th align=\"left\">Description</th></tr>
 
 <tr><td valign=\"top\"> Sept. 14, 2026 </td>
     <td valign=\"top\"> Parameters <code>useEvaluationTime</code> and <code>evaluationTime</code> added: opt-in verdict at a fixed instant for tools without <code>terminal()</code> (H. Tummescheit, Model Based Innovation LLC)</td></tr>
+<tr><td valign=\"top\"> Oct. 16, 2026 </td>
+    <td valign=\"top\"> The verdict is printed once in a tool that evaluates its when-equations twice at the event (Modelon Impact printed every requirement twice): the HTML report of an earlier run is removed at initialization and the summary is not printed again once the report exists; the log file holds one line per requirement (H. Tummescheit, Model Based Innovation LLC)</td></tr>
 </table>
 </html>"));
   end PrintViolations;
