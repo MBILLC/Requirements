@@ -1,0 +1,136 @@
+# Copyright © 2026 Model Based Innovation LLC. All rights reserved.
+#
+# The Requirements library's ModCheck regression suite against a real Modelon Impact server
+# -- run BY HAND only.
+#
+# Start it from the Actions tab (regression -> Run workflow) or from a shell:
+#   gh workflow run regression.yml --repo MBILLC/Requirements
+#   gh workflow run regression.yml --repo MBILLC/Requirements -f case=MR_Examples_AircraftRequirements_LimitedControlFrequency
+#
+# The library at the commit the run was started on is imported into a throwaway Impact
+# workspace (ci-requirements-<run>-<attempt>) and its examples are checked against the
+# references in Requirements/Resources/ModCheck/Impact/ by ModCheck (MBILLC/ModCheck, private,
+# read with the MODCHECK_READ_TOKEN secret). The workspace and its projects are deleted
+# again, also when the run failed or was cancelled.
+#
+# Secrets: IMPACT_API_KEY (the owner's ~/.impact/api.key) and MODCHECK_READ_TOKEN (a
+# fine-grained token with read-only Contents access to MBILLC/ModCheck). This repository is
+# public, but a workflow_dispatch run can only be started by someone with write access, and
+# GitHub never hands secrets to workflows run from forks. The simulations run on the owner's
+# Impact server, which has one compiler worker: do not start this while another regression
+# (this repository's, ModCheck's or RotorDynamics') is running.
+name: regression
+
+on:
+  push:   # TEMPORARY, for testing the PR branch
+    branches: [ci-regression-dispatch]
+  workflow_dispatch:
+    inputs:
+      config:
+        description: Case list (in Requirements/Resources/ModCheck/Impact)
+        type: choice
+        options:
+          - regression_cases_requirements_impact.yaml
+          - ImpactOnly/regression_cases_requirements_impact_only.yaml
+        default: regression_cases_requirements_impact.yaml
+      case:
+        description: Only these cases, space-separated (empty = every enabled case)
+        type: string
+        default: ""
+      rtol_factor:
+        description: Re-simulate at this factor x each case's rtol
+        type: string
+        default: "100"
+      modcheck_ref:
+        description: ModCheck branch, tag or commit
+        type: string
+        default: main
+
+concurrency:
+  group: impact-regression
+  cancel-in-progress: false
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      MODELON_IMPACT_CLIENT_URL: https://impact.modelon.cloud
+      MODELON_IMPACT_CLIENT_API_KEY: ${{ secrets.IMPACT_API_KEY }}
+      WORKSPACE: ci-requirements-${{ github.run_number }}-${{ github.run_attempt }}
+      MPLBACKEND: Agg
+      PYTHONUNBUFFERED: "1"
+    steps:
+      - name: Check out Requirements (this commit)
+        uses: actions/checkout@v4
+        with:
+          path: Requirements
+
+      - name: Check out ModCheck
+        uses: actions/checkout@v4
+        with:
+          repository: MBILLC/ModCheck
+          ref: ${{ inputs.modcheck_ref || 'main' }}
+          path: ModCheck
+          token: ${{ secrets.MODCHECK_READ_TOKEN }}   # ModCheck is private
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: ModCheck/requirements.txt
+
+      - name: Install ModCheck's requirements
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r ModCheck/requirements.txt
+
+      # The repository holds a bare library (Requirements/package.mo, no .impact/project.json);
+      # the helper wraps it as a one-library project.
+      - name: Create the workspace and import the library
+        run: python ModCheck/ModCheck/Resources/CI/impact_ci_workspace.py create "$WORKSPACE" Requirements/Requirements
+
+      - name: Run the regression suite
+        working-directory: ModCheck/ModCheck/Resources
+        shell: bash   # = bash -eo pipefail: a failing harness is not hidden by the tee
+        env:
+          CONFIG: ${{ inputs.config }}
+          CASES: ${{ inputs.case }}
+          RTOL_FACTOR: ${{ inputs.rtol_factor }}
+        run: |
+          # The inputs are empty when the run was not started from the form.
+          CONFIG=${CONFIG:-regression_cases_requirements_impact.yaml}
+          RTOL_FACTOR=${RTOL_FACTOR:-100}
+          CASES=${CASES:-"MR_Examples_AircraftRequirements_LimitedControlFrequency MR_Examples_AircraftRequirements_LimitedFreshECSFlow"}   # TEMPORARY
+          src="$GITHUB_WORKSPACE/Requirements/Requirements/Resources/ModCheck/Impact/$CONFIG"
+          # A copy beside the original, so --ref-dir still finds ReferenceResults/ there.
+          ci="$(dirname "$src")/ci_$(basename "$src")"
+          python CI/impact_ci_workspace.py point "$WORKSPACE" "$src" "$ci"
+          args=(--config "$ci" --rtol-factor "$RTOL_FACTOR"
+                --html-report-dir "$GITHUB_WORKSPACE/reports"
+                --error-log "$GITHUB_WORKSPACE/errors.log")
+          for c in $CASES; do args+=(--case "$c"); done
+          python regression_testing.py "${args[@]}" 2>&1 | tee "$GITHUB_WORKSPACE/regression.log"
+
+      - name: Summary
+        if: always()
+        run: |
+          [ -f regression.log ] || exit 0
+          { echo '### Regression'; echo '```'; grep -E "checks passed|FAIL|MISSING" regression.log | tail -20
+            echo; tail -5 regression.log; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload the report and the log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: regression-report-${{ github.run_number }}
+          retention-days: 14
+          if-no-files-found: warn
+          path: |
+            regression.log
+            errors.log
+            reports/
+
+      - name: Delete the workspace and its projects
+        if: always()
+        run: python ModCheck/ModCheck/Resources/CI/impact_ci_workspace.py delete "$WORKSPACE"
