@@ -22,8 +22,6 @@
 name: regression
 
 on:
-  push:   # TEMPORARY, for testing the PR branch
-    branches: [ci-regression-dispatch]
   workflow_dispatch:
     inputs:
       config:
@@ -101,7 +99,6 @@ jobs:
           # The inputs are empty when the run was not started from the form.
           CONFIG=${CONFIG:-regression_cases_requirements_impact.yaml}
           RTOL_FACTOR=${RTOL_FACTOR:-100}
-          CASES=${CASES:-"MR_Examples_AircraftRequirements_LimitedControlFrequency MR_Examples_AircraftRequirements_LimitedFreshECSFlow"}   # TEMPORARY
           src="$GITHUB_WORKSPACE/Requirements/Requirements/Resources/ModCheck/Impact/$CONFIG"
           # A copy beside the original, so --ref-dir still finds ReferenceResults/ there.
           ci="$(dirname "$src")/ci_$(basename "$src")"
