@@ -33,7 +33,7 @@
       "onTable.y",
       "time"
     ],
-    "bytes": 9136,
+    "bytes": 8891,
     "metrics": {
       "solver": "CVode",
       "linear_multistep_method": "BDF",
@@ -41,8 +41,11 @@
       "linear_solver_type": "DENSE",
       "atol": 1e-06,
       "rtol": 1e-06,
-      "cpu_time": 0.05690793699977803,
-      "steps": 562,
+      "cpu_time": 0.07759721099864691,
+      "steps": 560,
+      "rhs_evaluations": 712,
+      "jacobian_evaluations": 39,
+      "time_events": 19,
       "error_test_failures": 0,
       "convergence_failures": 0,
       "state_events": 19,

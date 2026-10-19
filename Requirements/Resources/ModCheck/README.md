@@ -55,6 +55,14 @@ with the new `Examples.Elementary.LogicalBlocks.PropertyTable4` as a case in the
 (omc, Dymola and the composite carry its reference). The numbers below are the 0.7.1
 measurement and stand as history.
 
+**Version 0.12.1, 2026-10-19** (`DelayedRising` at coincident events): the fix moved
+`Examples.BackupPowerSupply.MainPowerSupplyRequirements`'s `MPS.during4.y` and `MPS.duringAny4.y` on Impact, whose
+references (the composite list's and the Impact-only list's, both `reference_from: impact`) had recorded the faulty
+output; both re-stored. The full Impact suite: 561/563 with the fix and the old references (exactly those two), 563/563
+after; the Impact-only list 61/63, then 63/63. The OpenModelica and Dymola lists were not re-run (neither tool is available here, and
+neither runs this example); their other `DelayedRising` cases, `SimplePumpingSystem` and
+`Elementary.LogicalBlocks.DelayedRising`, are unchanged on Impact.
+
 **Version 0.12.0, 2026-10-19** (violation statistics): four new cases in the Impact list,
 `Examples.Elementary.ViolationStatistics.Sine`, `Episodes`, `Gating` and `RequirementLog`, with Impact's own
 references (`reference_from: impact`, 149 kB together): the statistics outputs are stored, so a count, a duration or a

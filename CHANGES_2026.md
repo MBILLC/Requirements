@@ -2,7 +2,7 @@
 
 This file summarizes what changed in the Modelica **Requirements** library
 (package folder [`Requirements/`](Requirements/)) during 2026. The library went from
-**0.7.0** (Feb. 2025) to **0.12.0** (2026-10-19) in eight releases.
+**0.7.0** (Feb. 2025) to **0.12.1** (2026-10-19) in nine releases.
 
 The full release notes are in the library itself, under
 `Requirements.UsersGuide.ReleaseNotes`. The same summary is in the library documentation,
@@ -19,6 +19,7 @@ tool-by-tool measurements are kept beside the library (see `Requirements.UsersGu
 | 0.11.0 | 2026-09-16 | Eigenvalue checks over a linearization (`LinearAnalysis`) |
 | 0.11.1 | 2026-10-16 | Steady-state check example; the verdict printed once in every tool; self-contained documentation |
 | 0.12.0 | 2026-10-19 | Violation statistics: how often, how long and how badly a requirement was violated |
+| 0.12.1 | 2026-10-19 | Bug fix: `DelayedRising` stayed true after its input fell, when the fall coincided with the end of the duration |
 
 No release needs a model conversion. Each one declares `conversion(noneFromVersion=...)`
 for the version before it. One exception: from 0.8.0 on, code that reads a stored
@@ -200,6 +201,16 @@ This release changes requirement semantics.
     tools.
 - The repository [MBILLC/Requirements](https://github.com/MBILLC/Requirements) is public;
   the User's Guide and the Contact page link to it.
+
+## 0.12.1 — DelayedRising at coincident events
+
+- **`LogicalBlocks.DelayedRising`** is now `y = u and time >= startTime + duration`. It assigned its output in a
+  `when`/`elsewhen` chain; when the input fell at the instant the duration ran out, both branches' conditions became
+  true in one event iteration, only the first ran, and the output stayed true until the next rising edge (Modelon
+  Impact; the order of the two events decided it). Now it is never true while the input is false.
+- `Examples.BackupPowerSupply.MainPowerSupplyRequirements`: R8 is untested on Impact, as documented (it was violated at
+  55 s). Its two Impact references were re-stored; the full Impact suite went from 561/563 to 563/563.
+- Found by ModCheck's requirements corpus (`TC-SYS-MainPowerSupply`, REQ-8).
 
 ## 0.12.0 — Violation statistics
 
