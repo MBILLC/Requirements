@@ -2,7 +2,7 @@
 
 This file summarizes what changed in the Modelica **Requirements** library
 (package folder [`Requirements/`](Requirements/)) during 2026. The library went from
-**0.7.0** (Feb. 2025) to **0.11.1** (2026-10-16) in seven releases.
+**0.7.0** (Feb. 2025) to **0.12.0** (2026-10-19) in eight releases.
 
 The full release notes are in the library itself, under
 `Requirements.UsersGuide.ReleaseNotes`. The same summary is in the library documentation,
@@ -18,6 +18,7 @@ tool-by-tool measurements are kept beside the library (see `Requirements.UsersGu
 | 0.10.0 | 2026-09-16 | Step-response metrics (overshoot, rise time, settling time, …) |
 | 0.11.0 | 2026-09-16 | Eigenvalue checks over a linearization (`LinearAnalysis`) |
 | 0.11.1 | 2026-10-16 | Steady-state check example; the verdict printed once in every tool; self-contained documentation |
+| 0.12.0 | 2026-10-19 | Violation statistics: how often, how long and how badly a requirement was violated |
 
 No release needs a model conversion. Each one declares `conversion(noneFromVersion=...)`
 for the version before it. One exception: from 0.8.0 on, code that reads a stored
@@ -199,6 +200,30 @@ This release changes requirement semantics.
     tools.
 - The repository [MBILLC/Requirements](https://github.com/MBILLC/Requirements) is public;
   the User's Guide and the Contact page link to it.
+
+## 0.12.0 — Violation statistics
+
+- New block **`Verify.ViolationStatistics`**. From a check's `property` and `margin` it gives:
+  - how often the requirement was violated (`nViolations`);
+  - for how long in total (`totalDuration`, `violatedFraction`);
+  - the longest violation (`longestDuration`, `tLongestStart`);
+  - the worst violation and when (`worstMargin`, `tWorst`), also per episode.
+- It is meant for long runs such as annual building simulations, where a verdict alone does not say
+  enough.
+- A violation is a phase with `property = Violated`, so the statistics agree with the verdict.
+  `mergeGap` and `minDuration` stop a signal that hovers at its limit from counting as hundreds of
+  violations.
+- The worst margin is found in one of two ways:
+  - The default extends the MSL's `Modelica.Blocks.Math.ContinuousSignalExtrema`, which fires an
+    event at every local extremum.
+  - A ratchet fires only at a new low, and is cheaper for an oscillating margin: on a year with a
+    10-minute ripple it took 31 s against 97 s.
+- `Verify.Requirement` and `BooleanRequirement` compute the same statistics when
+  `computeStatistics` is set. The statistics are written as a second `Statistics` line in the log
+  file and printed by `PrintViolations`.
+- The check blocks still have no accumulators. No existing output, log line or regression
+  reference changed.
+- New examples: `Examples.Elementary.ViolationStatistics`.
 
 ---
 

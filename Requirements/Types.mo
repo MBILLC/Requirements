@@ -131,4 +131,24 @@ over the modes of a state matrix; the pole region is
 <a href=\"modelica://Requirements.ChecksInFixedWindow.StepResponseCheck\">StepResponseCheck</a> bounds them.</p>
 </html>"));
 
+  type WorstMarginMethod = enumeration(
+      Continuous "Every local extremum of the margin (Modelica.Blocks.Math.ContinuousSignalExtrema): exact, one event per local extremum",
+      Ratchet "Every new low by more than resolution: within resolution of the exact value, one event per resolution of descent")
+    "How Verify.ViolationStatistics finds the worst margin"
+    annotation (Documentation(info="<html>
+<p>The two ways <a href=\"modelica://Requirements.Verify.ViolationStatistics\">ViolationStatistics</a> tracks the least
+margin of a run.</p>
+<ul>
+<li><b>Continuous</b> (the default) detects every local extremum of the margin with the derivative filter of
+    <a href=\"modelica://Modelica.Blocks.Math.ContinuousSignalExtrema\">Modelica.Blocks.Math.ContinuousSignalExtrema</a>,
+    which it extends. The worst margin is exact up to the filter's lag (about <code>T</code>, to be chosen from the margin's
+time scale); the cost is one state event
+    per local extremum of the margin, minima and maxima.</li>
+<li><b>Ratchet</b> fires a state event only when the margin falls more than <code>resolution</code> below the least value
+    found so far. The worst margin is within <code>resolution</code> of the exact value; the number of events is bounded by
+    the depth of the descent divided by <code>resolution</code>, however much the margin oscillates. Use it for a margin
+    with many small local extrema (a temperature under an oscillating controller).</li>
+</ul>
+</html>"));
+
 end Types;

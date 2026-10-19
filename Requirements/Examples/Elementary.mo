@@ -3542,6 +3542,350 @@ example per block family; each is a case in the regression lists beside this lib
 </html>"));
   end Margin;
 
+  package ViolationStatistics "Examples of Verify.ViolationStatistics: how often, how long and how badly a requirement was violated, asserted against closed-form values"
+    extends Modelica.Icons.ExamplesPackage;
+
+    model Sine "A sine against a limit: four episodes of 10/3 s each, the worst margin -2 between two output points"
+      extends Modelica.Icons.Example;
+      import Requirements.Types.Property;
+      import Requirements.Types.WorstMarginMethod;
+      Modelica.Blocks.Sources.Sine u(amplitude=1, f=0.1) "u = sin(2 pi t / 10 s)"
+        annotation (Placement(transformation(extent={{-80,10},{-60,30}})));
+      Requirements.Sources.BooleanConstant always
+        annotation (Placement(transformation(extent={{-80,40},{-60,60}})));
+      Requirements.ChecksInFixedWindow.During during1(
+        check=u.y < 0.5,
+        rho=0.5 - u.y,
+        scale=0.25) "u shall stay below 0.5, tolerance 0.25"
+        annotation (Placement(transformation(extent={{-40,40},{0,60}})));
+      Requirements.Verify.ViolationStatistics continuous
+        "Worst margin at the local extrema of the margin (default)"
+        annotation (Placement(transformation(extent={{30,40},{50,60}})));
+      Requirements.Verify.ViolationStatistics ratchet(method=WorstMarginMethod.Ratchet, resolution=0.01)
+        "Worst margin at every new low by more than 0.01"
+        annotation (Placement(transformation(extent={{30,0},{50,20}})));
+    protected
+      constant Real P = 10 "Period of the sine";
+    equation
+      connect(always.y, during1.condition) annotation (Line(points={{-59,50},{-42,50}}, color={255,0,255}));
+      connect(during1.y, continuous.property) annotation (Line(points={{1,50},{16,50},{16,54},{28,54}}, color={0,0,255}));
+      connect(during1.margin, continuous.margin) annotation (Line(points={{1,42},{16,42},{16,46},{28,46}}, color={0,127,0}));
+      connect(during1.y, ratchet.property) annotation (Line(points={{1,50},{16,50},{16,14},{28,14}}, color={0,0,255}));
+      connect(during1.margin, ratchet.margin) annotation (Line(points={{1,42},{12,42},{12,6},{28,6}}, color={0,127,0}));
+      when time >= 34.99 then
+        assert(noEvent(continuous.nViolations == 4), "Sine: four episodes, one per period in which sin > 0.5");
+        assert(noEvent(abs(continuous.totalDuration - 4*P/3) < 1e-4), "Sine: violated 4 x 10/3 s in total");
+        assert(noEvent(abs(continuous.violatedFraction - 4*P/3/34.99) < 1e-5), "Sine: the fraction is the total over the run so far");
+        assert(noEvent(abs(continuous.longestDuration - P/3) < 1e-4
+          and abs(continuous.tLongestStart - P*floor(continuous.tLongestStart/P) - P/12) < 1e-4),
+          "Sine: the longest episode is 10/3 s long and starts at 10/12 s in its period");
+        assert(noEvent(abs(continuous.worstMargin + 2) < 1e-4), "Sine: the worst margin is (0.5 - 1)/0.25 = -2");
+        assert(noEvent(abs(continuous.tWorst - P*floor(continuous.tWorst/P) - P/4) < 2*continuous.T),
+          "Sine: the worst margin is at a maximum of the sine, found about T after it");
+        assert(noEvent(abs(continuous.episodeWorstMargin + 2) < 1e-4 and abs(continuous.tEpisodeWorst - 32.5) < 2*continuous.T),
+          "Sine: the last episode is as bad, at 32.5 s");
+        assert(noEvent(abs(continuous.currentDuration) < 1e-12), "Sine: not violated at the end");
+        assert(noEvent(ratchet.nViolations == 4 and abs(ratchet.totalDuration - continuous.totalDuration) < 1e-6),
+          "Sine: the method changes the worst margin only");
+        assert(noEvent(ratchet.worstMargin >= -2 - 1e-6 and ratchet.worstMargin <= -2 + 0.01),
+          "Sine: the ratchet is within its resolution of -2");
+        assert(noEvent(abs(ratchet.tWorst - P*floor(ratchet.tWorst/P) - P/4) < 0.12),
+          "Sine: the ratchet's instant is within a resolution of the maximum");
+      end when;
+      annotation (experiment(StopTime=35, Interval=1), Documentation(info="<html>
+<p>u = sin(2&pi; t / 10 s) against <em>u shall stay below 0.5</em> with a tolerance of 0.25:
+<code>During(check = u &lt; 0.5, rho = 0.5 &minus; u, scale = 0.25)</code>, into two
+<a href=\"modelica://Requirements.Verify.ViolationStatistics\">ViolationStatistics</a>, one per worst-margin method.
+The sine exceeds 0.5 from 10/12 s to 50/12 s in every period: four episodes of 10/3 s each in 35 s, 40/3 s in total;
+which of the four equally long ones is reported as the longest is decided by the last digits of the event times. The worst margin is (0.5 &minus; 1)/0.25 = &minus;2 at
+every maximum, t = 2.5 s + k&middot;10 s; the continuous method reports it T = 0.01 s late (2.51 s), off by
+8&middot;10<sup>&minus;5</sup>.</p>
+<p>The output interval is 1 s on purpose. The stored result has no point at a maximum of the sine, so the least margin
+over the stored points is (0.5 &minus; sin(0.4&pi;))/0.25 = &minus;1.80 (at 2 s and 3 s); the block finds &minus;2.
+The ratchet method is within its resolution of 0.01.</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+    end Sine;
+
+    model Episodes "Five violations against mergeGap and minDuration, and against a property that is applicable half of the time"
+      extends Modelica.Icons.Example;
+      import Requirements.Types.Property;
+      Modelica.Blocks.Sources.BooleanTable violatedTable(startValue=false, table={1,1.2,1.3,2,5,5.05,8,8.9,9.7})
+        "true on [1, 1.2), [1.3, 2), [5, 5.05), [8, 8.9) and from 9.7 s"
+        annotation (Placement(transformation(extent={{-80,40},{-60,60}})));
+      Property p = if violatedTable.y then Property.Violated else Property.Satisfied "Violated while the table is true";
+      Property q = if time < 5 then Property.Undefined elseif violatedTable.y then Property.Violated else Property.Satisfied
+        "The same, not applicable before 5 s";
+      Requirements.Verify.ViolationStatistics plain(useMargin=false, property=p) "Every violation an episode"
+        annotation (Placement(transformation(extent={{-20,60},{0,80}})));
+      Requirements.Verify.ViolationStatistics merged(useMargin=false, mergeGap=0.2, property=p)
+        "A violation within 0.2 s of the previous one continues its episode"
+        annotation (Placement(transformation(extent={{20,60},{40,80}})));
+      Requirements.Verify.ViolationStatistics mergedMin(useMargin=false, mergeGap=0.2, minDuration=0.1, property=p)
+        "Merged, and episodes under 0.1 s not counted"
+        annotation (Placement(transformation(extent={{-20,20},{0,40}})));
+      Requirements.Verify.ViolationStatistics minOnly(useMargin=false, minDuration=0.25, property=p)
+        "Episodes under 0.25 s not counted"
+        annotation (Placement(transformation(extent={{20,20},{40,40}})));
+      Requirements.Verify.ViolationStatistics partly(useMargin=false, property=q)
+        "Applicable from 5 s only"
+        annotation (Placement(transformation(extent={{-20,-20},{0,0}})));
+    equation
+      when time >= 9.9 then
+        assert(noEvent(minOnly.nViolations == 2), "Episodes: at 9.9 s the running violation (0.2 s) is still under 0.25 s");
+      end when;
+      when time >= 9.99 then
+        assert(noEvent(plain.nViolations == 5), "Episodes: five violations");
+        assert(noEvent(abs(plain.totalDuration - 2.14) < 1e-6), "Episodes: 0.2 + 0.7 + 0.05 + 0.9 + 0.29 s violated");
+        assert(noEvent(abs(plain.violatedFraction - 2.14/9.99) < 1e-6), "Episodes: always applicable");
+        assert(noEvent(abs(plain.longestDuration - 0.9) < 1e-6 and abs(plain.tLongestStart - 8) < 1e-6), "Episodes: the longest is [8, 8.9)");
+        assert(noEvent(abs(plain.currentDuration - 0.29) < 1e-6), "Episodes: violated for 0.29 s at 9.99 s");
+        assert(noEvent(merged.nViolations == 4), "Episodes: [1, 1.2) and [1.3, 2) merge, the gap at 8.9 s is too long");
+        assert(noEvent(abs(merged.longestDuration - 1) < 1e-6 and abs(merged.tLongestStart - 1) < 1e-6),
+          "Episodes: the merged [1, 2) is the longest, its gap included");
+        assert(noEvent(abs(merged.totalDuration - 2.14) < 1e-6), "Episodes: merging leaves the total unchanged");
+        assert(noEvent(mergedMin.nViolations == 3), "Episodes: merged, and [5, 5.05) too short");
+        assert(noEvent(abs(mergedMin.totalDuration - 2.14) < 1e-6), "Episodes: minDuration leaves the total unchanged");
+        assert(noEvent(minOnly.nViolations == 3 and abs(minOnly.longestDuration - 0.9) < 1e-6), "Episodes: 0.7, 0.9 and the running 0.29 s count");
+        assert(noEvent(partly.nViolations == 3), "Episodes: three violations after 5 s");
+        assert(noEvent(abs(partly.totalDuration - 1.24) < 1e-6), "Episodes: 0.05 + 0.9 + 0.29 s violated after 5 s");
+        assert(noEvent(abs(partly.violatedFraction - 1.24/4.99) < 1e-6), "Episodes: applicable for 4.99 s");
+        assert(noEvent(abs(plain.worstMargin) < 1e-12 and abs(plain.tWorst) < 1e-12), "Episodes: without margin the worst margin is 0");
+      end when;
+      annotation (experiment(StopTime=10, Interval=0.01), Documentation(info="<html>
+<p>A property that is <code>Violated</code> on [1, 1.2), [1.3, 2), [5, 5.05), [8, 8.9) and from 9.7 s, and
+<code>Satisfied</code> otherwise, into five <a href=\"modelica://Requirements.Verify.ViolationStatistics\">ViolationStatistics</a>
+without margin. At 9.99 s:</p>
+<table border=1 cellspacing=0 cellpadding=2>
+<tr><th>Instance</th><th>Settings</th><th>nViolations</th><th>longest</th><th>total</th></tr>
+<tr><td>plain</td><td>&mdash;</td><td>5</td><td>0.9 s from 8 s</td><td>2.14 s</td></tr>
+<tr><td>merged</td><td>mergeGap = 0.2 s</td><td>4: the first two merge across their 0.1 s gap</td><td>1 s from 1 s (gap included)</td><td>2.14 s</td></tr>
+<tr><td>mergedMin</td><td>mergeGap = 0.2 s, minDuration = 0.1 s</td><td>3: [5, 5.05) is too short</td><td>1 s from 1 s</td><td>2.14 s</td></tr>
+<tr><td>minOnly</td><td>minDuration = 0.25 s</td><td>3 (2 at 9.9 s: the running violation counts once it is 0.25 s long)</td><td>0.9 s from 8 s</td><td>2.14 s</td></tr>
+<tr><td>partly</td><td>property <code>Undefined</code> before 5 s</td><td>3</td><td>0.9 s from 8 s</td><td>1.24 s, 1.24/4.99 of the applicable time</td></tr>
+</table>
+<p>The filters change the count and the longest episode, never the total.</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+    end Episodes;
+
+    model Gating "A MinDuration check: its provisional margin while Undecided does not count, the worst decided margin is 0"
+      extends Modelica.Icons.Example;
+      import Requirements.Types.Property;
+      import Requirements.Types.WorstMarginMethod;
+      Modelica.Blocks.Sources.BooleanTable condition(startValue=false, table={1,4}) "true on [1, 4)"
+        annotation (Placement(transformation(extent={{-80,40},{-60,60}})));
+      Modelica.Blocks.Sources.BooleanTable check(startValue=false, table={1.5,3}) "true on [1.5, 3)"
+        annotation (Placement(transformation(extent={{-80,10},{-60,30}})));
+      Requirements.ChecksInFixedWindow.MinDuration minDuration(durationMin=1, check=check.y, scale=0.5)
+        annotation (Placement(transformation(extent={{-40,40},{0,60}})));
+      Requirements.Verify.ViolationStatistics continuous
+        annotation (Placement(transformation(extent={{30,40},{50,60}})));
+      Requirements.Verify.ViolationStatistics ratchet(method=WorstMarginMethod.Ratchet)
+        annotation (Placement(transformation(extent={{30,0},{50,20}})));
+    equation
+      connect(condition.y, minDuration.condition) annotation (Line(points={{-59,50},{-42,50}}, color={255,0,255}));
+      connect(minDuration.y, continuous.property) annotation (Line(points={{1,50},{16,50},{16,54},{28,54}}, color={0,0,255}));
+      connect(minDuration.margin, continuous.margin) annotation (Line(points={{1,42},{16,42},{16,46},{28,46}}, color={0,127,0}));
+      connect(minDuration.y, ratchet.property) annotation (Line(points={{1,50},{16,50},{16,14},{28,14}}, color={0,0,255}));
+      connect(minDuration.margin, ratchet.margin) annotation (Line(points={{1,42},{12,42},{12,6},{28,6}}, color={0,127,0}));
+      when time >= 2 then
+        assert(noEvent(minDuration.y == Property.Undecided and minDuration.margin < -0.9),
+          "Gating: at 2 s the check is still Undecided, its margin provisional and negative");
+        assert(noEvent(abs(continuous.worstMargin) < 1e-12 and abs(ratchet.worstMargin) < 1e-12),
+          "Gating: nothing is decided yet, the worst margin is 0");
+      end when;
+      when time >= 4.5 then
+        assert(noEvent(minDuration.y == Property.Satisfied), "Gating: satisfied once the duration reached 1 s");
+        assert(noEvent(abs(continuous.worstMargin) < 1e-6 and abs(continuous.tWorst - 2.5) < 1e-6),
+          "Gating: the worst decided margin is 0, at 2.5 s, not the provisional -2 before");
+        assert(noEvent(abs(ratchet.worstMargin) < 1e-6 and abs(ratchet.tWorst - 2.5) < 1e-6),
+          "Gating: the same with the ratchet");
+        assert(noEvent(continuous.nViolations == 0 and abs(continuous.totalDuration) < 1e-12), "Gating: never violated");
+      end when;
+      annotation (experiment(StopTime=5, Interval=0.01), Documentation(info="<html>
+<p>The condition phase [1, 4) s with the check true on [1.5, 3) s against <code>MinDuration(durationMin = 1, scale = 0.5)</code>.
+The check is <code>Undecided</code> until the accumulated duration reaches 1 s at 2.5 s; until then its margin
+(duration &minus; 1)/0.5 is provisional, &minus;2 at 1.5 s. A
+<a href=\"modelica://Requirements.Verify.ViolationStatistics\">ViolationStatistics</a> takes the worst margin over the
+decided phases only: 0 at 2.5 s, the instant the requirement became satisfied. The verdict of the requirement follows
+the same rule.</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+    end Gating;
+
+    model RequirementLog "Verify.Requirement with computeStatistics: the statistics are logged beside the verdict and printed in the summary"
+      extends Modelica.Icons.Example;
+      Modelica.Blocks.Sources.Sine u(amplitude=1, f=0.1) "u = sin(2 pi t / 10 s)"
+        annotation (Placement(transformation(extent={{-80,10},{-60,30}})));
+      Requirements.Sources.BooleanConstant always
+        annotation (Placement(transformation(extent={{-80,40},{-60,60}})));
+      Requirements.ChecksInFixedWindow.During during1(
+        check=u.y < 0.5,
+        rho=0.5 - u.y,
+        scale=0.25) "u shall stay below 0.5, tolerance 0.25"
+        annotation (Placement(transformation(extent={{-40,40},{0,60}})));
+      Requirements.ChecksInFixedWindow.During during2(check=u.y > -1.5) "u shall stay above -1.5"
+        annotation (Placement(transformation(extent={{-40,0},{0,20}})));
+      Requirements.Verify.Requirement below(
+        text="u shall stay below 0.5",
+        computeStatistics=true,
+        useMargin=true) "Violated four times; its statistics with the worst margin"
+        annotation (Placement(transformation(extent={{20,40},{80,60}})));
+      Requirements.Verify.Requirement above(text="u shall stay above -1.5", computeStatistics=true)
+        "Satisfied; its statistics without margin"
+        annotation (Placement(transformation(extent={{20,0},{80,20}})));
+      Requirements.Verify.Requirement plain(text="u shall stay above -1.5")
+        "Without statistics: logged as before"
+        annotation (Placement(transformation(extent={{20,-40},{80,-20}})));
+      inner Requirements.Verify.PrintViolations printViolations(evaluationTime=35)
+        annotation (Placement(transformation(extent={{-80,-60},{-20,-40}})));
+    equation
+      connect(always.y, during1.condition) annotation (Line(points={{-59,50},{-42,50}}, color={255,0,255}));
+      connect(always.y, during2.condition) annotation (Line(points={{-59,50},{-50,50},{-50,10},{-42,10}}, color={255,0,255}));
+      connect(during1.y, below.property) annotation (Line(points={{1,50},{16,50}}, color={0,0,255}));
+      connect(during1.margin, below.margin) annotation (Line(points={{1,42},{8,42},{8,43},{16,43}}, color={0,127,0}));
+      connect(during2.y, above.property) annotation (Line(points={{1,10},{16,10}}, color={0,0,255}));
+      connect(during2.y, plain.property) annotation (Line(points={{1,10},{10,10},{10,-30},{16,-30}}, color={0,0,255}));
+      annotation (experiment(StopTime=35, Interval=1), Documentation(info="<html>
+<p>The sine of <a href=\"modelica://Requirements.Examples.Elementary.ViolationStatistics.Sine\">Sine</a> against two
+requirements in <a href=\"modelica://Requirements.Verify.Requirement\">Verify.Requirement</a> blocks with
+<code>computeStatistics = true</code> (tab Statistics). <code>below</code> also has <code>useMargin = true</code> and its
+<code>margin</code> input connected to the check's margin; <code>above</code> has no margin; <code>plain</code> has no
+statistics. Each requirement with statistics writes a <code>Statistics</code> line to the log file beside its verdict line,
+and <a href=\"modelica://Requirements.Verify.PrintViolations\">PrintViolations</a> prints them in a section of its summary:</p>
+<pre>
+Violation statistics (2 of 3 requirements):
+   RequirementLog (below): 4 violations, 13.3333 s violated in total (38.1 % of the applicable time), longest 3.33333 s from 0.833333 s, worst margin -2 at 2.5 s
+   RequirementLog (above): 0 violations, 0 s violated in total (0.0 % of the applicable time), longest 0 s from 0 s
+</pre>
+<p>Set <code>useEvaluationTime = true</code> in <code>printViolations</code> to print in a tool without <code>terminal()</code>.</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+    end RequirementLog;
+
+    partial model PartialYear "A year of a room temperature against a comfort band, hourly output"
+      extends Modelica.Icons.Example;
+      parameter Real ripple(unit="K") = 0 "Amplitude of a 10-minute oscillation, as of a controller";
+      Modelica.Blocks.Sources.RealExpression load(y=22.5 + 3*sin(2*Modelica.Constants.pi*(time - 9*3600)/86400)
+          + 2.5*sin(2*Modelica.Constants.pi*(time - 105*86400)/(365*86400))
+          + ripple*sin(2*Modelica.Constants.pi*time/600))
+        "Temperature the room is driven to, in degC: daily swing of 3 K peaking at 15:00, seasonal swing of 2.5 K peaking in mid-July"
+        annotation (Placement(transformation(extent={{-100,10},{-80,30}})));
+      Modelica.Blocks.Continuous.FirstOrder T(T=60, initType=Modelica.Blocks.Types.Init.SteadyState)
+        "Room temperature in degC: the room air follows with a time constant of 60 s"
+        annotation (Placement(transformation(extent={{-70,10},{-50,30}})));
+      Requirements.Sources.BooleanConstant always
+        annotation (Placement(transformation(extent={{-80,40},{-60,60}})));
+      Requirements.ChecksInFixedWindow.During comfort(
+        check=T.y >= 20 and T.y <= 26,
+        rho=min(T.y - 20, 26 - T.y),
+        scale=1) "The room temperature shall stay within 20 degC and 26 degC, tolerance 1 K"
+        annotation (Placement(transformation(extent={{-40,40},{0,60}})));
+    equation
+      connect(always.y, comfort.condition) annotation (Line(points={{-59,50},{-42,50}}, color={255,0,255}));
+      connect(load.y, T.u) annotation (Line(points={{-79,20},{-72,20}}, color={0,0,127}));
+      annotation (experiment(StopTime=31536000, Interval=3600), Documentation(info="<html>
+<p>The plant of the year-long examples: a synthetic room temperature over a year (t = 0 is 1 January, 0:00),
+22.5 &deg;C + 3 K daily (peak at 15:00) + 2.5 K seasonal (peak in mid-July), optionally with a 10-minute <code>ripple</code>,
+through a first-order lag of 60 s for the room air, against <em>within 20 &deg;C and 26 &deg;C, tolerance 1 K</em>. It is
+too warm on summer afternoons and too cold on winter nights. The output interval is one hour, as is usual for an annual
+building simulation.</p>
+<p>The lag is what a real room has, and it matters here: it gives the solver a state to control its error on. Without it
+the temperature is a plain expression, the solver takes steps of up to an hour, and a 10-minute ripple's dip across a band
+edge, or below the least margin so far, falls between two steps and is missed &mdash; by every event-based check, the check
+block's own included. ViolationStatistics sees what the solver resolves, no more.</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+    end PartialYear;
+
+    model YearSmooth "A smooth year: 366 violations, 2937 h, the worst three tolerances below the band; both worst-margin methods agree"
+      extends PartialYear(ripple=0);
+      Requirements.Verify.ViolationStatistics continuous(T=60) "T: a thousandth of a day"
+        annotation (Placement(transformation(extent={{30,40},{50,60}})));
+      Requirements.Verify.ViolationStatistics ratchet(method=Requirements.Types.WorstMarginMethod.Ratchet)
+        annotation (Placement(transformation(extent={{30,0},{50,20}})));
+    equation
+      connect(comfort.y, continuous.property) annotation (Line(points={{1,50},{16,50},{16,54},{28,54}}, color={0,0,255}));
+      connect(comfort.margin, continuous.margin) annotation (Line(points={{1,42},{16,42},{16,46},{28,46}}, color={0,127,0}));
+      connect(comfort.y, ratchet.property) annotation (Line(points={{1,50},{16,50},{16,14},{28,14}}, color={0,0,255}));
+      connect(comfort.margin, ratchet.margin) annotation (Line(points={{1,42},{12,42},{12,6},{28,6}}, color={0,127,0}));
+      when time >= 31535000 then
+        assert(noEvent(abs(continuous.worstMargin + 2.99992) < 1e-4 and abs(continuous.tWorst - 1220460) < 2*continuous.T),
+          "YearSmooth: the coldest instant, 17.00008 degC on 15 January at 3:01, is three tolerances below 20 degC");
+        assert(noEvent(continuous.nViolations == 366 and abs(continuous.totalDuration - 10573667.39) < 1),
+          "YearSmooth: 366 episodes (one at the start of the run), 10573667.39 s violated by the instant of this check");
+        assert(noEvent(ratchet.worstMargin >= continuous.worstMargin - 1e-6 and ratchet.worstMargin <= continuous.worstMargin + 0.01),
+          "YearSmooth: the ratchet is within its resolution of the continuous method");
+        assert(noEvent(ratchet.nViolations == continuous.nViolations and abs(ratchet.totalDuration - continuous.totalDuration) < 1),
+          "YearSmooth: the method changes the worst margin only");
+      end when;
+      annotation (experiment(StopTime=31536000, Interval=3600), Documentation(info="<html>
+<p><a href=\"modelica://Requirements.Examples.Elementary.ViolationStatistics.PartialYear\">PartialYear</a> without ripple into
+both worst-margin methods. The band is left on both sides: on summer afternoons (up to 28 &deg;C, margin &minus;2) and on
+winter nights. The worst instant is the coldest, 17.00008 &deg;C at 3:01 on 15 January (t = 1,220,460 s): margin
+&minus;2.99992. The requirement is violated in 366 episodes (one at the start of the run, a winter night), 2937.1 h in all
+by the check at t = 31,535,000 s; the values are those of the closed-form response of the lag, evaluated on a 1 s grid
+with the crossings interpolated. The two methods agree to the ratchet's resolution, and in count and
+duration exactly.</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+    end YearSmooth;
+
+    model YearRippleNoStatistics "A year with a 10-minute ripple, no statistics: the reference for the cost of the statistics"
+      extends PartialYear(ripple=0.1);
+      annotation (experiment(StopTime=31536000, Interval=3600), Documentation(info="<html>
+<p><a href=\"modelica://Requirements.Examples.Elementary.ViolationStatistics.PartialYear\">PartialYear</a> with a 0.1 K ripple
+of 10-minute period and no statistics: the reference that the two models with statistics are timed against.</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+    end YearRippleNoStatistics;
+
+    model YearRippleContinuous "A year with a 10-minute ripple, continuous method: one event per local extremum of the margin"
+      extends PartialYear(ripple=0.1);
+      Requirements.Verify.ViolationStatistics statistics(mergeGap=1800, T=0.6)
+        "Violations within 30 min of each other are one episode; T a thousandth of the ripple's period"
+        annotation (Placement(transformation(extent={{30,40},{50,60}})));
+    equation
+      connect(comfort.y, statistics.property) annotation (Line(points={{1,50},{16,50},{16,54},{28,54}}, color={0,0,255}));
+      connect(comfort.margin, statistics.margin) annotation (Line(points={{1,42},{16,42},{16,46},{28,46}}, color={0,127,0}));
+      annotation (experiment(StopTime=31536000, Interval=3600), Documentation(info="<html>
+<p><a href=\"modelica://Requirements.Examples.Elementary.ViolationStatistics.PartialYear\">PartialYear</a> with a 0.1 K ripple
+of 10-minute period into a <a href=\"modelica://Requirements.Verify.ViolationStatistics\">ViolationStatistics</a> with the
+continuous method: the margin has two local extrema every 10 minutes, about 105,000 in the year, and the method fires an
+event at each. <code>mergeGap</code> = 30 min keeps the ripple's repeated crossings of the band edge from counting as
+separate violations.</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+    end YearRippleContinuous;
+
+    model YearRippleRatchet "A year with a 10-minute ripple, ratchet method: an event only at a new low"
+      extends PartialYear(ripple=0.1);
+      Requirements.Verify.ViolationStatistics statistics(mergeGap=1800, method=Requirements.Types.WorstMarginMethod.Ratchet)
+        "Violations within 30 min of each other are one episode"
+        annotation (Placement(transformation(extent={{30,40},{50,60}})));
+    equation
+      connect(comfort.y, statistics.property) annotation (Line(points={{1,50},{16,50},{16,54},{28,54}}, color={0,0,255}));
+      connect(comfort.margin, statistics.margin) annotation (Line(points={{1,42},{16,42},{16,46},{28,46}}, color={0,127,0}));
+      annotation (experiment(StopTime=31536000, Interval=3600), Documentation(info="<html>
+<p>The same as <a href=\"modelica://Requirements.Examples.Elementary.ViolationStatistics.YearRippleContinuous\">YearRippleContinuous</a>
+with the ratchet method: an event only when the margin falls 0.01 below its least value so far, however often it
+oscillates.</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+    end YearRippleRatchet;
+
+    annotation (Documentation(info="<html>
+<p>
+Examples of <a href=\"modelica://Requirements.Verify.ViolationStatistics\">Verify.ViolationStatistics</a> and of the
+statistics option of the requirement blocks. <code>Sine</code>, <code>Episodes</code> and <code>Gating</code> assert every
+output against closed-form values; <code>RequirementLog</code> shows the log and the summary; the <code>Year*</code> models
+run a year with hourly output, as an annual building simulation does, and measure what the two worst-margin methods cost.
+</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+  end ViolationStatistics;
+
   package StepResponse "Library of examples asserting the step-response blocks against the closed forms of a second-order system"
     extends Modelica.Icons.ExamplesPackage;
 

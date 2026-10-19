@@ -55,6 +55,16 @@ with the new `Examples.Elementary.LogicalBlocks.PropertyTable4` as a case in the
 (omc, Dymola and the composite carry its reference). The numbers below are the 0.7.1
 measurement and stand as history.
 
+**Version 0.12.0, 2026-10-19** (violation statistics): four new cases in the Impact list,
+`Examples.Elementary.ViolationStatistics.Sine`, `Episodes`, `Gating` and `RequirementLog`, with Impact's own
+references (`reference_from: impact`, 149 kB together): the statistics outputs are stored, so a count, a duration or a
+worst margin that moves is caught like a verdict. Two instants are not compared, `tLongestStart` and `tWorst` of the
+sine examples: their four episodes are equally long and their maxima equally deep, so which one is reported moves by
+a period at the 100x rtol re-simulation (the examples assert both modulo the period). `YearSmooth` is in the list
+but `enabled: false`: a stored result keeps every event row, and its reference would be 805 kB. The full Impact
+suite then passed **563/563** checks; no existing case changed. The OpenModelica and Dymola lists do not carry the
+new cases yet.
+
 **Version 0.11.1, 2026-10-16** (steady-state check example, printing fix): `Examples.SteadyState.CheckHeatExchanger`
 is a case in the three lists with its variables named one by one (the three requirement properties, the outlet and
 wall temperatures, the transferred heat, the two filtered rates that define "settled", `printViolations.satisfaction`):

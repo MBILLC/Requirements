@@ -1137,3 +1137,71 @@ cases:
     rtol: 1.0e-06
     modifiers: {}
     variables: [time, "R*_*.property", T_out1, T_out2, T_wall_max, Q_transferred, derT_out1.y, derT_out2.y, printViolations.satisfaction]
+
+  # --- Verify.ViolationStatistics (library 0.12.0, ModCheck plan §24), added 2026-10-19. Each example
+  # asserts its statistics against closed-form values; the stored statistics outputs are the
+  # reference, so a count, a duration or a worst margin that moves is caught like a verdict.
+  # References from Impact itself (reference_from: impact); no other tool has run the 0.12.0 blocks yet.
+  - name: MR_Examples_Elementary_ViolationStatistics_Sine
+    # Four episodes of 10/3 s; the worst margin -2 between two output points (1 s interval), found
+    # by the continuous method T = 0.01 s late and by the ratchet within 0.01.
+    # Not compared: tLongestStart and tWorst. The four episodes are equally long and the four maxima
+    # equally deep, so which one is reported moves by a period with the solver's last digits (it did,
+    # at the 100x rtol re-simulation); the example asserts both modulo the period itself.
+    enabled: true
+    model: Requirements.Examples.Elementary.ViolationStatistics.Sine
+    start_time: 0.0
+    final_time: 35.0
+    ncp: 35
+    rtol: 1.0e-06
+    modifiers: {}
+    variables: [time, during1.y, during1.margin, "*.nViolations", "*.totalDuration", "*.violatedFraction", "*.longestDuration", "*.worstMargin", "*.currentDuration", "*.episodeWorstMargin", "*.tEpisodeWorst"]
+
+  - name: MR_Examples_Elementary_ViolationStatistics_Episodes
+    # Five violations against mergeGap and minDuration, and a property applicable half of the time.
+    enabled: true
+    model: Requirements.Examples.Elementary.ViolationStatistics.Episodes
+    start_time: 0.0
+    final_time: 10.0
+    ncp: 1000
+    rtol: 1.0e-06
+    modifiers: {}
+    variables: [time, p, q, "*.nViolations", "*.totalDuration", "*.violatedFraction", "*.longestDuration", "*.tLongestStart", "*.currentDuration"]
+
+  - name: MR_Examples_Elementary_ViolationStatistics_Gating
+    # MinDuration's provisional margin while Undecided is not the worst; 0 at 2.5 s is.
+    enabled: true
+    model: Requirements.Examples.Elementary.ViolationStatistics.Gating
+    start_time: 0.0
+    final_time: 5.0
+    ncp: 500
+    rtol: 1.0e-06
+    modifiers: {}
+    variables: [time, minDuration.y, minDuration.margin, "*.nViolations", "*.totalDuration", "*.worstMargin", "*.tWorst"]
+
+  - name: MR_Examples_Elementary_ViolationStatistics_RequirementLog
+    # Verify.Requirement with computeStatistics: the embedded statistics are stored; the log's
+    # Statistics lines are compared with Python's by verdict_acceptance.py (ModCheck).
+    # Not compared: tWorst, for the reason given at the Sine case (the same sine).
+    enabled: true
+    model: Requirements.Examples.Elementary.ViolationStatistics.RequirementLog
+    start_time: 0.0
+    final_time: 35.0
+    ncp: 35
+    rtol: 1.0e-06
+    modifiers: {}
+    variables: [time, during1.y, during1.margin, during2.y, "*.statistics.nViolations", "*.statistics.totalDuration", "*.statistics.longestDuration", "*.statistics.worstMargin"]
+
+  - name: MR_Examples_Elementary_ViolationStatistics_YearSmooth
+    # A year with hourly output: 366 episodes, the worst margin -2.99992 on 15 January; both methods.
+    # DISABLED: a stored result keeps every event row (about 134,000 here, 62,700 events), so even
+    # four variables make an 805 kB reference -- as much as the rest of the list. The example asserts
+    # its closed-form values itself; run it by hand (22 s on Impact) after a change to the blocks.
+    enabled: false
+    model: Requirements.Examples.Elementary.ViolationStatistics.YearSmooth
+    start_time: 0.0
+    final_time: 31536000.0
+    ncp: 8760
+    rtol: 1.0e-06
+    modifiers: {}
+    variables: [time, continuous.nViolations, continuous.totalDuration, continuous.worstMargin, ratchet.worstMargin]
