@@ -22,8 +22,6 @@
 name: regression
 
 on:
-  push:   # TEMPORARY, for testing the PR branch
-    branches: [ci-regression-dispatch]
   workflow_dispatch:
     inputs:
       config:
@@ -101,7 +99,6 @@ jobs:
           # The inputs are empty when the run was not started from the form.
           CONFIG=${CONFIG:-regression_cases_requirements_impact.yaml}
           RTOL_FACTOR=${RTOL_FACTOR:-100}
-          CASES=${CASES:-"MR_Examples_AircraftRequirements_LimitedControlFrequency MR_Examples_AircraftRequirements_LimitedFreshECSFlow"}   # TEMPORARY
           src="$GITHUB_WORKSPACE/Requirements/Requirements/Resources/ModCheck/Impact/$CONFIG"
           # A copy beside the original, so --ref-dir still finds ReferenceResults/ there.
           ci="$(dirname "$src")/ci_$(basename "$src")"
@@ -133,4 +130,8 @@ jobs:
 
       - name: Delete the workspace and its projects
         if: always()
-        run: python ModCheck/ModCheck/Resources/CI/impact_ci_workspace.py delete "$WORKSPACE"
+        # Nothing to clean up when ModCheck was never checked out (the run failed before it).
+        run: |
+          h=ModCheck/ModCheck/Resources/CI/impact_ci_workspace.py
+          [ -f "$h" ] || { echo "no ModCheck checkout, no workspace was created"; exit 0; }
+          python "$h" delete "$WORKSPACE"
