@@ -86,8 +86,41 @@ check, the signed distance of the check to its limit divided by the check block'
 (the requirement's tolerance). The margin is &ge; 0 exactly when the check holds, 1 is one tolerance of
 headroom, &lt; 0 a violation by that many tolerances. Its own connector type keeps a margin from being
 connected to a physical-unit signal by mistake, and lets a report find every margin of a model by type.
-The extremum over a run is not the block's business: a block emits
-the instantaneous value, the worst value and its instant are taken from the stored trajectory.
+A check block emits the instantaneous value. The worst value over a run and its instant are taken from the
+stored trajectory, or computed during the run by
+<a href=\"modelica://Requirements.Verify.ViolationStatistics\">Verify.ViolationStatistics</a>
+(through its <a href=\"modelica://Requirements.Interfaces.MarginInput\">MarginInput</a>).
+</p>
+</html>"));
+
+  connector MarginInput = input Real(unit="1")
+    "'input Real' connector for a normalized margin: robustness/scale, >= 0 exactly when the check holds"
+    annotation (
+    defaultComponentName="margin",
+    Icon(coordinateSystem(
+        preserveAspectRatio=true,
+        extent={{-100,-100},{100,100}}), graphics={Polygon(
+          points={{-100,100},{100,0},{-100,-100},{-100,100}},
+          lineColor={0,127,0},
+          fillColor={0,127,0},
+          fillPattern=FillPattern.Solid)}),
+    Diagram(coordinateSystem(
+        preserveAspectRatio=true,
+        extent={{-100,-100},{100,100}}), graphics={Polygon(
+          points={{0,50},{100,0},{0,-50},{0,50}},
+          lineColor={0,127,0},
+          fillColor={0,127,0},
+          fillPattern=FillPattern.Solid), Text(
+          extent={{-10,85},{-10,60}},
+          lineColor={0,127,0},
+          textString="%name")}),
+    Documentation(info="<html>
+<p>
+Connector with one input signal of type Real and <code>unit=\"1\"</code>: the counterpart of
+<a href=\"modelica://Requirements.Interfaces.MarginOutput\">MarginOutput</a>. It takes the normalized margin of a check
+(&ge; 0 exactly when the check holds, in tolerances), for example in
+<a href=\"modelica://Requirements.Verify.ViolationStatistics\">Verify.ViolationStatistics</a> and in the requirement
+blocks of <a href=\"modelica://Requirements.Verify\">Verify</a> when their violation statistics are switched on.
 </p>
 </html>"));
 
@@ -773,6 +806,43 @@ into the top level of your model.");
     input Requirements.Types.Property localProperty
       "Property that is required to be satisfied";
 
+    parameter Boolean computeStatistics = false
+      "= true, if violation statistics are computed (Verify.ViolationStatistics) and logged beside the verdict"
+      annotation(Dialog(tab="Statistics"), Evaluate=true, choices(checkBox=true));
+    parameter Boolean useMargin = false
+      "= true, if the margin input is enabled: the worst margin is computed and logged as well"
+      annotation(Dialog(tab="Statistics", enable=computeStatistics), Evaluate=true, choices(checkBox=true));
+    parameter Modelica.Units.SI.Time minDuration(min=0) = 0
+      "Violation episodes shorter than this are not counted (0: every one is)"
+      annotation(Dialog(tab="Statistics", enable=computeStatistics));
+    parameter Modelica.Units.SI.Time mergeGap(min=0) = 0
+      "A violation that starts within this time after the previous one ended continues that episode"
+      annotation(Dialog(tab="Statistics", enable=computeStatistics));
+    parameter Requirements.Types.WorstMarginMethod method = Requirements.Types.WorstMarginMethod.Continuous
+      "How the worst margin is found"
+      annotation(Dialog(tab="Statistics", group="Worst margin", enable=computeStatistics and useMargin), Evaluate=true);
+    parameter Modelica.Units.SI.Time T(min=Modelica.Constants.small) = 0.01
+      "Continuous: time constant of the derivative filter, about a thousandth of the margin's time scale (60 s for a year)"
+      annotation(Dialog(tab="Statistics", group="Worst margin", enable=computeStatistics and useMargin));
+    parameter Real resolution(min=Modelica.Constants.small) = 0.01
+      "Ratchet: resolution of the worst margin, in margin units (tolerances)"
+      annotation(Dialog(tab="Statistics", group="Worst margin", enable=computeStatistics and useMargin));
+    Requirements.Interfaces.MarginInput margin if computeStatistics and useMargin
+      "Margin of the property (connect the check block's margin output)"
+      annotation (Placement(transformation(extent={{-340,-90},{-300,-50}})));
+    Requirements.Verify.ViolationStatistics statistics(
+      final useMargin=useMargin,
+      final minDuration=minDuration,
+      final mergeGap=mergeGap,
+      final method=method,
+      final T=T,
+      final resolution=resolution,
+      final logStatistics=true,
+      final requirementName=instanceName,
+      property=localProperty) if computeStatistics
+      "Violation statistics of the property (computeStatistics = true)"
+      annotation (Placement(transformation(extent={{-60,-60},{-20,-20}})));
+
   protected
     outer Requirements.Verify.PrintViolations printViolations;
     outer Requirements.Interfaces.ObservationID observationID;
@@ -870,6 +940,7 @@ into the top level of your model.");
 
   equation
     connect(dummy.sortingPort, printViolations.sortingPort);
+    connect(margin, statistics.margin);
 
     // attempts: the number of phases in which the property was applicable
     applicable = localProperty <> Property.Undefined;
@@ -948,6 +1019,11 @@ For an example to use the Requirement block in textual form, see
     <td valign=\"top\"> The instant the verdict is taken at comes from the inner <code>printViolations</code>: <code>terminal()</code>, or <code>evaluationTime</code> when its <code>useEvaluationTime</code> is set (H. Tummescheit, Model Based Innovation LLC)</td></tr>
 <tr><td valign=\"top\"> Sept. 15, 2026 </td>
     <td valign=\"top\"> Four-valued <code>Property</code>: <code>Undefined</code> (not applicable) counts as untested like <code>Undecided</code>; <code>attempts</code>, the number of phases in which the property was applicable, is logged beside the verdict (H. Tummescheit, Model Based Innovation LLC)</td></tr>
+<tr><td valign=\"top\"> Oct. 19, 2026 </td>
+    <td valign=\"top\"> Optional violation statistics (<code>computeStatistics</code>, tab Statistics): a
+    <a href=\"modelica://Requirements.Verify.ViolationStatistics\">ViolationStatistics</a> on the property, with the
+    conditional <code>margin</code> input when <code>useMargin</code> is set, logged as a <code>Statistics</code> line beside the
+    verdict and printed in the summary (H. Tummescheit, Model Based Innovation LLC)</td></tr>
 </table>
 </html>"));
   end PartialRequirement;

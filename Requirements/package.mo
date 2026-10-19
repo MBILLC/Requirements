@@ -1,5 +1,5 @@
 within ;
-package Requirements "Requirements (Version 0.11.1) - Defining requirements formally and checking them when simulating"
+package Requirements "Requirements (Version 0.12.0) - Defining requirements formally and checking them when simulating"
   extends Modelica.Icons.Package;
 
 
@@ -14,7 +14,7 @@ package ReleaseNotes "Release notes"
 
     annotation (Documentation(info="<html>
 <p>
-In 2026 the library went from version 0.7.0 (Feb. 2025) to <b>0.11.1</b> (2026-10-16) in seven
+In 2026 the library went from version 0.7.0 (Feb. 2025) to <b>0.12.0</b> (2026-10-19) in eight
 releases. This page summarizes them; the release note of each version has the details.
 The same summary is kept as Markdown in
 <a href=\"https://github.com/MBILLC/Requirements/blob/HEAD/CHANGES_2026.md\">CHANGES_2026.md</a>
@@ -39,6 +39,8 @@ The regression baselines and the tool-by-tool measurements are kept beside the l
     <td>Eigenvalue checks over a linearization (<code>LinearAnalysis</code>)</td></tr>
 <tr><td><a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Version_0_11_1\">0.11.1</a></td><td>2026-10-16</td>
     <td>Steady-state check example; the verdict printed once in every tool; self-contained documentation</td></tr>
+<tr><td><a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Version_0_12_0\">0.12.0</a></td><td>2026-10-19</td>
+    <td>Violation statistics: how often, how long and how badly a requirement was violated</td></tr>
 </table>
 
 <p>
@@ -187,7 +189,9 @@ This release changes requirement semantics.
 <li> <a href=\"modelica://Requirements.LogicalFunctions.marginAnd\">LogicalFunctions.marginAnd</a> and
      <a href=\"modelica://Requirements.LogicalFunctions.marginOr\">marginOr</a> give the minimum and maximum
      margin over the elements that are not <code>Undefined</code>.</li>
-<li> The blocks have no accumulators. The worst margin over a run is taken from the stored trajectory.</li>
+<li> The blocks have no accumulators. The worst margin over a run is taken from the stored trajectory
+     (or, since 0.12.0, computed during the run by the separate, opt-in
+     <a href=\"modelica://Requirements.Verify.ViolationStatistics\">Verify.ViolationStatistics</a>).</li>
 <li> New examples <a href=\"modelica://Requirements.Examples.Elementary.Margin\">Examples.Elementary.Margin</a>:
      eight of them, one per block family. Each checks the margins against closed-form values and checks
      the sign invariant.</li>
@@ -268,6 +272,20 @@ This release changes requirement semantics.
      </ul></li>
 </ul>
 
+<h4>0.12.0 &mdash; Violation statistics</h4>
+<ul>
+<li> New block <a href=\"modelica://Requirements.Verify.ViolationStatistics\">Verify.ViolationStatistics</a>. From a
+     check's <code>property</code> and <code>margin</code> it gives how often the requirement was violated, for how long
+     in total, the longest violation, and the worst violation and when. Meant for long runs such as annual building
+     simulations, where a verdict alone does not say enough.</li>
+<li> The worst margin is found with
+     <a href=\"modelica://Modelica.Blocks.Math.ContinuousSignalExtrema\">Modelica.Blocks.Math.ContinuousSignalExtrema</a>,
+     which the block extends, or with a cheaper ratchet for a margin that oscillates.</li>
+<li> <code>Verify.Requirement</code> and <code>BooleanRequirement</code> compute the same statistics when
+     <code>computeStatistics</code> is set. They are written to the log file and printed in the summary.</li>
+<li> The check blocks still have no accumulators, and every existing output and log line is unchanged.</li>
+</ul>
+
 <h4>Regression baselines</h4>
 <ul>
 <li> Case lists generated from the examples' <code>experiment()</code> annotations:
@@ -284,6 +302,103 @@ This release changes requirement semantics.
 </ul>
 </html>"));
   end Summary2026;
+
+  class Version_0_12_0 "Version 0.12.0 (Oct. 19, 2026)"
+  extends Modelica.Icons.ReleaseNotes;
+
+    annotation (Documentation(info="<html>
+<p>
+<b>Violation statistics.</b> For a long run a verdict is not enough: a requirement violated once for a second and one
+violated every summer afternoon are both <em>violated</em>. The new block
+<a href=\"modelica://Requirements.Verify.ViolationStatistics\">Verify.ViolationStatistics</a> answers three questions per
+requirement: how often was it violated, what was the worst violation and when, and what was the longest violation.
+No existing output, log line or regression reference changed.
+</p>
+<h4>The block</h4>
+<ul>
+<li> Inputs: the check's <code>property</code>, and optionally its <code>margin</code> (new connector
+     <a href=\"modelica://Requirements.Interfaces.MarginInput\">Interfaces.MarginInput</a>).</li>
+<li> Outputs: <code>nViolations</code>, <code>totalDuration</code>, <code>violatedFraction</code>,
+     <code>longestDuration</code> and <code>tLongestStart</code>, <code>worstMargin</code> and <code>tWorst</code>, the same
+     for the current episode, and <code>currentDuration</code>. Every output holds its final value without
+     <code>terminal()</code>.</li>
+<li> A violation is a phase with <code>property = Violated</code>, not one with a negative margin. A margin is
+     provisional while the check is <code>Undecided</code>, so the worst margin is taken over the decided phases only.
+     This is the rule the verdict follows.</li>
+<li> <code>mergeGap</code> and <code>minDuration</code> stop a signal that hovers at its limit from counting as hundreds
+     of violations. They change the count and the longest episode, never the total.</li>
+<li> Counting and timing cost no extra events: the property only changes at events the check produces anyway.</li>
+</ul>
+<h4>The worst margin</h4>
+<ul>
+<li> <b>Continuous</b> (default): <a href=\"modelica://Requirements.Internal.ContinuousWorst\">Internal.ContinuousWorst</a>
+     extends <a href=\"modelica://Modelica.Blocks.Math.ContinuousSignalExtrema\">Modelica.Blocks.Math.ContinuousSignalExtrema</a>.
+     A state event fires at every local extremum of the margin, without sampling. Three changes from the MSL block:
+     <ul>
+     <li>only the decided phases count;</li>
+     <li>the worst value is also tracked per episode;</li>
+     <li>the final value does not depend on <code>terminal()</code>, which Modelon Impact evaluates to false.</li>
+     </ul>
+     The filter time constant <code>T</code> defaults to 0.01 s, not the MSL block's 1 &micro;s. At 1 &micro;s the
+     event indicator near an extremum is below the solver tolerance, and the solver reports chattering. Choose
+     <code>T</code> as about a thousandth of the margin's time scale (60 s for a year).</li>
+<li> <b>Ratchet</b>: an event only when the margin falls a <code>resolution</code> (default 0.01) below the least value
+     so far. The result is within <code>resolution</code> of the exact value.
+     <a href=\"modelica://Modelica.Blocks.Math.SignalExtrema\">Modelica.Blocks.Math.SignalExtrema</a> was considered and
+     not used: it samples, and is no more accurate than the stored result.</li>
+<li> Measured on Impact, a year with hourly output and a 0.1 K, 10-minute ripple on a room temperature
+     (<code>Examples.Elementary.ViolationStatistics.YearRipple*</code>):
+     <table border=1 cellspacing=0 cellpadding=2>
+     <tr><th>Model</th><th>Run time</th><th>State events</th><th>Episodes</th><th>Worst margin</th></tr>
+     <tr><td>no statistics</td><td>9.0 s</td><td>2,804</td><td>&mdash;</td><td>&mdash;</td></tr>
+     <tr><td>continuous</td><td>96.7 s</td><td>219,103</td><td>374</td><td>&minus;3.0844</td></tr>
+     <tr><td>ratchet</td><td>31.1 s</td><td>64,991</td><td>374</td><td>&minus;3.0800</td></tr>
+     </table>
+     On a smooth margin the continuous method is cheap: two events a day. On an oscillating one the ratchet is three
+     times cheaper.</li>
+</ul>
+<h4>Statistics in the log</h4>
+<ul>
+<li> <a href=\"modelica://Requirements.Verify.Requirement\">Verify.Requirement</a> and
+     <a href=\"modelica://Requirements.Verify.BooleanRequirement\">BooleanRequirement</a> have a new tab Statistics:
+     <code>computeStatistics</code> (default false), <code>useMargin</code> with a conditional <code>margin</code>
+     input, and the block's parameters.</li>
+<li> A requirement with statistics writes a second line to the log file beside its verdict:
+     <code>Statistics,&lt;observation&gt;,&lt;requirement&gt;,&lt;n&gt;,&lt;total&gt;,&lt;fraction&gt;,&lt;longest&gt;,&lt;longest
+     from&gt;,&lt;worst&gt;,&lt;worst at&gt;,&lt;minDuration&gt;,&lt;mergeGap&gt;</code>. The worst-margin fields are empty without
+     margin. The two filters are included so that a reader can recompute the statistics from the stored result. It is a separate line, not columns added to the verdict line,
+     because the verdict line ends with free text, and a reader would take any added columns for part of the text.</li>
+<li> <a href=\"modelica://Requirements.Verify.PrintViolations\">PrintViolations</a> prints a <em>Violation
+     statistics</em> section in its summary, on the console and in the HTML report.</li>
+<li> <code>Internal.printViolationsToLogFile</code> no longer takes a <code>Statistics</code> line of the same
+     requirement for its own verdict line when it checks whether that line is already written.</li>
+</ul>
+<h4>Examples</h4>
+<p>
+<a href=\"modelica://Requirements.Examples.Elementary.ViolationStatistics\">Examples.Elementary.ViolationStatistics</a>:
+</p>
+<ul>
+<li> <code>Sine</code>, <code>Episodes</code> and <code>Gating</code> assert every output against closed-form values.</li>
+<li> <code>RequirementLog</code> shows the log and the summary.</li>
+<li> The <code>Year*</code> models run a year and measure the cost of the two methods.</li>
+</ul>
+<p>
+The first four are cases in the Impact regression list, with Impact's own references. <code>YearSmooth</code> is in
+the list but disabled: its stored result has every event row and would be as large as the rest of the list. Full
+Impact suite afterwards: 563/563 checks, every existing case unchanged.
+</p>
+<h4>Changes</h4>
+<ul>
+<li> New: <code>Verify.ViolationStatistics</code>, <code>Interfaces.MarginInput</code>,
+     <code>Types.WorstMarginMethod</code>, <code>Internal.ContinuousWorst</code>, <code>Internal.RatchetWorst</code>,
+     <code>Internal.StatisticsLogger</code>, <code>Internal.printStatisticsToLogFile</code>,
+     <code>Examples.Elementary.ViolationStatistics</code>.</li>
+<li> <code>Interfaces.PartialRequirement</code>: the Statistics tab (no change while <code>computeStatistics = false</code>).</li>
+<li> <code>Internal.printViolationsToLogFile</code>, <code>Internal.printViolationsToOutput</code>: as above.</li>
+<li> <code>conversion(noneFromVersion=\"0.11.1\")</code>: no model needs conversion.</li>
+</ul>
+</html>"));
+  end Version_0_12_0;
 
   class Version_0_11_1 "Version 0.11.1 (Oct. 16, 2026)"
   extends Modelica.Icons.ReleaseNotes;
@@ -797,7 +912,7 @@ First version of the library provided to the public.
 <p>
 This section summarizes the changes that have been performed
 on package Requirements. An overview of all changes and additions made in 2026
-(versions 0.7.1 to 0.11.1) is given in
+(versions 0.7.1 to 0.12.0) is given in
 <a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Summary2026\">Summary of 2026</a>.
 </p>
 </html>"));
@@ -914,10 +1029,10 @@ end UsersGuide;
 
   annotation (preferredView="info",
   uses(Modelica(version="4.1.0")),
-version="0.11.1",
-versionDate="2026-10-16",
+version="0.12.0",
+versionDate="2026-10-19",
 dateModified = "2026-10-16",
-conversion(noneFromVersion="0.7.1", noneFromVersion="0.8.0", noneFromVersion="0.9.0", noneFromVersion="0.9.1", noneFromVersion="0.10.0", noneFromVersion="0.11.0"),
+conversion(noneFromVersion="0.7.1", noneFromVersion="0.8.0", noneFromVersion="0.9.0", noneFromVersion="0.9.1", noneFromVersion="0.10.0", noneFromVersion="0.11.0", noneFromVersion="0.11.1"),
 revisionId="$Id:: package.mo 9390 2016-06-21 06:35:11Z #$",
 Documentation(info="<html>
 <p>

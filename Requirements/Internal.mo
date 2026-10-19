@@ -50,12 +50,15 @@ package Internal "Library of internal components (should not be directly used)"
      String key = "," + checkedComponentName + "," + requirementName + ",";
      Integer nLines = Modelica.Utilities.Streams.countLines(logFile);
      Boolean logged = false;
+     String line;
   algorithm
      // A tool may evaluate the when-equation that calls this function more than once at the
      // same event instant (Modelon Impact does): write the requirement's line only once.
      for i in 2:nLines loop
         if not logged then
-           logged := Modelica.Utilities.Strings.find(Modelica.Utilities.Streams.readLine(logFile, i), key) > 0;
+           line := Modelica.Utilities.Streams.readLine(logFile, i);
+           // A Statistics line of the same requirement carries the same key; it is not the verdict line.
+           logged := Modelica.Utilities.Strings.find(line, key) > 0 and Modelica.Utilities.Strings.find(line, "Statistics,") <> 1;
         end if;
      end for;
      if nLines > 0 then
@@ -119,6 +122,16 @@ package Internal "Library of internal components (should not be directly used)"
      String violated[ nLines-1]=fill("", nLines-1);
      String untested[ nLines-1]=fill("", nLines-1);
      String satisfied[nLines-1]=fill("", nLines-1);
+     String statistics[nLines-1]=fill("", nLines-1);
+     String sN;
+     String sTotal;
+     String sFraction;
+     String sLongest;
+     String sLongestFrom;
+     String sWorst;
+     String sWorstAt;
+     String sPercent;
+     Integer nStatistics=0;
      String line;
      String element;
      String instance;
@@ -156,6 +169,9 @@ package Internal "Library of internal components (should not be directly used)"
         elseif element=="Satisfied" then
            nSatisfied := nSatisfied + 1;
            satisfied[nSatisfied] :=line;
+        elseif element=="Statistics" then
+           nStatistics := nStatistics + 1;
+           statistics[nStatistics] :=line;
         end if;
      end for;
      close(logFile);
@@ -296,6 +312,61 @@ package Internal "Library of internal components (should not be directly used)"
         end if;
      end if;
 
+     // Violation statistics of the requirements that compute them (Verify.ViolationStatistics)
+     if nStatistics > 0 then
+        print("");
+        print("Violation statistics (" + String(nStatistics) + " of " + String(nRequirements) + " requirements):");
+        print("\n<h2>Violation statistics (" + String(nStatistics) + " of " + String(nRequirements) + " requirements)</h2>", htmlFile);
+        print("\n<table>\n" +
+              "<tr style=\"background-color:rgb(230, 230, 230);\">\n" +
+              "    <td>Observation</td>\n" +
+              "    <td>Requirement</td>\n" +
+              "    <td align=\"right\">Violations</td>\n" +
+              "    <td align=\"right\">Violated in total</td>\n" +
+              "    <td align=\"right\">Of the applicable time</td>\n" +
+              "    <td align=\"right\">Longest violation</td>\n" +
+              "    <td align=\"right\">Longest from</td>\n" +
+              "    <td align=\"right\">Worst margin</td>\n" +
+              "    <td align=\"right\">Worst at</td>\n" +
+              "    </tr>", htmlFile);
+        for i in 1:nStatistics loop
+           (instance, line) := removeFirstElement(statistics[i]);
+           (reqName, line) := removeFirstElement(line);
+           reqName := removeFirstName(reqName);
+           (sN, line) := removeFirstElement(line);
+           (sTotal, line) := removeFirstElement(line);
+           (sFraction, line) := removeFirstElement(line);
+           (sLongest, line) := removeFirstElement(line);
+           (sLongestFrom, line) := removeFirstElement(line);
+           (sWorst, line) := removeFirstElement(line);
+           (sWorstAt, line) := removeFirstElement(line);
+           sPercent := String(100*scanReal(sFraction), format="3.1f");
+           // The log keeps 10 significant digits for a reader that compares; the summary prints 6.
+           sTotal := String(scanReal(sTotal), significantDigits=6);
+           sLongest := String(scanReal(sLongest), significantDigits=6);
+           sLongestFrom := String(scanReal(sLongestFrom), significantDigits=6);
+           if sWorst <> "" then
+              sWorst := String(scanReal(sWorst), significantDigits=6);
+              sWorstAt := String(scanReal(sWorstAt), significantDigits=6);
+           end if;
+           print("<tr><td>" + instance + "</td>\n" +
+                 "    <td>" + reqName + "</td>\n" +
+                 "    <td align=\"right\">" + sN + "</td>\n" +
+                 "    <td align=\"right\">" + sTotal + " s</td>\n" +
+                 "    <td align=\"right\">" + sPercent + " %</td>\n" +
+                 "    <td align=\"right\">" + sLongest + " s</td>\n" +
+                 "    <td align=\"right\">" + sLongestFrom + " s</td>\n" +
+                 "    <td align=\"right\">" + sWorst + "</td>\n" +
+                 "    <td align=\"right\">" + (if sWorstAt == "" then "" else sWorstAt + " s") + "</td>\n" +
+                 "    </tr>", htmlFile);
+           print("   " + instance + " (" + reqName + "): " + sN + " violations, " + sTotal +
+                 " s violated in total (" + sPercent + " % of the applicable time), longest " + sLongest +
+                 " s from " + sLongestFrom + " s" +
+                 (if sWorst == "" then "" else ", worst margin " + sWorst + " at " + sWorstAt + " s"));
+        end for;
+        print("</table>", htmlFile);
+     end if;
+
      print("");
 
      // Close html file
@@ -424,6 +495,285 @@ package Internal "Library of internal components (should not be directly used)"
         end if;
       end if;
   end getElements;
+
+  block ContinuousWorst
+    "Worst margin over the decided phases and over the current violation episode, at the local extrema of the margin (used by Verify.ViolationStatistics)"
+    extends Modelica.Blocks.Math.ContinuousSignalExtrema;
+    input Boolean decided "= true while the property is Satisfied or Violated"
+      annotation(Dialog);
+    input Boolean violated "= true while the property is Violated"
+      annotation(Dialog);
+    input Integer episode "Number of violation episodes started; a change starts a new episode"
+      annotation(Dialog);
+    Modelica.Blocks.Interfaces.RealOutput worst(unit="1")
+      "Least margin over the decided phases (0 before the property is first decided)"
+      annotation (Placement(transformation(extent={{100,10},{120,30}})));
+    Modelica.Blocks.Interfaces.RealOutput tWorst(unit="s")
+      "Instant of worst"
+      annotation (Placement(transformation(extent={{100,-30},{120,-10}})));
+    Modelica.Blocks.Interfaces.RealOutput episodeWorst(unit="1")
+      "Least margin of the current (or last) violation episode (0 before the first episode)"
+      annotation (Placement(transformation(extent={{100,-90},{120,-70}})));
+    Modelica.Blocks.Interfaces.RealOutput tEpisodeWorst(unit="s")
+      "Instant of episodeWorst"
+      annotation (Placement(transformation(extent={{100,-110},{120,-90}})));
+  protected
+    discrete Real held "Least decided margin at the events so far";
+    discrete Real tHeld "Instant of held";
+    discrete Boolean found "= true once the property has been decided";
+    discrete Real epHeld "Least margin of the current episode at the events so far";
+    discrete Real tEpHeld "Instant of epHeld";
+    discrete Boolean epFound "= true once the current episode has a value";
+  initial equation
+    found = decided;
+    held = u;
+    tHeld = time;
+    epFound = violated;
+    epHeld = u;
+    tEpHeld = time;
+  algorithm
+    // The extrema of the margin come from the inherited derivative filter: u <= x after a maximum,
+    // u >= x after a minimum. The property's own edges are events already; pre(u) there is the
+    // value just before the event, which belongs to the phase that ends.
+    when {u <= x, u >= x, decided, not decided, violated, not violated, change(episode)} then
+      if pre(decided) and (not found or pre(u) < held) then
+        held := pre(u);
+        tHeld := time;
+        found := true;
+      end if;
+      if decided and (not found or u < held) then
+        held := u;
+        tHeld := time;
+        found := true;
+      end if;
+      if change(episode) then
+        epFound := false;
+      elseif pre(violated) and (not epFound or pre(u) < epHeld) then
+        epHeld := pre(u);
+        tEpHeld := time;
+        epFound := true;
+      end if;
+      if violated and (not epFound or u < epHeld) then
+        epHeld := u;
+        tEpHeld := time;
+        epFound := true;
+      end if;
+    end when;
+  equation
+    // Between events the running value takes part as well, so that a run ending on a descent
+    // reports its last value without terminal() (which Modelon Impact evaluates to false).
+    worst = if found then (if decided then noEvent(min(held, u)) else held) else (if decided then u else 0);
+    tWorst = if found then (if decided and noEvent(u < held) then time else tHeld) else (if decided then time else 0);
+    episodeWorst = if epFound then (if violated then noEvent(min(epHeld, u)) else epHeld) else (if violated then u else 0);
+    tEpisodeWorst = if epFound then (if violated and noEvent(u < epHeld) then time else tEpHeld) else (if violated then time else 0);
+    annotation (Documentation(info="<html>
+<p>
+The worst margin for <a href=\"modelica://Requirements.Verify.ViolationStatistics\">Verify.ViolationStatistics</a> with
+<code>method = Continuous</code>. It extends
+<a href=\"modelica://Modelica.Blocks.Math.ContinuousSignalExtrema\">Modelica.Blocks.Math.ContinuousSignalExtrema</a> and
+reuses its derivative filter (time constant <code>T</code>, set by ViolationStatistics, default 0.01 s instead of
+the base block's 1 &micro;s, see there): a state event at every local extremum of the margin <code>u</code>, without sampling. At
+these events, and at every change of the property, it keeps the least margin over the phases in which the property is
+decided (<code>worst</code>, <code>tWorst</code>) and over the current violation episode (<code>episodeWorst</code>,
+<code>tEpisodeWorst</code>, reset when <code>episode</code> changes). The inherited <code>y_min</code> / <code>y_max</code>
+are those of the raw margin, provisional values included.
+</p>
+<p>
+Unlike the base block, the outputs include the running value between events, so the last value of a run that ends on a
+descent counts without <code>terminal()</code>.
+</p>
+</html>"));
+  end ContinuousWorst;
+
+  block RatchetWorst
+    "Worst margin over the decided phases and over the current violation episode, at every new low by more than resolution (used by Verify.ViolationStatistics)"
+    extends Modelica.Blocks.Icons.Block;
+    parameter Real resolution(min=Modelica.Constants.small) = 0.01
+      "Resolution of the worst margin, in margin units (tolerances)";
+    Modelica.Blocks.Interfaces.RealInput u "Margin"
+      annotation (Placement(transformation(extent={{-140,-20},{-100,20}})));
+    input Boolean decided "= true while the property is Satisfied or Violated"
+      annotation(Dialog);
+    input Boolean violated "= true while the property is Violated"
+      annotation(Dialog);
+    input Integer episode "Number of violation episodes started; a change starts a new episode"
+      annotation(Dialog);
+    Modelica.Blocks.Interfaces.RealOutput worst(unit="1")
+      "Least margin over the decided phases (0 before the property is first decided)"
+      annotation (Placement(transformation(extent={{100,50},{120,70}})));
+    Modelica.Blocks.Interfaces.RealOutput tWorst(unit="s")
+      "Instant of worst"
+      annotation (Placement(transformation(extent={{100,10},{120,30}})));
+    Modelica.Blocks.Interfaces.RealOutput episodeWorst(unit="1")
+      "Least margin of the current (or last) violation episode (0 before the first episode)"
+      annotation (Placement(transformation(extent={{100,-30},{120,-10}})));
+    Modelica.Blocks.Interfaces.RealOutput tEpisodeWorst(unit="s")
+      "Instant of episodeWorst"
+      annotation (Placement(transformation(extent={{100,-70},{120,-50}})));
+  protected
+    discrete Real held "Least decided margin at the events so far";
+    discrete Real tHeld "Instant of held";
+    discrete Boolean found "= true once the property has been decided";
+    discrete Real epHeld "Least margin of the current episode at the events so far";
+    discrete Real tEpHeld "Instant of epHeld";
+    discrete Boolean epFound "= true once the current episode has a value";
+  initial equation
+    found = decided;
+    held = u;
+    tHeld = time;
+    epFound = violated;
+    epHeld = u;
+    tEpHeld = time;
+  algorithm
+    // A new low: the margin fell a resolution below the least value (over the run, and in the episode). The
+    // relations are in the when-condition of this algorithm, which reads held and epHeld as kept before the event.
+    when {decided and found and u < held - resolution, violated and epFound and u < epHeld - resolution,
+          decided, not decided, violated, not violated, change(episode)} then
+      if pre(decided) and (not found or pre(u) < held) then
+        held := pre(u);
+        tHeld := time;
+        found := true;
+      end if;
+      if decided and (not found or u < held) then
+        held := u;
+        tHeld := time;
+        found := true;
+      end if;
+      if change(episode) then
+        epFound := false;
+      elseif pre(violated) and (not epFound or pre(u) < epHeld) then
+        epHeld := pre(u);
+        tEpHeld := time;
+        epFound := true;
+      end if;
+      if violated and (not epFound or u < epHeld) then
+        epHeld := u;
+        tEpHeld := time;
+        epFound := true;
+      end if;
+    end when;
+  equation
+    worst = if found then (if decided then noEvent(min(held, u)) else held) else (if decided then u else 0);
+    tWorst = if found then (if decided and noEvent(u < held) then time else tHeld) else (if decided then time else 0);
+    episodeWorst = if epFound then (if violated then noEvent(min(epHeld, u)) else epHeld) else (if violated then u else 0);
+    tEpisodeWorst = if epFound then (if violated and noEvent(u < epHeld) then time else tEpHeld) else (if violated then time else 0);
+    annotation (Documentation(info="<html>
+<p>
+The worst margin for <a href=\"modelica://Requirements.Verify.ViolationStatistics\">Verify.ViolationStatistics</a> with
+<code>method = Ratchet</code>: a state event only when the margin falls more than <code>resolution</code> below the least
+value found so far (over the decided phases, and over the current violation episode). The value kept is within
+<code>resolution</code> of the true minimum; the number of events is bounded by the depth of the descent divided by
+<code>resolution</code>, however often the margin oscillates. The outputs include the running value between events,
+as in <a href=\"modelica://Requirements.Internal.ContinuousWorst\">ContinuousWorst</a>.
+</p>
+</html>"));
+  end RatchetWorst;
+
+  block StatisticsLogger
+    "Writes the violation statistics of one requirement to the log file of the inner printViolations (used by Verify.ViolationStatistics)"
+    parameter String requirementName "Full path name of the requirement the statistics belong to";
+    parameter Boolean hasMargin "= true, if worst and tWorst are logged";
+    parameter Modelica.Units.SI.Time minDuration "The statistics' minDuration, logged with them";
+    parameter Modelica.Units.SI.Time mergeGap "The statistics' mergeGap, logged with them";
+    input Integer nViolations annotation(Dialog);
+    input Modelica.Units.SI.Time totalDuration annotation(Dialog);
+    input Real violatedFraction annotation(Dialog);
+    input Modelica.Units.SI.Time longestDuration annotation(Dialog);
+    input Modelica.Units.SI.Time tLongestStart annotation(Dialog);
+    input Real worst annotation(Dialog);
+    input Modelica.Units.SI.Time tWorst annotation(Dialog);
+  protected
+    outer Requirements.Verify.PrintViolations printViolations;
+    outer Requirements.Interfaces.ObservationID observationID;
+    model Dummy
+      input Real one=0.0;
+      input Real status=0.0;
+      Requirements.Internal.SortingPort sortingPort;
+    equation
+      sortingPort.one = one;
+      sortingPort.status = status;
+    end Dummy;
+    Real ok "= 1 once the line is written; orders the write before the summary";
+    // Contributes 0 to the requirement count and to the status sum, but makes the summary depend on ok.
+    Dummy dummy(one=ok - 1, status=0);
+  initial equation
+    pre(ok) = 1.0;
+  equation
+    connect(dummy.sortingPort, printViolations.sortingPort);
+    when (if printViolations.useEvaluationTime then time >= printViolations.evaluationTime
+          else terminal()) then
+      ok = Requirements.Internal.printStatisticsToLogFile(
+          printViolations.logFile,
+          observationID.name,
+          requirementName,
+          nViolations,
+          totalDuration,
+          violatedFraction,
+          longestDuration,
+          tLongestStart,
+          hasMargin,
+          worst,
+          tWorst,
+          minDuration,
+          mergeGap);
+    end when;
+    annotation (Documentation(info="<html>
+<p>
+Writes one <code>Statistics</code> line per requirement to the log file of the inner
+<a href=\"modelica://Requirements.Verify.PrintViolations\">PrintViolations</a>, at the same instant the verdicts are
+written, and orders the write before the summary through the sorting port (it adds 0 to the requirement count).
+</p>
+</html>"));
+  end StatisticsLogger;
+
+  impure function printStatisticsToLogFile
+    "Print the violation statistics of one requirement to the log file"
+     import Modelica.Utilities.Streams.print;
+     input String logFile "Name of log file";
+     input String checkedComponentName "Full path name of checked component";
+     input String requirementName "Full path name of requirement model";
+     input Integer nViolations "Number of violation episodes";
+     input Modelica.Units.SI.Time totalDuration "Total time violated";
+     input Real violatedFraction "Fraction of the applicable time violated";
+     input Modelica.Units.SI.Time longestDuration "Longest violation episode";
+     input Modelica.Units.SI.Time tLongestStart "Start of the longest violation episode";
+     input Boolean hasMargin "= true, if worst and tWorst are logged";
+     input Real worst "Worst margin";
+     input Modelica.Units.SI.Time tWorst "Instant of the worst margin";
+     input Modelica.Units.SI.Time minDuration = 0 "minDuration of the statistics (logged, so that a reader can recompute them)";
+     input Modelica.Units.SI.Time mergeGap = 0 "mergeGap of the statistics (logged, so that a reader can recompute them)";
+     output Real ok "Dummy variable needed for sorting";
+  protected
+     String key = "Statistics," + checkedComponentName + "," + requirementName + ",";
+     Integer nLines = Modelica.Utilities.Streams.countLines(logFile);
+     Boolean logged = false;
+  algorithm
+     // Written once, also when the tool evaluates the calling when-equation twice (see printViolationsToLogFile).
+     for i in 2:nLines loop
+        if not logged then
+           logged := Modelica.Utilities.Strings.find(Modelica.Utilities.Streams.readLine(logFile, i), key) == 1;
+        end if;
+     end for;
+     if nLines > 0 then
+        Modelica.Utilities.Streams.close(logFile);
+     end if;
+     ok := 1.0;
+     if logged then
+        return;
+     end if;
+     // Statistics,<observation>,<requirement>,<n>,<total>,<fraction>,<longest>,<longest from>,<worst>,<worst at>,<minDuration>,<mergeGap>
+     print(key + String(nViolations) +
+           "," + String(totalDuration, significantDigits=10) +
+           "," + String(violatedFraction, significantDigits=10) +
+           "," + String(longestDuration, significantDigits=10) +
+           "," + String(tLongestStart, significantDigits=10) +
+           "," + (if hasMargin then String(worst, significantDigits=10) else "") +
+           "," + (if hasMargin then String(tWorst, significantDigits=10) else "") +
+           "," + String(minDuration, significantDigits=10) +
+           "," + String(mergeGap, significantDigits=10),
+           logFile);
+  annotation(__iti_Impure = true);
+  end printStatisticsToLogFile;
 
   package SlidingWindow
      extends Modelica.Icons.Package;
