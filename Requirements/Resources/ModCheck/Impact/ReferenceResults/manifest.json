@@ -718,7 +718,7 @@
       "staSigPul1.y",
       "time"
     ],
-    "bytes": 27178,
+    "bytes": 27169,
     "metrics": {
       "solver": "CVode",
       "linear_multistep_method": "BDF",
@@ -726,12 +726,12 @@
       "linear_solver_type": "DENSE",
       "atol": 1e-06,
       "rtol": 1e-06,
-      "cpu_time": 0.14526033599395305,
-      "steps": 3126,
-      "rhs_evaluations": 4559,
-      "jacobian_evaluations": 70,
+      "cpu_time": 0.15176045102998614,
+      "steps": 2746,
+      "rhs_evaluations": 4087,
+      "jacobian_evaluations": 61,
       "time_events": 21,
-      "error_test_failures": 285,
+      "error_test_failures": 268,
       "convergence_failures": 0,
       "kind": "dynamic"
     },
@@ -2142,7 +2142,7 @@
       "time",
       "u.y"
     ],
-    "bytes": 46034,
+    "bytes": 46106,
     "metrics": {
       "solver": "CVode",
       "linear_multistep_method": "BDF",
@@ -2150,7 +2150,7 @@
       "linear_solver_type": "DENSE",
       "atol": 1e-06,
       "rtol": 1e-06,
-      "cpu_time": 0.45051560102729127,
+      "cpu_time": 0.42440331797115505,
       "steps": 8927,
       "rhs_evaluations": 18724,
       "jacobian_evaluations": 1502,

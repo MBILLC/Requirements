@@ -2336,9 +2336,8 @@ see <a href=\"modelica://Requirements.UsersGuide.BuildingsLicense\">UsersGuide.B
     Modelica.Blocks.Continuous.Derivative derivative(
       final k=1,
       final T=Td,
-      initType=Modelica.Blocks.Types.Init.InitialState,
-      x_start=0,
-      u=if active then u else 0) "Approximate du/dt (input held at 0 while inactive)";
+      initType=Modelica.Blocks.Types.Init.SteadyState,
+      u=u) "Approximate du/dt, started in steady state and fed u at all times: no spike at the start of a phase";
     Real I(start=0, fixed=true)
       "Integral of |du/dt| since the start of the current phase";
     Boolean unstable "= true, if the moving average is above the limit (with hysteresis h)";
@@ -2409,13 +2408,14 @@ the limit and can adjust upperLimit.
 du/dt is approximated with a first-order filter (time constant <b>Td</b>, default 1 s). Its absolute value is
 integrated from the start of each phase, and the moving average is the difference of that integral over the last
 window, <code>(I(t) - I(t - window))/window</code>. This avoids the state events that a test on changes of direction
-would generate. The original averaged with
+would generate. The filter is started in steady state and always sees u: the original held its input at 0 while the
+check did not apply, and the step to u at the start of a phase (290 K for a temperature in kelvin) put a derivative
+spike into the first window -- harmless during that window, but at the instant it was full the spike was still at its
+edge, and the average read 290 K / window for a few seconds: a violation that never happened. The original averaged with
 <a href=\"modelica://Requirements.SignalAnalysis.MovingAverage\">SignalAnalysis.MovingAverage</a>, which integrates
 <code>u - delay(u, window)</code>: its numerical error never decays, and over a long run (or a pulsed condition, whose
 derivative spike at every start is not cancelled exactly by its delayed copy) the average drifts by tens of percent
-with the solver's step sequence. The difference of the integral has no such drift. While the check does not
-apply, the input of the filter is held at 0; the step at the start of a phase falls into the first window,
-which gives no verdict. Parameter <b>h</b> adds a hysteresis: once unstable, u counts as stable again only at
+with the solver's step sequence. The difference of the integral has no such drift. Parameter <b>h</b> adds a hysteresis: once unstable, u counts as stable again only at
 or below upperLimit - h, which avoids chattering verdicts at the limit.
 </p>
 
@@ -2444,8 +2444,9 @@ original are <b>window</b> and <b>upperLimit</b> here, the activation input and 
 <b>delayTime</b>. Changes besides those listed in
 <a href=\"modelica://Requirements.ChecksInFixedWindow.WithinBand\">WithinBand</a>: the hysteresis is a parameter
 <b>h</b> with default 0 (the original fixed it to upperLimit/20) so that the margin's sign is the verdict, and
-the derivative filter's time constant is a parameter <b>Td</b> (fixed to 1 s in the original), and the moving
-average is the difference of an integral instead of <code>SignalAnalysis.MovingAverage</code> (see Implementation).
+the derivative filter's time constant is a parameter <b>Td</b> (fixed to 1 s in the original), the moving
+average is the difference of an integral instead of <code>SignalAnalysis.MovingAverage</code>, and the derivative filter
+always sees u instead of 0 while inactive (see Implementation for both).
 Copyright (c) 1998-2024 Modelica Association, International Building Performance Simulation Association (IBPSA),
 The Regents of the University of California, through Lawrence Berkeley National Laboratory, and contributors;
 see <a href=\"modelica://Requirements.UsersGuide.BuildingsLicense\">UsersGuide.BuildingsLicense</a>.

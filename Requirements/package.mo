@@ -360,6 +360,10 @@ which skips the transient after a plant switches on. Changes from the originals:
      <code>u - delay(u, T)</code> and keeps every numerical error: at the regression's loose tolerance (rtol 1e-4) the
      original's average drifted by up to 3e-3 1/s on a value of 3e-3 under a pulsed condition; the difference of the
      integral moved by 1e-4 on 0.018.</li>
+<li> StableSignal's derivative filter always sees u and starts in steady state. The original held its input at 0
+     while inactive; the step at the start of each phase left a derivative spike at the edge of the first full window,
+     and a temperature in kelvin read as unstable (0.8 K/s over 6 min) for a few seconds after every start. Found on
+     the TIER plant study.</li>
 <li> No dependency on the Buildings library: the blocks use the MSL and this library only.</li>
 </ul>
 <p>
