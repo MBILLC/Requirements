@@ -466,28 +466,18 @@ This block is demonstrated with example
       "= true, after rising edge of u for given duration"
       annotation (Placement(transformation(extent={{200,-10},{220,10}})));
   protected
-    discrete Boolean startDuration;
-    discrete Real startTime;
+    discrete Modelica.Units.SI.Time startTime "Instant of the last rising edge of u (the start time while u is true initially)";
   initial equation
-    startDuration = u;
     startTime = time;
-    y = false;
   equation
     when u then
       // u has a rising edge, duration starts
-      startDuration = true;
       startTime = time;
-      y = false;
-    elsewhen pre(startDuration) and time >= pre(startTime) + duration then
-      // end of duration reached
-      startDuration = false;
-      startTime = time;
-      y = true;
-    elsewhen not u then
-      startDuration = false;
-      startTime = time;
-      y = false;
     end when;
+    // y is u gated by the elapsed time, not a when-assigned state: at an instant where u falls
+    // and the duration runs out together, y is false whatever order the tool handles the two
+    // events in (version 0.12.1)
+    y = u and time >= startTime + duration;
 
     annotation (defaultComponentName="delayedRising1",
         Diagram(coordinateSystem(
@@ -553,6 +543,14 @@ condition = <b>DelayedRising</b>(u=..., duration=...).y;
 <p>
 Output <b>y</b> = true, after a rising edge of the input <b>u</b> and after u remains true for at least the defined <b>duration</b> .
 After a falling edge of u, y = false immediately.
+</p>
+
+<p>
+y is computed as <code>u and time &gt;= startTime + duration</code>, with <code>startTime</code> the instant of the last rising
+edge of u. So y is never true while u is false. In particular, if u is true for exactly <b>duration</b>, y does not become
+true: the duration runs out at the instant u falls. Before version 0.12.1, y was assigned in a <code>when</code>/<code>elsewhen</code>
+chain, and when u fell at the instant the duration ran out, the result depended on the order in which the tool handled the
+two events: in Modelon Impact y became true and stayed true until the next rising edge of u.
 </p>
 
 <h4>Example</h4>

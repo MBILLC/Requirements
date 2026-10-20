@@ -1,5 +1,5 @@
 within ;
-package Requirements "Requirements (Version 0.12.0) - Defining requirements formally and checking them when simulating"
+package Requirements "Requirements (Version 0.12.1) - Defining requirements formally and checking them when simulating"
   extends Modelica.Icons.Package;
 
 
@@ -14,7 +14,7 @@ package ReleaseNotes "Release notes"
 
     annotation (Documentation(info="<html>
 <p>
-In 2026 the library went from version 0.7.0 (Feb. 2025) to <b>0.12.0</b> (2026-10-19) in eight
+In 2026 the library went from version 0.7.0 (Feb. 2025) to <b>0.12.1</b> (2026-10-19) in nine
 releases. This page summarizes them; the release note of each version has the details.
 The same summary is kept as Markdown in
 <a href=\"https://github.com/MBILLC/Requirements/blob/HEAD/CHANGES_2026.md\">CHANGES_2026.md</a>
@@ -41,6 +41,8 @@ The regression baselines and the tool-by-tool measurements are kept beside the l
     <td>Steady-state check example; the verdict printed once in every tool; self-contained documentation</td></tr>
 <tr><td><a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Version_0_12_0\">0.12.0</a></td><td>2026-10-19</td>
     <td>Violation statistics: how often, how long and how badly a requirement was violated</td></tr>
+<tr><td><a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Version_0_12_1\">0.12.1</a></td><td>2026-10-19</td>
+    <td>Bug fix: <code>DelayedRising</code> stayed true after its input fell, when the fall coincided with the end of the duration</td></tr>
 </table>
 
 <p>
@@ -272,6 +274,14 @@ This release changes requirement semantics.
      </ul></li>
 </ul>
 
+<h4>0.12.1 &mdash; DelayedRising at coincident events</h4>
+<ul>
+<li> <a href=\"modelica://Requirements.LogicalBlocks.DelayedRising\">LogicalBlocks.DelayedRising</a> is now
+     <code>y = u and time &gt;= startTime + duration</code>. Before, when the input fell at the instant the duration ran out,
+     the result depended on the tool's order of the two events, and in Modelon Impact the output stayed true until the
+     next rising edge. One stored reference moved, to the behaviour the example documents.</li>
+</ul>
+
 <h4>0.12.0 &mdash; Violation statistics</h4>
 <ul>
 <li> New block <a href=\"modelica://Requirements.Verify.ViolationStatistics\">Verify.ViolationStatistics</a>. From a
@@ -302,6 +312,46 @@ This release changes requirement semantics.
 </ul>
 </html>"));
   end Summary2026;
+
+  class Version_0_12_1 "Version 0.12.1 (Oct. 19, 2026)"
+  extends Modelica.Icons.ReleaseNotes;
+
+    annotation (Documentation(info="<html>
+<p>
+<b>Bug fix: DelayedRising at coincident events.</b>
+<a href=\"modelica://Requirements.LogicalBlocks.DelayedRising\">LogicalBlocks.DelayedRising</a> assigned its output in a
+<code>when</code>/<code>elsewhen</code> chain: a rising edge of <code>u</code> started the duration, the end of the
+duration set <code>y = true</code>, a falling edge set <code>y = false</code>. When <code>u</code> fell at the instant the
+duration ran out, both conditions became true in the same event iteration, only the first branch ran, and since
+<code>not u</code> was then already true it never had a rising edge: <code>y</code> stayed true while <code>u</code> was
+false, until the next rising edge of <code>u</code>. Whether this happened depended on the order in which the tool handled
+the two events. Modelon Impact did it; Dymola did not.
+</p>
+<p>
+The block is now <code>y = u and time &gt;= startTime + duration</code>, with <code>startTime</code> the instant of the
+last rising edge of <code>u</code>. <code>y</code> is never true while <code>u</code> is false, in any tool, and an input
+that is true for exactly <code>duration</code> does not make <code>y</code> true. The interface and every other behaviour
+are unchanged.
+</p>
+<h4>Where it showed</h4>
+<ul>
+<li> <a href=\"modelica://Requirements.Examples.BackupPowerSupply.MainPowerSupplyRequirements\">Examples.BackupPowerSupply.MainPowerSupplyRequirements</a>:
+     the on phases of the main power supply are exactly 10 s long, and R8 (<em>available again when on for more than 10
+     consecutive seconds</em>) uses <code>DelayedRising(On, 10 s)</code>. The example's documented verdict is untested; on
+     Modelon Impact R8 was violated at 55 s, because <code>during4</code>'s condition stayed true from 50 s to 60 s. It is
+     untested now.</li>
+<li> The regression references of that example on Impact (the composite list and the Impact-only list; it has no Dymola
+     or OpenModelica reference, which recorded the faulty behaviour) were re-stored: <code>MPS.during4.y</code> and
+     <code>MPS.duringAny4.y</code> moved, nothing else. The full Impact suite passed 561/563 before, with exactly those two
+     failing, and 563/563 after; the Impact-only list 61/63 before and 63/63 after.</li>
+<li> Found by ModCheck's requirements corpus: <code>TC-SYS-MainPowerSupply</code>'s REQ-8 is untested again on Impact.
+     The other two corpus items with <code>DelayedRising</code> are unchanged.</li>
+</ul>
+<p>
+No model conversion is needed: <code>conversion(noneFromVersion=\"0.12.0\")</code>.
+</p>
+</html>"));
+  end Version_0_12_1;
 
   class Version_0_12_0 "Version 0.12.0 (Oct. 19, 2026)"
   extends Modelica.Icons.ReleaseNotes;
@@ -912,7 +962,7 @@ First version of the library provided to the public.
 <p>
 This section summarizes the changes that have been performed
 on package Requirements. An overview of all changes and additions made in 2026
-(versions 0.7.1 to 0.12.0) is given in
+(versions 0.7.1 to 0.12.1) is given in
 <a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Summary2026\">Summary of 2026</a>.
 </p>
 </html>"));
@@ -1029,10 +1079,10 @@ end UsersGuide;
 
   annotation (preferredView="info",
   uses(Modelica(version="4.1.0")),
-version="0.12.0",
+version="0.12.1",
 versionDate="2026-10-19",
-dateModified = "2026-10-16",
-conversion(noneFromVersion="0.7.1", noneFromVersion="0.8.0", noneFromVersion="0.9.0", noneFromVersion="0.9.1", noneFromVersion="0.10.0", noneFromVersion="0.11.0", noneFromVersion="0.11.1"),
+dateModified = "2026-10-19",
+conversion(noneFromVersion="0.7.1", noneFromVersion="0.8.0", noneFromVersion="0.9.0", noneFromVersion="0.9.1", noneFromVersion="0.10.0", noneFromVersion="0.11.0", noneFromVersion="0.11.1", noneFromVersion="0.12.0"),
 revisionId="$Id:: package.mo 9390 2016-06-21 06:35:11Z #$",
 Documentation(info="<html>
 <p>
