@@ -1,5 +1,5 @@
 within ;
-package Requirements "Requirements (Version 0.12.1) - Defining requirements formally and checking them when simulating"
+package Requirements "Requirements (Version 0.13.0) - Defining requirements formally and checking them when simulating"
   extends Modelica.Icons.Package;
 
 
@@ -14,7 +14,7 @@ package ReleaseNotes "Release notes"
 
     annotation (Documentation(info="<html>
 <p>
-In 2026 the library went from version 0.7.0 (Feb. 2025) to <b>0.12.1</b> (2026-10-19) in nine
+In 2026 the library went from version 0.7.0 (Feb. 2025) to <b>0.13.0</b> (2026-10-20) in ten
 releases. This page summarizes them; the release note of each version has the details.
 The same summary is kept as Markdown in
 <a href=\"https://github.com/MBILLC/Requirements/blob/HEAD/CHANGES_2026.md\">CHANGES_2026.md</a>
@@ -43,6 +43,8 @@ The regression baselines and the tool-by-tool measurements are kept beside the l
     <td>Violation statistics: how often, how long and how badly a requirement was violated</td></tr>
 <tr><td><a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Version_0_12_1\">0.12.1</a></td><td>2026-10-19</td>
     <td>Bug fix: <code>DelayedRising</code> stayed true after its input fell, when the fall coincided with the end of the duration</td></tr>
+<tr><td><a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Version_0_13_0\">0.13.0</a></td><td>2026-10-20</td>
+    <td>Three check blocks ported from the Modelica Buildings_Requirements library: <code>WithinBand</code>, <code>GreaterEqual</code>, <code>StableSignal</code></td></tr>
 </table>
 
 <p>
@@ -274,6 +276,17 @@ This release changes requirement semantics.
      </ul></li>
 </ul>
 
+<h4>0.13.0 &mdash; Check blocks from Buildings_Requirements</h4>
+<ul>
+<li> Three blocks of LBNL's <a href=\"https://github.com/lbl-srg/modelica-buildings-requirements\">Buildings_Requirements</a>
+     library are ported into <code>ChecksInFixedWindow</code> as check blocks with <code>Property</code> and <code>margin</code>:
+     <code>WithinBand</code> (a signal within constant limits), <code>GreaterEqual</code> (one signal at least another) and
+     <code>StableSignal</code> (the moving average of |du/dt| at most a limit), each with an activation delay.</li>
+<li> An inactive check is Undefined, where the originals reported Undecided. The ported validation models give the
+     originals' verdicts otherwise, at every instant compared.</li>
+<li> The fourth block, <code>MinimumDuration</code>, is not ported: it is <code>MinDuration(condition = u, check = true)</code>.</li>
+</ul>
+
 <h4>0.12.1 &mdash; DelayedRising at coincident events</h4>
 <ul>
 <li> <a href=\"modelica://Requirements.LogicalBlocks.DelayedRising\">LogicalBlocks.DelayedRising</a> is now
@@ -312,6 +325,66 @@ This release changes requirement semantics.
 </ul>
 </html>"));
   end Summary2026;
+
+  class Version_0_13_0 "Version 0.13.0 (Oct. 20, 2026)"
+  extends Modelica.Icons.ReleaseNotes;
+
+    annotation (Documentation(info="<html>
+<p>
+<b>Check blocks from the Modelica Buildings_Requirements library.</b> LBNL's
+<a href=\"https://github.com/lbl-srg/modelica-buildings-requirements\">Buildings_Requirements</a> library (D. Blum,
+E. Zanetti, M. Wetter) builds templates for HVAC requirements on this library's predecessor. Three of its four blocks are
+ported into <a href=\"modelica://Requirements.ChecksInFixedWindow\">ChecksInFixedWindow</a>:
+</p>
+<ul>
+<li> <a href=\"modelica://Requirements.ChecksInFixedWindow.WithinBand\">WithinBand</a>: a Real input within constant limits.</li>
+<li> <a href=\"modelica://Requirements.ChecksInFixedWindow.GreaterEqual\">GreaterEqual</a>: one Real input at least another,
+     for example a temperature against its set point.</li>
+<li> <a href=\"modelica://Requirements.ChecksInFixedWindow.StableSignal\">StableSignal</a>: a signal does not oscillate,
+     measured by the moving average of |du/dt| over a window, without the state events of a test on changes of direction.</li>
+</ul>
+<p>
+Each has a <code>condition</code> input and a <code>delayTime</code> after each of its rising edges before the check applies,
+which skips the transient after a plant switches on. Changes from the originals:
+</p>
+<ul>
+<li> They are check blocks: they output <code>Property</code> and <code>margin</code> (with <code>scale</code>) like every other
+     check block, and feed <a href=\"modelica://Requirements.Verify.Requirement\">Verify.Requirement</a> and its violation
+     statistics. The originals contained a complete requirement each, with its own <code>inner ObservationID</code>.</li>
+<li> Four-valued logic: an inactive check is Undefined; the originals reported Undecided. StableSignal is Undecided during
+     the first window of a phase, while its average does not yet cover a full window.</li>
+<li> StableSignal's hysteresis is a parameter <code>h</code>, default 0, so that the sign of the margin is the verdict;
+     the original fixed it to a twentieth of the limit. The derivative filter's time constant is a parameter.</li>
+<li> StableSignal's moving average is the difference of the integral of |du/dt| over the window, not
+     <a href=\"modelica://Requirements.SignalAnalysis.MovingAverage\">SignalAnalysis.MovingAverage</a>, which integrates
+     <code>u - delay(u, T)</code> and keeps every numerical error: at the regression's loose tolerance (rtol 1e-4) the
+     original's average drifted by up to 3e-3 1/s on a value of 3e-3 under a pulsed condition; the difference of the
+     integral moved by 1e-4 on 0.018.</li>
+<li> No dependency on the Buildings library: the blocks use the MSL and this library only.</li>
+</ul>
+<p>
+The fourth block, <code>MinimumDuration</code>, is not ported. It is
+<a href=\"modelica://Requirements.ChecksInFixedWindow.MinDuration\">MinDuration</a> with <code>condition = u</code> and
+<code>check = true</code>: every true phase of <code>u</code> must last at least <code>durationMin</code>.
+</p>
+<h4>Examples and verification</h4>
+<ul>
+<li> <code>Examples.Elementary.ChecksInFixedWindow.WithinBand</code>, <code>.GreaterEqual</code> and <code>.StableSignal</code> are the
+     originals' validation models with the same instances, each check feeding a requirement with statistics. Both were run
+     in Modelon Impact and the verdicts compared at 3999 instants per requirement: identical for all 14 requirements, except
+     Undecided &rarr; Undefined while a check does not apply.</li>
+<li> <code>Examples.Elementary.Margin.Gated</code> asserts WithinBand's and GreaterEqual's margins in closed form behind a pulsed
+     condition and a delay, and the statistics of the violations; <code>Examples.Elementary.Margin.StableSignal</code> asserts
+     the moving average of a sine's |du/dt| and the margin, and shows the hysteresis.</li>
+<li> The five examples are cases of the Impact regression list, with Impact references.</li>
+</ul>
+<p>
+The ported code is covered by the Buildings library's license; see
+<a href=\"modelica://Requirements.UsersGuide.BuildingsLicense\">UsersGuide.BuildingsLicense</a>.
+No model conversion is needed: <code>conversion(noneFromVersion=\"0.12.1\")</code>; no existing block changed.
+</p>
+</html>"));
+  end Version_0_13_0;
 
   class Version_0_12_1 "Version 0.12.1 (Oct. 19, 2026)"
   extends Modelica.Icons.ReleaseNotes;
@@ -962,7 +1035,7 @@ First version of the library provided to the public.
 <p>
 This section summarizes the changes that have been performed
 on package Requirements. An overview of all changes and additions made in 2026
-(versions 0.7.1 to 0.12.1) is given in
+(versions 0.7.1 to 0.13.0) is given in
 <a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Summary2026\">Summary of 2026</a>.
 </p>
 </html>"));
@@ -1023,6 +1096,93 @@ class Contact "Contact"
 
 end Contact;
 
+class BuildingsLicense "License of the code ported from the Modelica Buildings library"
+  extends Modelica.Icons.Information;
+  annotation (preferredView="info", Documentation(info="<html>
+<p>
+The check blocks <a href=\"modelica://Requirements.ChecksInFixedWindow.WithinBand\">ChecksInFixedWindow.WithinBand</a>,
+<a href=\"modelica://Requirements.ChecksInFixedWindow.GreaterEqual\">GreaterEqual</a> and
+<a href=\"modelica://Requirements.ChecksInFixedWindow.StableSignal\">StableSignal</a>, and the examples
+<code>Examples.Elementary.ChecksInFixedWindow.WithinBand</code>, <code>.GreaterEqual</code> and <code>.StableSignal</code>,
+are ported (version 0.13.0) from the library <code>Buildings_Requirements</code> of
+<a href=\"https://github.com/lbl-srg/modelica-buildings-requirements\">modelica-buildings-requirements</a>
+(Lawrence Berkeley National Laboratory). That library is distributed under the license of the Modelica Buildings
+library, reproduced here as its terms require. The rest of this library is under its own BSD 3-Clause license.
+</p>
+<h4>License of the Modelica Buildings library</h4>
+<p>
+Modelica Buildings Library. Copyright (c) 1998-2024
+Modelica Association,
+International Building Performance Simulation Association (IBPSA),
+The Regents of the University of California, through Lawrence Berkeley National Laboratory
+(subject to receipt of any required approvals from the U.S. Dept. of Energy) and
+contributors.
+All rights reserved.
+</p>
+<p>
+NOTICE.  This Software was developed under funding from the U.S. Department of Energy and
+the U.S. Government consequently retains certain rights.
+As such, the U.S. Government has been granted for itself and others acting on its behalf
+a paid-up, nonexclusive, irrevocable, worldwide license in the Software
+to reproduce, distribute copies to the public, prepare derivative works, and
+perform publicly and display publicly, and to permit other to do so.
+</p>
+<p>
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+</p>
+<ol>
+<li>
+Redistributions of source code must retain the above copyright notice,
+this list of conditions and the following disclaimer.
+</li>
+<li>
+Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the distribution.
+</li>
+<li>
+Neither the names of the Modelica Association,
+International Building Performance Simulation Association (IBPSA),
+the University of California,
+Lawrence Berkeley National Laboratory,
+U.S. Dept. of Energy,
+nor the names of its contributors
+may be used to endorse or promote products derived from this software
+without specific prior written permission.
+</li>
+</ol>
+<p>
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS
+BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+</p>
+<p>
+You are under no obligation whatsoever to provide any bug fixes, patches,
+or upgrades to the features, functionality or performance of the source code
+(\"Enhancements\") to anyone; however, if you choose to make your Enhancements
+available either publicly, or directly to Lawrence Berkeley National
+Laboratory, without imposing a separate written license agreement for such
+Enhancements, then you hereby grant the following license: a non-exclusive,
+royalty-free perpetual license to install, use, modify, prepare derivative
+works, incorporate into other computer software, distribute, and sublicense
+such enhancements or derivative works thereof, in binary and source code form.
+</p>
+<p>
+Note: The license is a revised 3 clause BSD license with an ADDED paragraph
+at the end that makes it easy to accept improvements.
+</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC (this page). All rights reserved.</p>
+</html>"));
+end BuildingsLicense;
+
 annotation (DocumentationClass=true, Documentation(info="<html>
 <p>
 Library <b>Requirements</b> is a Modelica package
@@ -1079,10 +1239,10 @@ end UsersGuide;
 
   annotation (preferredView="info",
   uses(Modelica(version="4.1.0")),
-version="0.12.1",
-versionDate="2026-10-19",
-dateModified = "2026-10-19",
-conversion(noneFromVersion="0.7.1", noneFromVersion="0.8.0", noneFromVersion="0.9.0", noneFromVersion="0.9.1", noneFromVersion="0.10.0", noneFromVersion="0.11.0", noneFromVersion="0.11.1", noneFromVersion="0.12.0"),
+version="0.13.0",
+versionDate="2026-10-20",
+dateModified = "2026-10-20",
+conversion(noneFromVersion="0.7.1", noneFromVersion="0.8.0", noneFromVersion="0.9.0", noneFromVersion="0.9.1", noneFromVersion="0.10.0", noneFromVersion="0.11.0", noneFromVersion="0.11.1", noneFromVersion="0.12.0", noneFromVersion="0.12.1"),
 revisionId="$Id:: package.mo 9390 2016-06-21 06:35:11Z #$",
 Documentation(info="<html>
 <p>

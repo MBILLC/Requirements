@@ -2115,6 +2115,345 @@ Property and the margin of this block agree with that evaluation to one sampling
 </html>"));
   end StepResponseCheck;
 
+  block WithinBand
+    "In every true condition phase (after an optional delay), the Real input must stay within a lower and an upper limit"
+    extends Requirements.Interfaces.PartialCheck(final check=uAct >= u_min and uAct <= u_max);
+    import Requirements.Types.Property;
+
+    parameter Real u_max "Upper limit";
+    parameter Real u_min "Lower limit";
+    parameter Modelica.Units.SI.Time delayTime(min=0) = 0
+      "Time after each rising edge of condition before the check applies (to skip a start-up transient)";
+    Modelica.Blocks.Interfaces.RealInput u "Monitored quantity"
+      annotation (Placement(transformation(extent={{-240,40},{-200,80}})));
+  protected
+    Requirements.LogicalBlocks.DelayedRising delayedCondition(
+      u=condition,
+      final duration=delayTime) "condition, delayed by delayTime after each rising edge";
+    Boolean active = delayedCondition.y "= true, while the check applies";
+    Real uAct = if active then u else (u_max + u_min)/2
+      "u while the check applies, the middle of the band otherwise (an inactive check generates no state events)";
+  equation
+    assert(u_min <= u_max, "WithinBand: u_min <= u_max required");
+    y = if active then (if check then Property.Satisfied else Property.Violated) else Property.Undefined;
+    robustness = min(uAct - u_min, u_max - uAct);
+
+    annotation (defaultComponentName="withinBand1",
+      Icon(coordinateSystem(preserveAspectRatio=false, extent={{-200,-100},{200,100}}), graphics={
+          Line(points={{-180,75},{20,75}}, color={95,95,95}),
+          Line(points={{-180,15},{20,15}}, color={95,95,95}),
+          Line(
+            points={{-180,40},{-140,62},{-100,28},{-60,52},{-20,30},{20,45}},
+            color={0,140,72},
+            smooth=Smooth.Bezier,
+            thickness=0.5),
+          Text(
+            extent={{30,90},{190,60}},
+            textColor={95,95,95},
+            textString="%u_max"),
+          Text(
+            extent={{30,30},{190,0}},
+            textColor={95,95,95},
+            textString="%u_min")}),
+      Documentation(info="<html>
+<h4>Syntax</h4>
+
+<blockquote><p>
+property = <b>WithinBand</b>(condition=..., u=..., u_min=..., u_max=..., delayTime=...).y;
+</p></blockquote>
+
+<h4>Description</h4>
+
+<p>
+In every duration where the Boolean input <b>condition</b> is true, the Real input <b>u</b> must satisfy
+<b>u_min</b> &le; u &le; <b>u_max</b> (both limits included). The check applies <b>delayTime</b> after each rising edge
+of condition (default 0: at once), which skips the transient that follows, for example, switching a plant
+on. While the check applies, property output y = Satisfied if u is within the band and y = Violated
+otherwise. While condition is false, and during the delay, y = Undefined: the check is not applicable.
+</p>
+
+<p>
+This is <a href=\"modelica://Requirements.ChecksInFixedWindow.During\">During</a> with
+<code>check = u_min &le; u &le; u_max</code> and its margin, plus the delay. Use it when the monitored
+quantity is a signal with a band, the most common requirement on a controlled variable.
+While the check does not apply, the band test is evaluated on the middle of the band instead of on u,
+so an inactive check generates no state events.
+</p>
+
+<h4>Margin</h4>
+<p>
+Output <b>margin</b> (present if <b>computeMargin</b> = true, the default) is the signed distance of u to the
+nearer limit, <code>min(u - u_min, u_max - u)</code>, divided by parameter <b>scale</b>: margin &ge; 0 exactly when
+the check holds, margin = 1 is one <b>scale</b> of headroom, margin &lt; 0 a violation by that many. While the
+check does not apply, the margin is that of the middle of the band, <code>(u_max - u_min)/2/scale</code>; a
+consumer takes the worst value over the applicable points only, as
+<a href=\"modelica://Requirements.Verify.ViolationStatistics\">Verify.ViolationStatistics</a> does.
+</p>
+
+<h4>Example</h4>
+<p>
+<a href=\"modelica://Requirements.Examples.Elementary.ChecksInFixedWindow.WithinBand\">Examples.Elementary.ChecksInFixedWindow.WithinBand</a>
+and, with the margin asserted in closed form,
+<a href=\"modelica://Requirements.Examples.Elementary.Margin.Gated\">Examples.Elementary.Margin.Gated</a>.
+</p>
+
+<h4>Origin</h4>
+<p>
+Ported in version 0.13.0 from block <code>Buildings_Requirements.WithinBand</code> of
+<a href=\"https://github.com/lbl-srg/modelica-buildings-requirements\">modelica-buildings-requirements</a>
+(M. Wetter, Lawrence Berkeley National Laboratory, 2024-2025), whose activation input and delay became
+<b>condition</b> and <b>delayTime</b>. Changes: a check block (Property and margin output) rather than a complete
+requirement, so it combines with the other blocks of this library and feeds
+<a href=\"modelica://Requirements.Verify.Requirement\">Verify.Requirement</a>; y = Undefined, not Undecided,
+while the check does not apply (four-valued logic, version 0.8.0); no dependency on the Buildings library.
+Copyright (c) 1998-2024 Modelica Association, International Building Performance Simulation Association (IBPSA),
+The Regents of the University of California, through Lawrence Berkeley National Laboratory, and contributors;
+see <a href=\"modelica://Requirements.UsersGuide.BuildingsLicense\">UsersGuide.BuildingsLicense</a>.
+</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC (the port). All rights reserved.</p>
+</html>"));
+  end WithinBand;
+
+  block GreaterEqual
+    "In every true condition phase (after an optional delay), Real input u_max must be greater than or equal to Real input u_min"
+    extends Requirements.Interfaces.PartialCheck(final check=u_max >= uMinAct);
+    import Requirements.Types.Property;
+
+    parameter Modelica.Units.SI.Time delayTime(min=0) = 0
+      "Time after each rising edge of condition before the check applies (to skip a start-up transient)";
+    Modelica.Blocks.Interfaces.RealInput u_max "Quantity that must be the greater one"
+      annotation (Placement(transformation(extent={{-240,40},{-200,80}})));
+    Modelica.Blocks.Interfaces.RealInput u_min "Quantity that must be the smaller one"
+      annotation (Placement(transformation(extent={{-240,-80},{-200,-40}})));
+  protected
+    Requirements.LogicalBlocks.DelayedRising delayedCondition(
+      u=condition,
+      final duration=delayTime) "condition, delayed by delayTime after each rising edge";
+    Boolean active = delayedCondition.y "= true, while the check applies";
+    Real uMinAct = if active then u_min else u_max
+      "u_min while the check applies, u_max otherwise (an inactive check generates no state events)";
+  equation
+    y = if active then (if check then Property.Satisfied else Property.Violated) else Property.Undefined;
+    robustness = u_max - uMinAct;
+
+    annotation (defaultComponentName="greaterEqual1",
+      Icon(coordinateSystem(preserveAspectRatio=false, extent={{-200,-100},{200,100}}), graphics={
+          Line(
+            points={{-180,60},{-140,40},{-100,45},{-60,70},{-20,50}},
+            color={0,0,0},
+            smooth=Smooth.Bezier,
+            thickness=0.5),
+          Line(
+            points={{-180,20},{-140,10},{-100,65},{-60,35},{-20,25}},
+            color={95,95,95},
+            smooth=Smooth.Bezier,
+            thickness=0.5),
+          Text(
+            extent={{20,70},{190,20}},
+            textColor={95,95,95},
+            textString="u_max >= u_min")}),
+      Documentation(info="<html>
+<h4>Syntax</h4>
+
+<blockquote><p>
+property = <b>GreaterEqual</b>(condition=..., u_max=..., u_min=..., delayTime=...).y;
+</p></blockquote>
+
+<h4>Description</h4>
+
+<p>
+In every duration where the Boolean input <b>condition</b> is true, the Real input <b>u_max</b> must be greater
+than or equal to the Real input <b>u_min</b>. Both are signals, for example a supply temperature that must
+not fall below its set point. The check applies <b>delayTime</b> after each rising edge of condition
+(default 0: at once). While the check applies, property output y = Satisfied if u_max &ge; u_min and
+y = Violated otherwise. While condition is false, and during the delay, y = Undefined.
+</p>
+
+<p>
+This is <a href=\"modelica://Requirements.ChecksInFixedWindow.During\">During</a> with
+<code>check = u_max &ge; u_min</code> and its margin, plus the delay. While the check does not apply,
+u_max is compared with itself, so an inactive check generates no state events.
+</p>
+
+<h4>Margin</h4>
+<p>
+Output <b>margin</b> (present if <b>computeMargin</b> = true, the default) is <code>(u_max - u_min)/scale</code>:
+margin &ge; 0 exactly when the check holds. While the check does not apply, the margin is 0; a consumer takes
+the worst value over the applicable points only, as
+<a href=\"modelica://Requirements.Verify.ViolationStatistics\">Verify.ViolationStatistics</a> does.
+</p>
+
+<h4>Example</h4>
+<p>
+<a href=\"modelica://Requirements.Examples.Elementary.ChecksInFixedWindow.GreaterEqual\">Examples.Elementary.ChecksInFixedWindow.GreaterEqual</a>
+and, with the margin asserted in closed form,
+<a href=\"modelica://Requirements.Examples.Elementary.Margin.Gated\">Examples.Elementary.Margin.Gated</a>.
+</p>
+
+<h4>Origin</h4>
+<p>
+Ported in version 0.13.0 from block <code>Buildings_Requirements.GreaterEqual</code> of
+<a href=\"https://github.com/lbl-srg/modelica-buildings-requirements\">modelica-buildings-requirements</a>
+(M. Wetter, Lawrence Berkeley National Laboratory, 2024-2025), with the changes listed in
+<a href=\"modelica://Requirements.ChecksInFixedWindow.WithinBand\">WithinBand</a>.
+Copyright (c) 1998-2024 Modelica Association, International Building Performance Simulation Association (IBPSA),
+The Regents of the University of California, through Lawrence Berkeley National Laboratory, and contributors;
+see <a href=\"modelica://Requirements.UsersGuide.BuildingsLicense\">UsersGuide.BuildingsLicense</a>.
+</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC (the port). All rights reserved.</p>
+</html>"));
+  end GreaterEqual;
+
+  block StableSignal
+    "In every true condition phase (after an optional delay), the moving average of the input's rate of change must stay at or below a limit"
+    extends Requirements.Interfaces.PartialCheck(final check=not unstable);
+    import Requirements.Types.Property;
+
+    parameter Modelica.Units.SI.Time window(min=Modelica.Constants.eps) = 360
+      "Length of the moving window over which |du/dt| is averaged (a few times the settling time of the loop)";
+    parameter Real upperLimit(min=0) = 0.01
+      "Largest moving average of |du/dt| (unit of u per second) at which u counts as stable";
+    parameter Real h(min=0) = 0
+      "Hysteresis: once unstable, u counts as stable again only at or below upperLimit - h (0: none, and the sign of the margin is the verdict)";
+    parameter Modelica.Units.SI.Time delayTime(min=0) = 0
+      "Time after each rising edge of condition before the averaging starts (to skip a start-up transient)";
+    parameter Modelica.Units.SI.Time Td(min=Modelica.Constants.eps) = 1
+      "Time constant of the filter that approximates du/dt"
+      annotation(Dialog(tab="Advanced"));
+    Modelica.Blocks.Interfaces.RealInput u "Monitored quantity"
+      annotation (Placement(transformation(extent={{-240,40},{-200,80}})));
+    Modelica.Blocks.Interfaces.RealOutput rateAverage
+      "Moving average of |du/dt| over the last window, 0 until a full window has passed in the current phase"
+      annotation (Placement(transformation(extent={{200,-70},{220,-50}})));
+  protected
+    Requirements.LogicalBlocks.DelayedRising delayedCondition(
+      u=condition,
+      final duration=delayTime) "condition, delayed by delayTime after each rising edge";
+    Boolean active = delayedCondition.y "= true, while u is being averaged";
+    Requirements.LogicalBlocks.DelayedRising windowFilled(
+      u=active,
+      final duration=window) "= true, once the moving average covers a full window of the current phase";
+    Modelica.Blocks.Continuous.Derivative derivative(
+      final k=1,
+      final T=Td,
+      initType=Modelica.Blocks.Types.Init.InitialState,
+      x_start=0,
+      u=if active then u else 0) "Approximate du/dt (input held at 0 while inactive)";
+    Real I(start=0, fixed=true)
+      "Integral of |du/dt| since the start of the current phase";
+    Boolean unstable "= true, if the moving average is above the limit (with hysteresis h)";
+  initial equation
+    pre(unstable) = false;
+  equation
+    der(I) = if active then abs(derivative.y) else 0;
+    when active then
+      reinit(I, 0);
+    end when;
+    // the exact moving average over the last window: a difference of the integral, whose numerical error does
+    // not accumulate (an integrator of u - delay(u, window), as SignalAnalysis.MovingAverage is, keeps every error
+    // forever, and the derivative's spike at the start of a phase is never cancelled exactly by its delayed copy)
+    rateAverage = if windowFilled.y then (I - delay(I, window))/window else 0;
+    unstable = not pre(unstable) and rateAverage > upperLimit or pre(unstable) and rateAverage > upperLimit - h;
+    y = if not active then Property.Undefined elseif not windowFilled.y then Property.Undecided
+        elseif check then Property.Satisfied else Property.Violated;
+    robustness = upperLimit - rateAverage;
+
+    annotation (defaultComponentName="stableSignal1",
+      Icon(coordinateSystem(preserveAspectRatio=false, extent={{-200,-100},{200,100}}), graphics={
+          Line(
+            points={{-180,45},{-160,45},{-150,75},{-140,20},{-130,60},{-120,35},{-110,50},{-100,42},
+                    {-80,46},{20,45}},
+            color={0,140,72},
+            smooth=Smooth.Bezier,
+            thickness=0.5),
+          Text(
+            extent={{30,90},{190,60}},
+            textColor={95,95,95},
+            textString="%window s"),
+          Text(
+            extent={{30,40},{190,10}},
+            textColor={95,95,95},
+            textString="%upperLimit /s")}),
+      Documentation(info="<html>
+<h4>Syntax</h4>
+
+<blockquote><p>
+property = <b>StableSignal</b>(condition=..., u=..., window=..., upperLimit=..., delayTime=...).y;
+</p></blockquote>
+
+<h4>Description</h4>
+
+<p>
+In every duration where the Boolean input <b>condition</b> is true, the Real input <b>u</b> must be <em>stable</em>:
+it must not oscillate. Stability is measured by the average speed of u, the moving average of
+|du/dt| over the last <b>window</b> seconds, output <b>rateAverage</b>; u is stable while it is at or below
+<b>upperLimit</b>. Averaging starts <b>delayTime</b> after each rising edge of condition; it needs a full
+window of the phase before the first verdict.
+</p>
+
+<ul>
+<li> y = Undefined while condition is false and during the delay: the check is not applicable.</li>
+<li> y = Undecided during the first window of a phase: the average does not yet cover a full window.</li>
+<li> y = Satisfied while rateAverage &le; upperLimit, y = Violated while it is above.</li>
+</ul>
+
+<p>
+Set delayTime to the time the system needs to reach quasi steady state, for example 600 s after a chiller
+switches on, and the window to a few times the settling time of the closed loop: a valve that settles in
+about 120 s suggests window = 360 s. With the output rateAverage one sees how close the signal comes to
+the limit and can adjust upperLimit.
+</p>
+
+<h4>Implementation</h4>
+<p>
+du/dt is approximated with a first-order filter (time constant <b>Td</b>, default 1 s). Its absolute value is
+integrated from the start of each phase, and the moving average is the difference of that integral over the last
+window, <code>(I(t) - I(t - window))/window</code>. This avoids the state events that a test on changes of direction
+would generate. The original averaged with
+<a href=\"modelica://Requirements.SignalAnalysis.MovingAverage\">SignalAnalysis.MovingAverage</a>, which integrates
+<code>u - delay(u, window)</code>: its numerical error never decays, and over a long run (or a pulsed condition, whose
+derivative spike at every start is not cancelled exactly by its delayed copy) the average drifts by tens of percent
+with the solver's step sequence. The difference of the integral has no such drift. While the check does not
+apply, the input of the filter is held at 0; the step at the start of a phase falls into the first window,
+which gives no verdict. Parameter <b>h</b> adds a hysteresis: once unstable, u counts as stable again only at
+or below upperLimit - h, which avoids chattering verdicts at the limit.
+</p>
+
+<h4>Margin</h4>
+<p>
+Output <b>margin</b> (present if <b>computeMargin</b> = true, the default) is <code>(upperLimit - rateAverage)/scale</code>.
+With h = 0 (the default), margin &ge; 0 exactly when the check holds. With h &gt; 0, the verdict stays Violated
+while the margin lies between 0 and h/scale after a violation, so the sign of the margin is no longer the
+verdict there. During the first window of a phase the margin is provisional (rateAverage is 0 then); a
+consumer takes the worst value over the decided points only.
+</p>
+
+<h4>Example</h4>
+<p>
+<a href=\"modelica://Requirements.Examples.Elementary.ChecksInFixedWindow.StableSignal\">Examples.Elementary.ChecksInFixedWindow.StableSignal</a>
+and, with the moving average and the margin asserted in closed form,
+<a href=\"modelica://Requirements.Examples.Elementary.Margin.StableSignal\">Examples.Elementary.Margin.StableSignal</a>.
+</p>
+
+<h4>Origin</h4>
+<p>
+Ported in version 0.13.0 from block <code>Buildings_Requirements.StableContinuousSignal</code> of
+<a href=\"https://github.com/lbl-srg/modelica-buildings-requirements\">modelica-buildings-requirements</a>
+(M. Wetter, Lawrence Berkeley National Laboratory, 2024-2025). Parameters <code>T</code> and <code>t</code> of the
+original are <b>window</b> and <b>upperLimit</b> here, the activation input and its delay are <b>condition</b> and
+<b>delayTime</b>. Changes besides those listed in
+<a href=\"modelica://Requirements.ChecksInFixedWindow.WithinBand\">WithinBand</a>: the hysteresis is a parameter
+<b>h</b> with default 0 (the original fixed it to upperLimit/20) so that the margin's sign is the verdict, and
+the derivative filter's time constant is a parameter <b>Td</b> (fixed to 1 s in the original), and the moving
+average is the difference of an integral instead of <code>SignalAnalysis.MovingAverage</code> (see Implementation).
+Copyright (c) 1998-2024 Modelica Association, International Building Performance Simulation Association (IBPSA),
+The Regents of the University of California, through Lawrence Berkeley National Laboratory, and contributors;
+see <a href=\"modelica://Requirements.UsersGuide.BuildingsLicense\">UsersGuide.BuildingsLicense</a>.
+</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC (the port). All rights reserved.</p>
+</html>"));
+  end StableSignal;
+
   annotation (Icon(coordinateSystem(preserveAspectRatio=false, extent={{-100,
             -100},{100,100}}), graphics={
         Line(
@@ -2152,7 +2491,12 @@ All blocks of this library have the following interface:
      <a href=\"modelica://Requirements.TimeLocators\">TimeLocators</a>.</li>
 
 <li> Boolean input <b>check</b> is a Boolean expression that must be true
-     according to the property check of the particular block. </li>
+     according to the property check of the particular block. The blocks
+     <a href=\"modelica://Requirements.ChecksInFixedWindow.WithinBand\">WithinBand</a>,
+     <a href=\"modelica://Requirements.ChecksInFixedWindow.GreaterEqual\">GreaterEqual</a> and
+     <a href=\"modelica://Requirements.ChecksInFixedWindow.StableSignal\">StableSignal</a> (ported from the Modelica
+     Buildings_Requirements library in version 0.13.0) form check from their Real inputs instead, and apply it only
+     <b>delayTime</b> after each rising edge of condition. </li>
 
 <li> Property output <b>y</b> is of enumeration type 
      <a href=\"modelica://Requirements.Types.Property\">Property</a>.
