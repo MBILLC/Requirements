@@ -19,6 +19,9 @@
               functions take the event bracket (nextTimeEvent, pre(nextTimeEvent))
               so the value on either side of an event is unambiguous during event
               iteration, exactly as Modelica.Blocks.Sources.CombiTimeTable does.
+     Groups   are rows whose times are within a relative 1e-10 of the group's first
+              row (exactly equal, or a few ulps apart): one instant, the first row's
+              time.
      Outside  the file's time range the first/last row is held (extrapolateHold),
               or an error is raised.
 
@@ -34,6 +37,8 @@
 */
 #ifndef REQUIREMENTS_CSV_H
 #define REQUIREMENTS_CSV_H
+
+#define REQUIREMENTS_CSV_EPS 1e-10   /* rows this close in time (relative) are one event group */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -209,6 +214,25 @@ static size_t RequirementsCsv_findRow(RequirementsCsv_File* f, double t)
     return lo;
 }
 
+/* A query time within a relative REQUIREMENTS_CSV_EPS of a row's time is that time.
+   PartialSignalsFromFile wakes on a state event (its `fileEvent`), which the integrator
+   locates only to its root-finding tolerance, possibly a hair before the row: without this,
+   nextTimeEvent() would return the same event again and the values would be the row
+   before's. */
+static double RequirementsCsv_snap(RequirementsCsv_File* f, double t)
+{
+    size_t i;
+    double r;
+    if (f->nRows == 0) return t;
+    if (t < f->time[0]) i = 0;
+    else {
+        i = RequirementsCsv_findRow(f, t);
+        if (i + 1 < f->nRows && f->time[i + 1] - t < t - f->time[i]) i++;
+    }
+    r = f->time[i];
+    return fabs(t - r) <= REQUIREMENTS_CSV_EPS * (fabs(r) > 1.0 ? fabs(r) : 1.0) ? r : t;
+}
+
 /* First row index of the duplicate-time group that row i belongs to. */
 static size_t RequirementsCsv_groupFirst(const RequirementsCsv_File* f, size_t i)
 {
@@ -258,7 +282,7 @@ void* RequirementsCsv_open(const char* fileName,
     FILE* fp;
     char* text;
     const char* p;
-    size_t length, nCols = 0, nRows = 0, j, c, k;
+    size_t length, nCols = 0, nRows = 0, j, c, k, g;
     char** header = NULL;
     long* realCol = NULL;
     long* booleanCol = NULL;
@@ -394,6 +418,19 @@ void* RequirementsCsv_open(const char* fileName,
         }
     }
 
+    /* ---- rows closer in time than a relative REQUIREMENTS_CSV_EPS are one event group: each
+       takes the time of the group's first row. A simulator's result can hold two event instants
+       a few ulps apart (3.1e-10 s at 28248 s in a year of the TIER plant); as two time events, the
+       second is due before the solver can move, OCT drops it as already past, the when-clause of
+       PartialSignalsFromFile never fires again and every Boolean and Integer column holds its value
+       for the rest of the run. The tolerance is Modelica.Blocks.Tables' (1e-10, relative). */
+    for (k = 1, g = 0; k < nRows; k++) {
+        if (f->time[k] - f->time[g] <= REQUIREMENTS_CSV_EPS * (fabs(f->time[g]) > 1.0 ? fabs(f->time[g]) : 1.0))
+            f->time[k] = f->time[g];
+        else
+            g = k;
+    }
+
     /* ---- event times */
     f->events = (double*)malloc((nRows + 1) * sizeof(double));
     if (f->events == NULL) ModelicaError("RequirementsCsv: out of memory\n");
@@ -438,12 +475,14 @@ void RequirementsCsv_close(void* obj)
 
 /* ------------------------------------------------------------- API: queries */
 
-/* Smallest event time strictly after t, or DBL_MAX when there is none. */
+/* Smallest event time strictly after t (t snapped to a row's time first), or DBL_MAX when
+   there is none. */
 double RequirementsCsv_nextTimeEvent(void* obj, double t)
 {
     RequirementsCsv_File* f = (RequirementsCsv_File*)obj;
     size_t lo = 0, hi;
     if (f == NULL || f->nEvents == 0) return DBL_MAX;
+    t = RequirementsCsv_snap(f, t);
     if (f->events[f->nEvents - 1] <= t) return DBL_MAX;
     hi = f->nEvents - 1;
     /* first index with events[i] > t */
@@ -463,6 +502,7 @@ double RequirementsCsv_getReal(void* obj, int column, double t, double tNext, do
     if (f == NULL) ModelicaError("RequirementsCsv: getReal on a closed file\n");
     if (column < 1 || (size_t)column > f->nReal) ModelicaFormatError("RequirementsCsv: Real column index %d is out of range 1..%lu\n", column, (unsigned long)f->nReal);
     v = f->real + (size_t)(column - 1) * f->nRows;
+    t = RequirementsCsv_snap(f, t);
     RequirementsCsv_locate(f, t, tNext, tPre, &i, &before, &outside);
     if (outside != 0) return v[i];
     if (before) {
@@ -494,6 +534,7 @@ double RequirementsCsv_getRealDer(void* obj, int column, double t, double tNext,
     if (f == NULL) ModelicaError("RequirementsCsv: getRealDer on a closed file\n");
     if (column < 1 || (size_t)column > f->nReal) ModelicaFormatError("RequirementsCsv: Real column index %d is out of range 1..%lu\n", column, (unsigned long)f->nReal);
     v = f->real + (size_t)(column - 1) * f->nRows;
+    t = RequirementsCsv_snap(f, t);
     RequirementsCsv_locate(f, t, tNext, tPre, &i, &before, &outside);
     if (outside != 0) return 0.0;
     if (before) {
@@ -514,6 +555,7 @@ static size_t RequirementsCsv_discreteRow(RequirementsCsv_File* f, double t, dou
 {
     size_t i;
     int before, outside;
+    t = RequirementsCsv_snap(f, t);
     RequirementsCsv_locate(f, t, tNext, tPre, &i, &before, &outside);
     if (outside != 0) return i;
     if (before) {

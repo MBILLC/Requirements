@@ -1,5 +1,5 @@
 within ;
-package Requirements "Requirements (Version 0.13.0) - Defining requirements formally and checking them when simulating"
+package Requirements "Requirements (Version 0.13.1) - Defining requirements formally and checking them when simulating"
   extends Modelica.Icons.Package;
 
 
@@ -14,7 +14,7 @@ package ReleaseNotes "Release notes"
 
     annotation (Documentation(info="<html>
 <p>
-In 2026 the library went from version 0.7.0 (Feb. 2025) to <b>0.13.0</b> (2026-10-20) in ten
+In 2026 the library went from version 0.7.0 (Feb. 2025) to <b>0.13.1</b> (2026-10-21) in eleven
 releases. This page summarizes them; the release note of each version has the details.
 The same summary is kept as Markdown in
 <a href=\"https://github.com/MBILLC/Requirements/blob/HEAD/CHANGES_2026.md\">CHANGES_2026.md</a>
@@ -45,6 +45,8 @@ The regression baselines and the tool-by-tool measurements are kept beside the l
     <td>Bug fix: <code>DelayedRising</code> stayed true after its input fell, when the fall coincided with the end of the duration</td></tr>
 <tr><td><a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Version_0_13_0\">0.13.0</a></td><td>2026-10-20</td>
     <td>Three check blocks ported from the Modelica Buildings_Requirements library: <code>WithinBand</code>, <code>GreaterEqual</code>, <code>StableSignal</code></td></tr>
+<tr><td><a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Version_0_13_1\">0.13.1</a></td><td>2026-10-21</td>
+    <td>Bug fix: the CSV reader stopped (every Boolean and Integer column held) at an event due a few ulps after another</td></tr>
 </table>
 
 <p>
@@ -276,6 +278,14 @@ This release changes requirement semantics.
      </ul></li>
 </ul>
 
+<h4>0.13.1 &mdash; CSV reader: event rows a few ulps apart</h4>
+<ul>
+<li> The MA-HS-CSV reader behind <a href=\"modelica://Requirements.Sources.PartialSignalsFromFile\">Sources.PartialSignalsFromFile</a>
+     wakes on a state event (<code>fileEvent</code>) instead of a time event, and treats times within a relative 1e-10 as
+     one instant. A time event of the reader due a few ulps after another event of the model was dropped by OCT as
+     already past, and every Boolean and Integer column held its value for the rest of the run.</li>
+</ul>
+
 <h4>0.13.0 &mdash; Check blocks from Buildings_Requirements</h4>
 <ul>
 <li> Three blocks of LBNL's <a href=\"https://github.com/lbl-srg/modelica-buildings-requirements\">Buildings_Requirements</a>
@@ -325,6 +335,58 @@ This release changes requirement semantics.
 </ul>
 </html>"));
   end Summary2026;
+
+  class Version_0_13_1 "Version 0.13.1 (Oct. 21, 2026)"
+  extends Modelica.Icons.ReleaseNotes;
+
+    annotation (Documentation(info="<html>
+<p>
+<b>Bug fix: the CSV reader stopped at an event due a few ulps after another.</b>
+<a href=\"modelica://Requirements.Sources.PartialSignalsFromFile\">Sources.PartialSignalsFromFile</a> woke at the file's
+events with <code>when {time &gt;= pre(nextTimeEvent), initial()}</code>, a time event. When that time event was due a few
+ulps after another event of the model, OCT treated it as already past, did not schedule it, and never evaluated the
+condition again: the reader stopped, and every Boolean and Integer column held its value for the rest of the run, without
+an error or a warning. Real columns were unaffected. In a year of the TIER plant it happened twice:
+</p>
+<ul>
+<li> at 28248 s, between two rows of the file 3.1e-10 s apart (two events of the plant in one instant, written with
+     times that differ in the last digits);</li>
+<li> at 1322822 s, between a timer of the check model (10 min after an event of the file) and the file's row of the
+     plant's own timer for the same instant, 2.3e-8 s later: the two timers started from times that differ in the last
+     digits. No change to the file can prevent this one.</li>
+</ul>
+<p>
+Three changes:
+</p>
+<ul>
+<li> The reader wakes on <code>fileEvent = clock &gt;= pre(nextTimeEvent)</code>, with <code>clock</code> a state equal to
+     <code>time</code>: a state event, which the integrator locates whatever other events are due. A block extending
+     <code>PartialSignalsFromFile</code> reads its Boolean and Integer columns in <code>when {fileEvent, initial()}</code>
+     (the documented pattern; Chaperone generates it). The old condition still compiles but has the old weakness.</li>
+<li> A state event is located only to the integrator's tolerance, possibly a hair before the row: a query time within a
+     relative 1e-10 of a row's time (the tolerance of <code>Modelica.Blocks.Tables</code>) is that row's time.</li>
+<li> Rows within a relative 1e-10 of the first row of their group are one event group at that row's time. The file
+     itself is not changed.</li>
+</ul>
+<p>
+A file without such rows reads as before, and events, values on either side of an event and slopes follow from the
+groups as before.
+</p>
+<h4>Where it showed</h4>
+<ul>
+<li> The TIER plant study (Chaperone, two-run workflow): over a year, every requirement condition read from a Boolean
+     column froze, first after 28248 s and, with only the grouping fixed, after 1322822 s. The week's file has no such
+     instant.</li>
+<li> <code>Resources/C-Sources/test/test_requirements_csv.py</code> checks the C reader against its Python twin
+     (Chaperone's <code>mahscsv.py</code>, which has the same rules): a corpus file with rows a few ulps apart, probes just
+     before and after every event, the TIER case, and a query a hair before an event. It found the twin through
+     ModCheck, where it no longer is; it now looks in Chaperone (<code>$CHAPERONE_DIR</code> or the sibling checkout).</li>
+</ul>
+<p>
+No model conversion is needed: <code>conversion(noneFromVersion=\"0.13.0\")</code>.
+</p>
+</html>"));
+  end Version_0_13_1;
 
   class Version_0_13_0 "Version 0.13.0 (Oct. 20, 2026)"
   extends Modelica.Icons.ReleaseNotes;
@@ -1243,10 +1305,10 @@ end UsersGuide;
 
   annotation (preferredView="info",
   uses(Modelica(version="4.1.0")),
-version="0.13.0",
-versionDate="2026-10-20",
+version="0.13.1",
+versionDate="2026-10-21",
 dateModified = "2026-10-20",
-conversion(noneFromVersion="0.7.1", noneFromVersion="0.8.0", noneFromVersion="0.9.0", noneFromVersion="0.9.1", noneFromVersion="0.10.0", noneFromVersion="0.11.0", noneFromVersion="0.11.1", noneFromVersion="0.12.0", noneFromVersion="0.12.1"),
+conversion(noneFromVersion="0.7.1", noneFromVersion="0.8.0", noneFromVersion="0.9.0", noneFromVersion="0.9.1", noneFromVersion="0.10.0", noneFromVersion="0.11.0", noneFromVersion="0.11.1", noneFromVersion="0.12.0", noneFromVersion="0.12.1", noneFromVersion="0.13.0"),
 revisionId="$Id:: package.mo 9390 2016-06-21 06:35:11Z #$",
 Documentation(info="<html>
 <p>
