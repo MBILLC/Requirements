@@ -29,7 +29,7 @@ The current version of the library uses a buffer for the implementation of slidi
 
 ## Changes in version 0.13.1 (October 2026)
 
-**Bug fix: the CSV reader at event rows a few ulps apart.** `Sources.PartialSignalsFromFile` treats rows within a relative 1e-10 in time as one event group. Two event rows 3.1e-10 s apart in a simulator's result were two time events; OCT dropped the second as already past, the reader's when-clause never fired again, and every Boolean and Integer column held its value for the rest of the run, with no error or warning. Found in a year of the TIER plant. Full account: `UsersGuide.ReleaseNotes.Version_0_13_1`.
+**Bug fix: the CSV reader stopped at an event due a few ulps after another.** `Sources.PartialSignalsFromFile` woke at the file's events on a time event; due a few ulps after another event of the model, OCT dropped it as already past, and every Boolean and Integer column held its value for the rest of the run, with no error or warning. Found twice in a year of the TIER plant. The reader now wakes on a state event, `fileEvent` (an extending block reads its Boolean and Integer columns in `when {fileEvent, initial()}`), and times within a relative 1e-10 are one instant. Full account: `UsersGuide.ReleaseNotes.Version_0_13_1`.
 
 ## Changes in version 0.13.0 (October 2026)
 

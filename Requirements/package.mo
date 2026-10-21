@@ -46,7 +46,7 @@ The regression baselines and the tool-by-tool measurements are kept beside the l
 <tr><td><a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Version_0_13_0\">0.13.0</a></td><td>2026-10-20</td>
     <td>Three check blocks ported from the Modelica Buildings_Requirements library: <code>WithinBand</code>, <code>GreaterEqual</code>, <code>StableSignal</code></td></tr>
 <tr><td><a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Version_0_13_1\">0.13.1</a></td><td>2026-10-21</td>
-    <td>Bug fix: the CSV reader froze every Boolean and Integer column for the rest of a run after two event rows a few ulps apart in time</td></tr>
+    <td>Bug fix: the CSV reader stopped (every Boolean and Integer column held) at an event due a few ulps after another</td></tr>
 </table>
 
 <p>
@@ -281,9 +281,9 @@ This release changes requirement semantics.
 <h4>0.13.1 &mdash; CSV reader: event rows a few ulps apart</h4>
 <ul>
 <li> The MA-HS-CSV reader behind <a href=\"modelica://Requirements.Sources.PartialSignalsFromFile\">Sources.PartialSignalsFromFile</a>
-     treats rows within a relative 1e-10 in time as one event group. Two event rows 3.1e-10 s apart in a simulator's
-     result were two time events; OCT dropped the second as already past, and every Boolean and Integer column held its
-     value for the rest of the run.</li>
+     wakes on a state event (<code>fileEvent</code>) instead of a time event, and treats times within a relative 1e-10 as
+     one instant. A time event of the reader due a few ulps after another event of the model was dropped by OCT as
+     already past, and every Boolean and Integer column held its value for the rest of the run.</li>
 </ul>
 
 <h4>0.13.0 &mdash; Check blocks from Buildings_Requirements</h4>
@@ -341,31 +341,46 @@ This release changes requirement semantics.
 
     annotation (Documentation(info="<html>
 <p>
-<b>Bug fix: the CSV reader at event rows a few ulps apart.</b>
-<a href=\"modelica://Requirements.Sources.PartialSignalsFromFile\">Sources.PartialSignalsFromFile</a> updates its Boolean and
-Integer outputs in <code>when {time &gt;= pre(nextTimeEvent), initial()}</code>, and the reader's
-<code>nextTimeEvent(t)</code> returns the first event strictly after <code>t</code>. A simulator's result can hold two event
-instants a few ulps apart: the TIER plant's year has rows at 28248.026729088244 s and 28248.026729088557 s, 3.1e-10 s
-apart. At the first, the when-clause set the next time event to the second; OCT treated a time event that close as
-already past and did not schedule it, the condition never fired again, and every Boolean and Integer column held its
-value for the rest of the run. Real columns were unaffected. The verdicts of every requirement with a Boolean condition
-were wrong from that instant on, without an error or a warning.
+<b>Bug fix: the CSV reader stopped at an event due a few ulps after another.</b>
+<a href=\"modelica://Requirements.Sources.PartialSignalsFromFile\">Sources.PartialSignalsFromFile</a> woke at the file's
+events with <code>when {time &gt;= pre(nextTimeEvent), initial()}</code>, a time event. When that time event was due a few
+ulps after another event of the model, OCT treated it as already past, did not schedule it, and never evaluated the
+condition again: the reader stopped, and every Boolean and Integer column held its value for the rest of the run, without
+an error or a warning. Real columns were unaffected. In a year of the TIER plant it happened twice:
 </p>
+<ul>
+<li> at 28248 s, between two rows of the file 3.1e-10 s apart (two events of the plant in one instant, written with
+     times that differ in the last digits);</li>
+<li> at 1322822 s, between a timer of the check model (10 min after an event of the file) and the file's row of the
+     plant's own timer for the same instant, 2.3e-8 s later: the two timers started from times that differ in the last
+     digits. No change to the file can prevent this one.</li>
+</ul>
 <p>
-The reader now treats rows whose times are within a relative 1e-10 (the tolerance of
-<code>Modelica.Blocks.Tables</code>) of the first row of their group as one event group at that row's time, as if they
-had the same time. The file itself is not changed. Events, values on either side of an event and slopes follow from the
-groups as before. A file without such rows reads exactly as before.
+Three changes:
+</p>
+<ul>
+<li> The reader wakes on <code>fileEvent = clock &gt;= pre(nextTimeEvent)</code>, with <code>clock</code> a state equal to
+     <code>time</code>: a state event, which the integrator locates whatever other events are due. A block extending
+     <code>PartialSignalsFromFile</code> reads its Boolean and Integer columns in <code>when {fileEvent, initial()}</code>
+     (the documented pattern; Chaperone generates it). The old condition still compiles but has the old weakness.</li>
+<li> A state event is located only to the integrator's tolerance, possibly a hair before the row: a query time within a
+     relative 1e-10 of a row's time (the tolerance of <code>Modelica.Blocks.Tables</code>) is that row's time.</li>
+<li> Rows within a relative 1e-10 of the first row of their group are one event group at that row's time. The file
+     itself is not changed.</li>
+</ul>
+<p>
+A file without such rows reads as before, and events, values on either side of an event and slopes follow from the
+groups as before.
 </p>
 <h4>Where it showed</h4>
 <ul>
 <li> The TIER plant study (Chaperone, two-run workflow): over a year, every requirement condition read from a Boolean
-     column froze after 28248 s, some true and some false for the rest of the year. The week's file has no such rows. With the fix,
-     a week of the year's file gives the same condition changes as the plant's data.</li>
+     column froze, first after 28248 s and, with only the grouping fixed, after 1322822 s. The week's file has no such
+     instant.</li>
 <li> <code>Resources/C-Sources/test/test_requirements_csv.py</code> checks the C reader against its Python twin
-     (Chaperone's <code>mahscsv.py</code>, which has the same rule): a corpus file with rows a few ulps apart, probes just
-     before and after every event, and the TIER case itself. It found the twin through ModCheck, where it no longer is;
-     it now looks in Chaperone (<code>$CHAPERONE_DIR</code> or the sibling checkout).</li>
+     (Chaperone's <code>mahscsv.py</code>, which has the same rules): a corpus file with rows a few ulps apart, probes just
+     before and after every event, the TIER case, and a query a hair before an event. It found the twin through
+     ModCheck, where it no longer is; it now looks in Chaperone (<code>$CHAPERONE_DIR</code> or the sibling checkout).</li>
 </ul>
 <p>
 No model conversion is needed: <code>conversion(noneFromVersion=\"0.13.0\")</code>.

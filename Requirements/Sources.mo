@@ -263,8 +263,14 @@ in the parameter menu.
     parameter Requirements.Internal.CSV.File file = Requirements.Internal.CSV.File(
       fileNameResolved, realNames, booleanNames, integerNames, extrapolateHold) "The file, read once";
     discrete Real nextTimeEvent(start=0, fixed=true) "Next instant at which a column of the file changes";
+    Real clock(fixed=false) "time as a state, so that fileEvent is a state event";
+    Boolean fileEvent = clock >= pre(nextTimeEvent)
+      "The file's next event is due: the condition of every when-clause that reads the file";
+  initial equation
+    clock = time;
   equation
-    when {time >= pre(nextTimeEvent), initial()} then
+    der(clock) = 1;
+    when {fileEvent, initial()} then
       nextTimeEvent = Requirements.Internal.CSV.nextTimeEvent(file, time);
     end when;
     annotation (
@@ -291,7 +297,7 @@ in the parameter menu.
   Modelica.Blocks.Interfaces.BooleanOutput packOn;
   Modelica.Blocks.Interfaces.IntegerOutput flightPhase;
 <b>equation</b>
-  <b>when</b> {time >= <b>pre</b>(nextTimeEvent), <b>initial</b>()} <b>then</b>
+  <b>when</b> {fileEvent, <b>initial</b>()} <b>then</b>
     packOn      = Requirements.Internal.CSV.getBoolean(file, 1, time, nextTimeEvent, <b>pre</b>(nextTimeEvent));
     flightPhase = Requirements.Internal.CSV.getInteger(file, 1, time, nextTimeEvent, <b>pre</b>(nextTimeEvent));
   <b>end when</b>;
@@ -312,9 +318,14 @@ values in XML-Schema lexical form: <code>Float64</code> as decimal or scientific
 The file carries no type row: <b>the extending block decides the type of every column it reads</b> through the three name lists,
 and declares one output per column, so the reader reads in a diagram like any block with named outputs:
 Real outputs as declaration equations (they are continuous-time), Boolean and Integer outputs assigned in a when-clause with the
-same trigger as the block's own, <code>when {time &gt;= pre(nextTimeEvent), initial()}</code>, because a discrete signal may only change
+same trigger as the block's own, <code>when {fileEvent, initial()}</code>, because a discrete signal may only change
 at an event and this is the event at which the file's Boolean and Integer columns change (the pattern of
 <a href=\"modelica://Modelica.Blocks.Sources.BooleanTable\">BooleanTable</a>).
+<code>fileEvent</code> is <code>clock &gt;= pre(nextTimeEvent)</code> with <code>clock</code> a state equal to <code>time</code>:
+a state event, located by the integrator. The obvious <code>time &gt;= pre(nextTimeEvent)</code> is a time event, and a time
+event due a few ulps after another event of the model (a timer started at an event of the file, due at the instant a later
+row of the file was written, from a time that differs in the last digits) is dropped by OCT as already past and never
+retried: the reader would hold every Boolean and Integer column for the rest of the run (version 0.13.1).
 Columns not named are skipped. A name that is not in the header, or a header name that appears twice, is an error when the file is opened
 (at initialization), not a silent zero. Arrays (space-separated fields) are not supported; a numeric field containing a space is an error.
 </p>

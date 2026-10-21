@@ -24,6 +24,9 @@ What is asserted, per corpus file:
   * rows a few ulps apart in time are one event group (a relative 1e-10): the
     TIER year's two event rows 3.1e-10 s apart at 28248 s are one event, the
     next event is the following one, and the later row's value applies;
+  * a query a hair before an event (within the same tolerance) is at the
+    event: the reader wakes on a state event, located only to the integrator's
+    root-finding tolerance;
   * identical value(t, tNext, tPre) at a grid of instants including every
     event time on both sides of the bracket, between rows, and outside the
     range (hold), and the same refusal outside the range without hold;
@@ -363,6 +366,12 @@ def check_near_coincident(c: CReader, tmp: Path) -> list[str]:
         failures.append("near_coincident: the left side of the event is not the old value")
     if c.get(mahscsv.BOOLEAN, h, 1, t, nxt, t) is not True:
         failures.append("near_coincident: the right side of the event is not the later row's value")
+    # the reader wakes on a state event, located a hair early (within the tolerance)
+    early = t - 0.5 * mahscsv.EVENT_EPS * t
+    if c.lib.test_nextTimeEvent(h, early) != 28454.553253635575:
+        failures.append(f"near_coincident: nextTimeEvent a hair early ({early!r}) is not the following event")
+    if c.get(mahscsv.BOOLEAN, h, 1, early, t, t) is not False or c.get(mahscsv.BOOLEAN, h, 1, early, nxt, t) is not True:
+        failures.append("near_coincident: a hair early, the two sides of the event are not the old and the new value")
     c.lib.test_close(h)
     return failures
 

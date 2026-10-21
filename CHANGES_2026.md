@@ -21,7 +21,7 @@ tool-by-tool measurements are kept beside the library (see `Requirements.UsersGu
 | 0.12.0 | 2026-10-19 | Violation statistics: how often, how long and how badly a requirement was violated |
 | 0.12.1 | 2026-10-19 | Bug fix: `DelayedRising` stayed true after its input fell, when the fall coincided with the end of the duration |
 | 0.13.0 | 2026-10-20 | Three check blocks ported from the Modelica Buildings_Requirements library: `WithinBand`, `GreaterEqual`, `StableSignal` |
-| 0.13.1 | 2026-10-21 | Bug fix: the CSV reader froze every Boolean and Integer column for the rest of a run after two event rows a few ulps apart in time |
+| 0.13.1 | 2026-10-21 | Bug fix: the CSV reader stopped (every Boolean and Integer column held) at an event due a few ulps after another |
 
 No release needs a model conversion. Each one declares `conversion(noneFromVersion=...)`
 for the version before it. One exception: from 0.8.0 on, code that reads a stored
@@ -206,11 +206,14 @@ This release changes requirement semantics.
 
 ## 0.13.1 — CSV reader: event rows a few ulps apart
 
-- **The MA-HS-CSV reader** (`Sources.PartialSignalsFromFile`) treats rows within a relative 1e-10 in time as one event
-  group at the first row's time (the tolerance of `Modelica.Blocks.Tables`). A simulator's result can hold two event
-  rows a few ulps apart (3.1e-10 s at 28248 s in a year of the TIER plant). As two time events, OCT dropped the second
-  as already past, the reader's when-clause never fired again, and every Boolean and Integer column held its value for
-  the rest of the run, without an error or a warning.
+- **The MA-HS-CSV reader** (`Sources.PartialSignalsFromFile`) woke at the file's events on a time event. Due a few ulps
+  after another event of the model, OCT dropped it as already past and never retried: every Boolean and Integer column
+  held its value for the rest of the run, without an error or a warning (twice in a year of the TIER plant: two rows of
+  the file 3.1e-10 s apart, and a timer of the check model 2.3e-8 s before the plant's own timer's row).
+- The reader now wakes on `fileEvent` (`clock >= pre(nextTimeEvent)`, `clock` a state equal to `time`): a state event.
+  A block extending it reads its Boolean and Integer columns in `when {fileEvent, initial()}`.
+- Times within a relative 1e-10 (`Modelica.Blocks.Tables`' tolerance) are one instant: a query a hair before a row is
+  at the row, and rows that close are one event group. The file is unchanged.
 - The C reader's test checks the new rule against its Python twin, which now lives in Chaperone (`$CHAPERONE_DIR`).
 
 ## 0.13.0 — Check blocks from Buildings_Requirements
