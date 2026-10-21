@@ -2,7 +2,7 @@
 
 This file summarizes what changed in the Modelica **Requirements** library
 (package folder [`Requirements/`](Requirements/)) during 2026. The library went from
-**0.7.0** (Feb. 2025) to **0.12.1** (2026-10-19) in nine releases.
+**0.7.0** (Feb. 2025) to **0.13.0** (2026-10-20) in ten releases.
 
 The full release notes are in the library itself, under
 `Requirements.UsersGuide.ReleaseNotes`. The same summary is in the library documentation,
@@ -20,6 +20,7 @@ tool-by-tool measurements are kept beside the library (see `Requirements.UsersGu
 | 0.11.1 | 2026-10-16 | Steady-state check example; the verdict printed once in every tool; self-contained documentation |
 | 0.12.0 | 2026-10-19 | Violation statistics: how often, how long and how badly a requirement was violated |
 | 0.12.1 | 2026-10-19 | Bug fix: `DelayedRising` stayed true after its input fell, when the fall coincided with the end of the duration |
+| 0.13.0 | 2026-10-20 | Three check blocks ported from the Modelica Buildings_Requirements library: `WithinBand`, `GreaterEqual`, `StableSignal` |
 
 No release needs a model conversion. Each one declares `conversion(noneFromVersion=...)`
 for the version before it. One exception: from 0.8.0 on, code that reads a stored
@@ -201,6 +202,25 @@ This release changes requirement semantics.
     tools.
 - The repository [MBILLC/Requirements](https://github.com/MBILLC/Requirements) is public;
   the User's Guide and the Contact page link to it.
+
+## 0.13.0 — Check blocks from Buildings_Requirements
+
+- Three blocks of LBNL's [Buildings_Requirements](https://github.com/lbl-srg/modelica-buildings-requirements) library are
+  ported into `ChecksInFixedWindow`, as check blocks with `Property` and `margin`:
+  - `WithinBand`: a Real input within constant limits.
+  - `GreaterEqual`: one Real input at least another (a temperature against its set point).
+  - `StableSignal`: the moving average of |du/dt| over a window at most a limit; no state events from
+    changes of direction.
+- Each has a `condition` input and a `delayTime` after each rising edge before the check applies.
+- Changes from the originals: check blocks instead of complete requirements; Undefined (not Undecided) while a
+  check does not apply; StableSignal's hysteresis a parameter, default 0, so the margin's sign is the verdict; no
+  dependency on the Buildings library.
+- `MinimumDuration` is not ported: it is `MinDuration(condition = u, check = true)`.
+- The originals' validation models are examples now. Run beside the originals in Modelon Impact, all 14
+  requirements give the same verdict at 3999 instants each, apart from Undecided → Undefined while inactive.
+  `Examples.Elementary.Margin.Gated` and `.StableSignal` assert the margins in closed form. The five examples are
+  Impact regression cases.
+- The ported code is under the Modelica Buildings library's license (`UsersGuide.BuildingsLicense`, LICENSE).
 
 ## 0.12.1 — DelayedRising at coincident events
 

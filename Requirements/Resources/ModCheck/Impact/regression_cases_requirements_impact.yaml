@@ -1205,3 +1205,64 @@ cases:
     rtol: 1.0e-06
     modifiers: {}
     variables: [time, continuous.nViolations, continuous.totalDuration, continuous.worstMargin, ratchet.worstMargin]
+
+  # Added 2026-10-20 with library 0.13.0: the check blocks ported from Buildings_Requirements
+  # (modelica-buildings-requirements, M. Wetter, LBNL). The three Elementary examples are the
+  # original validation models with the same instances; their verdicts were compared with the
+  # originals' run in the same workspace at 3999 instants each, identical except Undecided (2)
+  # -> Undefined (4) while a check does not apply. The two Margin examples assert the margins
+  # in closed form. References from Impact: no Dymola / OpenModelica baseline exists yet.
+  - name: MR_Examples_Elementary_ChecksInFixedWindow_WithinBand
+    enabled: true
+    model: Requirements.Examples.Elementary.ChecksInFixedWindow.WithinBand
+    start_time: 0.0
+    final_time: 1.0
+    ncp: 500
+    rtol: 1.0e-06
+    modifiers: {}
+    variables: [time, "*.y", "*.margin"]
+
+  - name: MR_Examples_Elementary_ChecksInFixedWindow_GreaterEqual
+    enabled: true
+    model: Requirements.Examples.Elementary.ChecksInFixedWindow.GreaterEqual
+    start_time: 0.0
+    final_time: 1.0
+    ncp: 500
+    rtol: 1.0e-06
+    modifiers: {}
+    variables: [time, "*.y", "*.margin"]
+
+  - name: MR_Examples_Elementary_ChecksInFixedWindow_StableSignal
+    # tolerance 2e-2, not the list's 1e-3: rateAverage is the difference of the integral of |du/dt| over the
+    # window, and at the CI's rtol factor of 100 (rtol 1e-4) the fast sine's final average (0.0177 1/s) moves by
+    # 1.0e-4 (0.6 %), its margin (-0.0077) by 1.3 % -- the solver's tolerance on an integral that reaches 64 in the
+    # hour, not a regression. At the reference's own rtol every check passes at 1e-3 (2026-10-20).
+    enabled: true
+    tolerance: 2.0e-2
+    model: Requirements.Examples.Elementary.ChecksInFixedWindow.StableSignal
+    start_time: 0.0
+    final_time: 3600.0
+    ncp: 720
+    rtol: 1.0e-06
+    modifiers: {}
+    variables: [time, "staSig*.y", "staSig*.margin", "staSig*.rateAverage"]
+
+  - name: MR_Examples_Elementary_Margin_Gated
+    enabled: true
+    model: Requirements.Examples.Elementary.Margin.Gated
+    start_time: 0.0
+    final_time: 20.0
+    ncp: 2000
+    rtol: 1.0e-06
+    modifiers: {}
+    variables: [time, "*.y", "*.margin", "*.nViolations", "*.totalDuration", "*.worstMargin"]
+
+  - name: MR_Examples_Elementary_Margin_StableSignal
+    enabled: true
+    model: Requirements.Examples.Elementary.Margin.StableSignal
+    start_time: 0.0
+    final_time: 150.0
+    ncp: 1500
+    rtol: 1.0e-06
+    modifiers: {}
+    variables: [time, "*.y", "*.margin", "*.rateAverage"]

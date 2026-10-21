@@ -1045,6 +1045,259 @@ Note, that the point is outside of the domain defined by the polygon if distance
 </p>
 </html>"));
     end WithinDomain;
+
+    model WithinBand
+      "Example for WithinBand (a sine and three constants against a band, always, never and sometimes active)"
+      extends Modelica.Icons.Example;
+      Modelica.Blocks.Sources.Sine sin(f=1) "u = sin(2 pi t / 1 s)"
+        annotation (Placement(transformation(extent={{-100,70},{-80,90}})));
+      Modelica.Blocks.Sources.Constant zer(k=0) "u = 0, inside the band"
+        annotation (Placement(transformation(extent={{-100,-30},{-80,-10}})));
+      Modelica.Blocks.Sources.Constant zer1(k=0.5) "u = 0.5, on the upper limit"
+        annotation (Placement(transformation(extent={{-100,-60},{-80,-40}})));
+      Modelica.Blocks.Sources.Constant zer2(k=-0.5) "u = -0.5, on the lower limit"
+        annotation (Placement(transformation(extent={{-100,-90},{-80,-70}})));
+      Requirements.Sources.BooleanConstant on(c=true) "Always active"
+        annotation (Placement(transformation(extent={{-100,40},{-80,60}})));
+      Requirements.Sources.BooleanConstant off(c=false) "Never active"
+        annotation (Placement(transformation(extent={{-100,10},{-80,30}})));
+      Modelica.Blocks.Sources.BooleanPulse booPul(width=50, period=0.25) "Active in the first half of every 0.25 s"
+        annotation (Placement(transformation(extent={{-100,-110},{-80,-90}})));
+      Requirements.ChecksInFixedWindow.WithinBand witBan(u_max=0.5, u_min=-0.5) "Always active: violated"
+        annotation (Placement(transformation(extent={{-40,80},{0,100}})));
+      Requirements.ChecksInFixedWindow.WithinBand witBan1(u_max=0.5, u_min=-0.5) "Never active: Undefined, untested"
+        annotation (Placement(transformation(extent={{-40,50},{0,70}})));
+      Requirements.ChecksInFixedWindow.WithinBand witBan2(u_max=0.5, u_min=-0.5) "Sometimes active: violated"
+        annotation (Placement(transformation(extent={{-40,20},{0,40}})));
+      Requirements.ChecksInFixedWindow.WithinBand con1(u_max=0.5, u_min=-0.5) "Constant inside the band: satisfied"
+        annotation (Placement(transformation(extent={{-40,-30},{0,-10}})));
+      Requirements.ChecksInFixedWindow.WithinBand con2(u_max=0.5, u_min=-0.5) "Constant on the upper limit: satisfied, margin 0"
+        annotation (Placement(transformation(extent={{-40,-60},{0,-40}})));
+      Requirements.ChecksInFixedWindow.WithinBand con3(u_max=0.5, u_min=-0.5) "Constant on the lower limit: satisfied, margin 0"
+        annotation (Placement(transformation(extent={{-40,-90},{0,-70}})));
+      Requirements.Verify.Requirement reqWitBan(text="Test whether signal is within band", computeStatistics=true, useMargin=true)
+        annotation (Placement(transformation(extent={{30,80},{90,100}})));
+      Requirements.Verify.Requirement reqWitBan1(text="Test whether signal is within band", computeStatistics=true, useMargin=true)
+        annotation (Placement(transformation(extent={{30,50},{90,70}})));
+      Requirements.Verify.Requirement reqWitBan2(text="Test whether signal is within band", computeStatistics=true, useMargin=true)
+        annotation (Placement(transformation(extent={{30,20},{90,40}})));
+      Requirements.Verify.Requirement reqCon1(text="Test whether signal is within band", computeStatistics=true, useMargin=true)
+        annotation (Placement(transformation(extent={{30,-30},{90,-10}})));
+      Requirements.Verify.Requirement reqCon2(text="Test whether signal is within band", computeStatistics=true, useMargin=true)
+        annotation (Placement(transformation(extent={{30,-60},{90,-40}})));
+      Requirements.Verify.Requirement reqCon3(text="Test whether signal is within band", computeStatistics=true, useMargin=true)
+        annotation (Placement(transformation(extent={{30,-90},{90,-70}})));
+      inner Requirements.Verify.PrintViolations printViolations(useEvaluationTime=true, evaluationTime=1)
+        annotation (Placement(transformation(extent={{30,-130},{90,-110}})));
+    equation
+      connect(sin.y, witBan.u) annotation (Line(points={{-79,80},{-60,80},{-60,96},{-42,96}}, color={0,0,127}));
+      connect(sin.y, witBan1.u) annotation (Line(points={{-79,80},{-60,80},{-60,66},{-42,66}}, color={0,0,127}));
+      connect(sin.y, witBan2.u) annotation (Line(points={{-79,80},{-60,80},{-60,36},{-42,36}}, color={0,0,127}));
+      connect(zer.y, con1.u) annotation (Line(points={{-79,-20},{-60,-20},{-60,-14},{-42,-14}}, color={0,0,127}));
+      connect(zer1.y, con2.u) annotation (Line(points={{-79,-50},{-60,-50},{-60,-44},{-42,-44}}, color={0,0,127}));
+      connect(zer2.y, con3.u) annotation (Line(points={{-79,-80},{-60,-80},{-60,-74},{-42,-74}}, color={0,0,127}));
+      connect(on.y, witBan.condition) annotation (Line(points={{-79,50},{-66,50},{-66,90},{-42,90}}, color={255,0,255}));
+      connect(off.y, witBan1.condition) annotation (Line(points={{-79,20},{-70,20},{-70,60},{-42,60}}, color={255,0,255}));
+      connect(booPul.y, witBan2.condition) annotation (Line(points={{-79,-100},{-50,-100},{-50,30},{-42,30}}, color={255,0,255}));
+      connect(on.y, con1.condition) annotation (Line(points={{-79,50},{-66,50},{-66,-20},{-42,-20}}, color={255,0,255}));
+      connect(on.y, con2.condition) annotation (Line(points={{-79,50},{-66,50},{-66,-50},{-42,-50}}, color={255,0,255}));
+      connect(on.y, con3.condition) annotation (Line(points={{-79,50},{-66,50},{-66,-80},{-42,-80}}, color={255,0,255}));
+      connect(witBan.y, reqWitBan.property) annotation (Line(points={{1,90},{26,90}}, color={0,0,255}));
+      connect(witBan.margin, reqWitBan.margin) annotation (Line(points={{1,81},{26,81},{26,83}}, color={0,127,0}));
+      connect(witBan1.y, reqWitBan1.property) annotation (Line(points={{1,60},{26,60}}, color={0,0,255}));
+      connect(witBan1.margin, reqWitBan1.margin) annotation (Line(points={{1,51},{26,51},{26,53}}, color={0,127,0}));
+      connect(witBan2.y, reqWitBan2.property) annotation (Line(points={{1,30},{26,30}}, color={0,0,255}));
+      connect(witBan2.margin, reqWitBan2.margin) annotation (Line(points={{1,21},{26,21},{26,23}}, color={0,127,0}));
+      connect(con1.y, reqCon1.property) annotation (Line(points={{1,-20},{26,-20}}, color={0,0,255}));
+      connect(con1.margin, reqCon1.margin) annotation (Line(points={{1,-29},{26,-29},{26,-27}}, color={0,127,0}));
+      connect(con2.y, reqCon2.property) annotation (Line(points={{1,-50},{26,-50}}, color={0,0,255}));
+      connect(con2.margin, reqCon2.margin) annotation (Line(points={{1,-59},{26,-59},{26,-57}}, color={0,127,0}));
+      connect(con3.y, reqCon3.property) annotation (Line(points={{1,-80},{26,-80}}, color={0,0,255}));
+      connect(con3.margin, reqCon3.margin) annotation (Line(points={{1,-89},{26,-89},{26,-87}}, color={0,127,0}));
+      annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-120,-140},{120,120}})),
+        experiment(StopTime=1, Tolerance=1e-06),
+        Documentation(info="<html>
+<p>
+Check block <a href=\"modelica://Requirements.ChecksInFixedWindow.WithinBand\">WithinBand</a> with the band
+[&minus;0.5, 0.5], each check feeding a <a href=\"modelica://Requirements.Verify.Requirement\">Verify.Requirement</a>
+with violation statistics and margin:
+</p>
+<ul>
+<li> <code>witBan</code>, <code>witBan1</code> and <code>witBan2</code> check sin(2&pi;t) with the condition always true,
+     always false and true in the first half of every 0.25 s. The first is violated; the second is Undefined
+     throughout, so its requirement is <em>untested</em>; the third is violated in the active windows that the sine
+     spends outside the band.</li>
+<li> <code>con1</code>, <code>con2</code> and <code>con3</code> check the constants 0, 0.5 and &minus;0.5, always active:
+     all three are satisfied (both limits are part of the band), the last two with margin 0.</li>
+</ul>
+<p>
+This is the validation model <code>Buildings_Requirements.Validation.WithinBand</code> of
+<a href=\"https://github.com/lbl-srg/modelica-buildings-requirements\">modelica-buildings-requirements</a>
+(M. Wetter, LBNL), ported with the block in version 0.13.0. The verdicts are the original's, except that an
+inactive check is Undefined (4) where the original reported Undecided (2).
+Copyright (c) 1998-2024 The Regents of the University of California, through Lawrence Berkeley National Laboratory,
+and contributors; see <a href=\"modelica://Requirements.UsersGuide.BuildingsLicense\">UsersGuide.BuildingsLicense</a>.
+</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC (the port). All rights reserved.</p>
+</html>"));
+    end WithinBand;
+
+    model GreaterEqual
+      "Example for GreaterEqual (a sine and a constant compared, always, never and sometimes active)"
+      extends Modelica.Icons.Example;
+      Modelica.Blocks.Sources.Sine sin(f=1) "sin(2 pi t / 1 s)"
+        annotation (Placement(transformation(extent={{-100,70},{-80,90}})));
+      Modelica.Blocks.Sources.Constant con(k=0) "Outputs zero"
+        annotation (Placement(transformation(extent={{-100,-40},{-80,-20}})));
+      Requirements.Sources.BooleanConstant on(c=true) "Always active"
+        annotation (Placement(transformation(extent={{-100,40},{-80,60}})));
+      Requirements.Sources.BooleanConstant off(c=false) "Never active"
+        annotation (Placement(transformation(extent={{-100,10},{-80,30}})));
+      Modelica.Blocks.Sources.BooleanPulse booPul(width=50, period=0.25) "Active in the first half of every 0.25 s"
+        annotation (Placement(transformation(extent={{-100,-80},{-80,-60}})));
+      Requirements.ChecksInFixedWindow.GreaterEqual greAct "sin >= 0, always active: violated"
+        annotation (Placement(transformation(extent={{-40,80},{0,100}})));
+      Requirements.ChecksInFixedWindow.GreaterEqual greAct1 "sin >= 0, never active: Undefined, untested"
+        annotation (Placement(transformation(extent={{-40,40},{0,60}})));
+      Requirements.ChecksInFixedWindow.GreaterEqual greAct2 "sin >= 0, sometimes active: violated"
+        annotation (Placement(transformation(extent={{-40,0},{0,20}})));
+      Requirements.ChecksInFixedWindow.GreaterEqual greAct3 "0 >= 0, sometimes active: satisfied, margin 0"
+        annotation (Placement(transformation(extent={{-40,-40},{0,-20}})));
+      Requirements.Verify.Requirement reqGreAct(text="sin >= 0", computeStatistics=true, useMargin=true)
+        annotation (Placement(transformation(extent={{30,80},{90,100}})));
+      Requirements.Verify.Requirement reqGreAct1(text="sin >= 0 (never active)", computeStatistics=true, useMargin=true)
+        annotation (Placement(transformation(extent={{30,40},{90,60}})));
+      Requirements.Verify.Requirement reqGreAct2(text="sin >= 0 (sometimes active)", computeStatistics=true, useMargin=true)
+        annotation (Placement(transformation(extent={{30,0},{90,20}})));
+      Requirements.Verify.Requirement reqGreAct3(text="0 >= 0 (sometimes active)", computeStatistics=true, useMargin=true)
+        annotation (Placement(transformation(extent={{30,-40},{90,-20}})));
+      inner Requirements.Verify.PrintViolations printViolations(useEvaluationTime=true, evaluationTime=1)
+        annotation (Placement(transformation(extent={{30,-90},{90,-70}})));
+    equation
+      connect(sin.y, greAct.u_max) annotation (Line(points={{-79,80},{-60,80},{-60,96},{-42,96}}, color={0,0,127}));
+      connect(sin.y, greAct1.u_max) annotation (Line(points={{-79,80},{-60,80},{-60,56},{-42,56}}, color={0,0,127}));
+      connect(sin.y, greAct2.u_max) annotation (Line(points={{-79,80},{-60,80},{-60,16},{-42,16}}, color={0,0,127}));
+      connect(con.y, greAct.u_min) annotation (Line(points={{-79,-30},{-56,-30},{-56,84},{-42,84}}, color={0,0,127}));
+      connect(con.y, greAct1.u_min) annotation (Line(points={{-79,-30},{-56,-30},{-56,44},{-42,44}}, color={0,0,127}));
+      connect(con.y, greAct2.u_min) annotation (Line(points={{-79,-30},{-56,-30},{-56,4},{-42,4}}, color={0,0,127}));
+      connect(con.y, greAct3.u_max) annotation (Line(points={{-79,-30},{-56,-30},{-56,-24},{-42,-24}}, color={0,0,127}));
+      connect(con.y, greAct3.u_min) annotation (Line(points={{-79,-30},{-56,-30},{-56,-36},{-42,-36}}, color={0,0,127}));
+      connect(on.y, greAct.condition) annotation (Line(points={{-79,50},{-66,50},{-66,90},{-42,90}}, color={255,0,255}));
+      connect(off.y, greAct1.condition) annotation (Line(points={{-79,20},{-70,20},{-70,50},{-42,50}}, color={255,0,255}));
+      connect(booPul.y, greAct2.condition) annotation (Line(points={{-79,-70},{-50,-70},{-50,10},{-42,10}}, color={255,0,255}));
+      connect(booPul.y, greAct3.condition) annotation (Line(points={{-79,-70},{-50,-70},{-50,-30},{-42,-30}}, color={255,0,255}));
+      connect(greAct.y, reqGreAct.property) annotation (Line(points={{1,90},{26,90}}, color={0,0,255}));
+      connect(greAct.margin, reqGreAct.margin) annotation (Line(points={{1,81},{26,81},{26,83}}, color={0,127,0}));
+      connect(greAct1.y, reqGreAct1.property) annotation (Line(points={{1,50},{26,50}}, color={0,0,255}));
+      connect(greAct1.margin, reqGreAct1.margin) annotation (Line(points={{1,41},{26,41},{26,43}}, color={0,127,0}));
+      connect(greAct2.y, reqGreAct2.property) annotation (Line(points={{1,10},{26,10}}, color={0,0,255}));
+      connect(greAct2.margin, reqGreAct2.margin) annotation (Line(points={{1,1},{26,1},{26,3}}, color={0,127,0}));
+      connect(greAct3.y, reqGreAct3.property) annotation (Line(points={{1,-30},{26,-30}}, color={0,0,255}));
+      connect(greAct3.margin, reqGreAct3.margin) annotation (Line(points={{1,-39},{26,-39},{26,-37}}, color={0,127,0}));
+      annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-120,-100},{120,120}})),
+        experiment(StopTime=1, Tolerance=1e-06),
+        Documentation(info="<html>
+<p>
+Check block <a href=\"modelica://Requirements.ChecksInFixedWindow.GreaterEqual\">GreaterEqual</a>, each check feeding a
+<a href=\"modelica://Requirements.Verify.Requirement\">Verify.Requirement</a> with violation statistics and margin:
+</p>
+<ul>
+<li> <code>greAct</code>, <code>greAct1</code> and <code>greAct2</code> require sin(2&pi;t) &ge; 0 with the condition always
+     true, always false and true in the first half of every 0.25 s: violated, Undefined throughout (untested), and
+     violated in the active window [0.5, 0.625) s where the sine is negative.</li>
+<li> <code>greAct3</code> requires 0 &ge; 0 in the same windows: satisfied, with margin 0.</li>
+</ul>
+<p>
+This is the validation model <code>Buildings_Requirements.Validation.GreaterEqual</code> of
+<a href=\"https://github.com/lbl-srg/modelica-buildings-requirements\">modelica-buildings-requirements</a>
+(M. Wetter, LBNL), ported with the block in version 0.13.0. The verdicts are the original's, except that an
+inactive check is Undefined (4) where the original reported Undecided (2).
+Copyright (c) 1998-2024 The Regents of the University of California, through Lawrence Berkeley National Laboratory,
+and contributors; see <a href=\"modelica://Requirements.UsersGuide.BuildingsLicense\">UsersGuide.BuildingsLicense</a>.
+</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC (the port). All rights reserved.</p>
+</html>"));
+    end GreaterEqual;
+
+    model StableSignal
+      "Example for StableSignal (a slow and a fast sine, always and sometimes active)"
+      extends Modelica.Icons.Example;
+      Modelica.Blocks.Sources.Sine sin(amplitude=0.5, f=0.1/120, offset=0.5) "Slow: a period of 1200 s"
+        annotation (Placement(transformation(extent={{-100,70},{-80,90}})));
+      Modelica.Blocks.Sources.Sine sin1(amplitude=0.5, f=1/120, offset=0.5) "Fast: a period of 120 s"
+        annotation (Placement(transformation(extent={{-100,-30},{-80,-10}})));
+      Requirements.Sources.BooleanConstant on(c=true) "Always active"
+        annotation (Placement(transformation(extent={{-100,40},{-80,60}})));
+      Modelica.Blocks.Sources.BooleanPulse booPul(width=50, period=600) "Active in the first half of every 600 s"
+        annotation (Placement(transformation(extent={{-100,10},{-80,30}})));
+      Modelica.Blocks.Sources.BooleanPulse booPul1(width=50, period=1200) "Active in the first half of every 1200 s"
+        annotation (Placement(transformation(extent={{-100,-70},{-80,-50}})));
+      Requirements.ChecksInFixedWindow.StableSignal staSigOn(window=120) "Slow sine, always active: satisfied"
+        annotation (Placement(transformation(extent={{-40,80},{0,100}})));
+      Requirements.ChecksInFixedWindow.StableSignal staSigPul(window=120) "Slow sine, sometimes active: satisfied"
+        annotation (Placement(transformation(extent={{-40,40},{0,60}})));
+      Requirements.ChecksInFixedWindow.StableSignal staSigOn1 "Fast sine, always active: violated"
+        annotation (Placement(transformation(extent={{-40,-10},{0,10}})));
+      Requirements.ChecksInFixedWindow.StableSignal staSigPul1 "Fast sine, sometimes active: violated"
+        annotation (Placement(transformation(extent={{-40,-50},{0,-30}})));
+      Requirements.Verify.Requirement reqStaSigOn(method=Requirements.Types.WorstMarginMethod.Ratchet, text="Slow sine is stable", computeStatistics=true, useMargin=true)
+        annotation (Placement(transformation(extent={{30,80},{90,100}})));
+      Requirements.Verify.Requirement reqStaSigPul(method=Requirements.Types.WorstMarginMethod.Ratchet, text="Slow sine is stable while active", computeStatistics=true, useMargin=true)
+        annotation (Placement(transformation(extent={{30,40},{90,60}})));
+      Requirements.Verify.Requirement reqStaSigOn1(method=Requirements.Types.WorstMarginMethod.Ratchet, text="Fast sine is stable", computeStatistics=true, useMargin=true)
+        annotation (Placement(transformation(extent={{30,-10},{90,10}})));
+      Requirements.Verify.Requirement reqStaSigPul1(method=Requirements.Types.WorstMarginMethod.Ratchet, text="Fast sine is stable while active", computeStatistics=true, useMargin=true)
+        annotation (Placement(transformation(extent={{30,-50},{90,-30}})));
+      inner Requirements.Verify.PrintViolations printViolations(useEvaluationTime=true, evaluationTime=3600)
+        annotation (Placement(transformation(extent={{30,-90},{90,-70}})));
+    equation
+      connect(sin.y, staSigOn.u) annotation (Line(points={{-79,80},{-60,80},{-60,96},{-42,96}}, color={0,0,127}));
+      connect(sin.y, staSigPul.u) annotation (Line(points={{-79,80},{-60,80},{-60,56},{-42,56}}, color={0,0,127}));
+      connect(sin1.y, staSigOn1.u) annotation (Line(points={{-79,-20},{-60,-20},{-60,6},{-42,6}}, color={0,0,127}));
+      connect(sin1.y, staSigPul1.u) annotation (Line(points={{-79,-20},{-60,-20},{-60,-34},{-42,-34}}, color={0,0,127}));
+      connect(on.y, staSigOn.condition) annotation (Line(points={{-79,50},{-66,50},{-66,90},{-42,90}}, color={255,0,255}));
+      connect(booPul.y, staSigPul.condition) annotation (Line(points={{-79,20},{-56,20},{-56,50},{-42,50}}, color={255,0,255}));
+      connect(on.y, staSigOn1.condition) annotation (Line(points={{-79,50},{-66,50},{-66,0},{-42,0}}, color={255,0,255}));
+      connect(booPul1.y, staSigPul1.condition) annotation (Line(points={{-79,-60},{-50,-60},{-50,-40},{-42,-40}}, color={255,0,255}));
+      connect(staSigOn.y, reqStaSigOn.property) annotation (Line(points={{1,90},{26,90}}, color={0,0,255}));
+      connect(staSigOn.margin, reqStaSigOn.margin) annotation (Line(points={{1,81},{26,81},{26,83}}, color={0,127,0}));
+      connect(staSigPul.y, reqStaSigPul.property) annotation (Line(points={{1,50},{26,50}}, color={0,0,255}));
+      connect(staSigPul.margin, reqStaSigPul.margin) annotation (Line(points={{1,41},{26,41},{26,43}}, color={0,127,0}));
+      connect(staSigOn1.y, reqStaSigOn1.property) annotation (Line(points={{1,0},{26,0}}, color={0,0,255}));
+      connect(staSigOn1.margin, reqStaSigOn1.margin) annotation (Line(points={{1,-9},{26,-9},{26,-7}}, color={0,127,0}));
+      connect(staSigPul1.y, reqStaSigPul1.property) annotation (Line(points={{1,-40},{26,-40}}, color={0,0,255}));
+      connect(staSigPul1.margin, reqStaSigPul1.margin) annotation (Line(points={{1,-49},{26,-49},{26,-47}}, color={0,127,0}));
+      annotation (Diagram(coordinateSystem(preserveAspectRatio=false, extent={{-120,-100},{120,120}})),
+        experiment(StopTime=3600, Tolerance=1e-06),
+        Documentation(info="<html>
+<p>
+Check block <a href=\"modelica://Requirements.ChecksInFixedWindow.StableSignal\">StableSignal</a> with the default limit of
+0.01 s<sup>-1</sup> on the moving average of |du/dt|, each check feeding a
+<a href=\"modelica://Requirements.Verify.Requirement\">Verify.Requirement</a> with violation statistics and margin:
+</p>
+<ul>
+<li> <code>staSigOn</code> and <code>staSigPul</code> check a slow sine, 0.5 + 0.5 sin(2&pi;t/1200 s), over a 120 s window,
+     always active and active in the first half of every 600 s. Its average speed is at most
+     0.5&middot;2&pi;/1200 s = 0.0026 s<sup>-1</sup>: satisfied, after an Undecided first window of each phase.</li>
+<li> <code>staSigOn1</code> and <code>staSigPul1</code> check a fast sine, 0.5 + 0.5 sin(2&pi;t/120 s), over the default
+     360 s window, always active and active in the first half of every 1200 s. Its average speed is
+     (2/&pi;)&middot;0.5&middot;2&pi;/120 s = 0.0167 s<sup>-1</sup>: violated once the first window is complete.</li>
+</ul>
+<p>
+This is the validation model <code>Buildings_Requirements.Validation.StableContinuousSignal</code> of
+<a href=\"https://github.com/lbl-srg/modelica-buildings-requirements\">modelica-buildings-requirements</a>
+(M. Wetter, LBNL), ported with the block in version 0.13.0. The verdicts are the original's, except that an
+inactive check is Undefined (4) where the original reported Undecided (2), and the original's hysteresis of
+upperLimit/20 is not set (default h = 0); neither signal comes near the limit, so the verdicts do not depend on it.
+The requirements' statistics use <code>method = WorstMarginMethod.Ratchet</code>: the fast sine's window holds a whole
+number of periods, so its average and margin are constant up to numerical noise, and the default continuous search
+for the margin's extrema would fire an event at every sign change of that noise (35,000 events in this hour).
+Copyright (c) 1998-2024 The Regents of the University of California, through Lawrence Berkeley National Laboratory,
+and contributors; see <a href=\"modelica://Requirements.UsersGuide.BuildingsLicense\">UsersGuide.BuildingsLicense</a>.
+</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC (the port). All rights reserved.</p>
+</html>"));
+    end StableSignal;
   end ChecksInFixedWindow;
 
     package ChecksInFixedWindow_withFFT
@@ -3533,6 +3786,160 @@ OpenModelica does not build the FFT checks; the example runs on Dymola and Model
 <p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
 </html>"));
     end FFT;
+
+    model Gated "WithinBand and GreaterEqual behind a pulsed condition and a delay: the margins in closed form while active, Undefined otherwise"
+      extends Modelica.Icons.Example;
+      import Requirements.Types.Property;
+      Modelica.Blocks.Sources.Sine u(amplitude=1, f=0.1) "u = sin(2 pi t / 10 s)"
+        annotation (Placement(transformation(extent={{-80,10},{-60,30}})));
+      Modelica.Blocks.Sources.Constant lower(k=-0.5) "-0.5"
+        annotation (Placement(transformation(extent={{-80,-40},{-60,-20}})));
+      Modelica.Blocks.Sources.BooleanPulse condition(width=50, period=10) "true on [0, 5) s of every 10 s"
+        annotation (Placement(transformation(extent={{-80,40},{-60,60}})));
+      Requirements.ChecksInFixedWindow.WithinBand withinBand1(
+        u_max=0.8,
+        u_min=-0.8,
+        delayTime=1,
+        scale=0.2) "|u| <= 0.8 from 1 s after the condition rises, tolerance 0.2"
+        annotation (Placement(transformation(extent={{-40,40},{0,60}})));
+      Requirements.ChecksInFixedWindow.GreaterEqual greaterEqual1(delayTime=1, scale=0.5)
+        "u >= -0.5 from 1 s after the condition rises, tolerance 0.5"
+        annotation (Placement(transformation(extent={{-40,-20},{0,0}})));
+      Requirements.Verify.ViolationStatistics statistics "Statistics of withinBand1"
+        annotation (Placement(transformation(extent={{30,40},{50,60}})));
+    protected
+      Real s = sin(2*Modelica.Constants.pi*0.1*time);
+      Real tm = mod(time, 10) "Time within the period of the condition";
+      constant Real t1 = asin(0.8)/(2*Modelica.Constants.pi*0.1) "u rises above 0.8 at t1 within each period";
+    equation
+      connect(condition.y, withinBand1.condition) annotation (Line(points={{-59,50},{-42,50}}, color={255,0,255}));
+      connect(condition.y, greaterEqual1.condition) annotation (Line(points={{-59,50},{-50,50},{-50,-10},{-42,-10}}, color={255,0,255}));
+      connect(u.y, withinBand1.u) annotation (Line(points={{-59,20},{-50,20},{-50,56},{-42,56}}, color={0,0,127}));
+      connect(u.y, greaterEqual1.u_max) annotation (Line(points={{-59,20},{-50,20},{-50,-4},{-42,-4}}, color={0,0,127}));
+      connect(lower.y, greaterEqual1.u_min) annotation (Line(points={{-59,-30},{-50,-30},{-50,-16},{-42,-16}}, color={0,0,127}));
+      connect(withinBand1.y, statistics.property) annotation (Line(points={{1,50},{16,50},{16,54},{28,54}}, color={0,0,255}));
+      connect(withinBand1.margin, statistics.margin) annotation (Line(points={{1,41},{16,41},{16,46},{28,46}}, color={0,127,0}));
+      when sample(0, 0.01) then
+        if noEvent(tm > 1.001 and tm < 4.999) then
+          assert(noEvent(abs(withinBand1.margin - min(s + 0.8, 0.8 - s)/0.2) < 1e-6), "Gated: WithinBand's margin is not min(u - u_min, u_max - u)/scale");
+          assert(noEvent(withinBand1.y <> Property.Satisfied or withinBand1.margin >= -1e-6), "Gated: WithinBand satisfied with a negative margin");
+          assert(noEvent(withinBand1.y <> Property.Violated or withinBand1.margin <= 1e-6), "Gated: WithinBand violated with a positive margin");
+          assert(noEvent(withinBand1.y <> Property.Undefined and withinBand1.y <> Property.Undecided), "Gated: WithinBand undecided while active");
+          assert(noEvent(abs(greaterEqual1.margin - (s + 0.5)/0.5) < 1e-6), "Gated: GreaterEqual's margin is not (u_max - u_min)/scale");
+          assert(noEvent(greaterEqual1.y == Property.Satisfied), "Gated: u stays above -0.5 while active");
+        elseif noEvent(tm < 0.999 or tm > 5.001) then
+          assert(noEvent(withinBand1.y == Property.Undefined and greaterEqual1.y == Property.Undefined),
+            "Gated: not Undefined while the condition is false or during the delay");
+          assert(noEvent(abs(withinBand1.margin - 4) < 1e-12 and abs(greaterEqual1.margin) < 1e-12),
+            "Gated: an inactive check does not have the margin of the middle of the band (WithinBand) or 0 (GreaterEqual)");
+        end if;
+      end when;
+      when time >= 19.9 then
+        assert(noEvent(statistics.nViolations == 2), "Gated: one violation in each of the two active phases");
+        assert(noEvent(abs(statistics.totalDuration - 2*(5 - 2*t1)) < 1e-3), "Gated: total violated time is not 2 (5 s - 2 t1)");
+        assert(noEvent(abs(statistics.violatedFraction - 2*(5 - 2*t1)/8) < 1e-3),
+          "Gated: the violated fraction is not of the 8 s in which the check applies");
+        assert(noEvent(abs(statistics.worstMargin + 1) < 1e-3), "Gated: the worst margin, at the peak u = 1, is not -1");
+      end when;
+      annotation (experiment(StopTime=20, Interval=0.01), Documentation(info="<html>
+<p>u = sin(2&pi;t / 10 s) against <a href=\"modelica://Requirements.ChecksInFixedWindow.WithinBand\">WithinBand</a>
+(|u| &le; 0.8, tolerance 0.2) and <a href=\"modelica://Requirements.ChecksInFixedWindow.GreaterEqual\">GreaterEqual</a>
+(u &ge; &minus;0.5, tolerance 0.5), both behind a condition that is true for the first 5 s of every 10 s and a delay of
+1 s: the checks apply on [1, 5) s and [11, 15) s. Asserted at every output point:</p>
+<ul>
+<li>while the checks apply, the margins are min(u + 0.8, 0.8 &minus; u)/0.2 and (u + 0.5)/0.5 in closed form, and the
+    sign of WithinBand's margin is its verdict; GreaterEqual is satisfied (u is positive on (0, 5) s);</li>
+<li>while the condition is false and during the delay, both are Undefined, with the margin of the inactive check:
+    the middle of the band for WithinBand (4 tolerances), 0 for GreaterEqual;</li>
+<li>a <a href=\"modelica://Requirements.Verify.ViolationStatistics\">ViolationStatistics</a> counts one violation of
+    WithinBand per active phase, u &gt; 0.8 from t1 = asin(0.8)/(0.2&pi;) = 1.476 s to 5 &minus; t1 within the period,
+    a violated fraction of the 8 s in which the check applies (the inactive time does not count), and the worst
+    margin &minus;1 at the peak u = 1.</li>
+</ul>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+    end Gated;
+
+    model StableSignal "StableSignal on a sine that stops: the moving average of |du/dt| and the margin in closed form, and the hysteresis"
+      extends Modelica.Icons.Example;
+      import Requirements.Types.Property;
+      Modelica.Blocks.Sources.RealExpression u(y=if time < 100 then sin(2*Modelica.Constants.pi*0.05*time) else 0)
+        "sin(2 pi t / 20 s) until 100 s, 0 after"
+        annotation (Placement(transformation(extent={{-80,10},{-60,30}})));
+      Requirements.Sources.BooleanConstant always
+        annotation (Placement(transformation(extent={{-80,40},{-60,60}})));
+      Requirements.ChecksInFixedWindow.StableSignal stable1(
+        window=40,
+        upperLimit=0.25,
+        Td=0.1,
+        scale=0.05) "Limit above the sine's average speed: satisfied"
+        annotation (Placement(transformation(extent={{-40,40},{0,60}})));
+      Requirements.ChecksInFixedWindow.StableSignal stable2(
+        window=40,
+        upperLimit=0.15,
+        Td=0.1,
+        scale=0.05) "Limit below it: violated while the sine runs"
+        annotation (Placement(transformation(extent={{-40,0},{0,20}})));
+      Requirements.ChecksInFixedWindow.StableSignal stable3(
+        window=40,
+        upperLimit=0.15,
+        h=0.06,
+        Td=0.1,
+        scale=0.05) "As stable2, with hysteresis: stable again only at or below 0.09"
+        annotation (Placement(transformation(extent={{-40,-40},{0,-20}})));
+    protected
+      constant Real w = 2*Modelica.Constants.pi*0.05 "Angular frequency of the sine";
+      constant Real average = 2/Modelica.Constants.pi*w/sqrt(1 + (w*0.1)^2)
+        "Moving average of |du/dt| over whole periods: 2/pi times the amplitude of the filtered derivative";
+    equation
+      connect(always.y, stable1.condition) annotation (Line(points={{-59,50},{-42,50}}, color={255,0,255}));
+      connect(always.y, stable2.condition) annotation (Line(points={{-59,50},{-50,50},{-50,10},{-42,10}}, color={255,0,255}));
+      connect(always.y, stable3.condition) annotation (Line(points={{-59,50},{-50,50},{-50,-30},{-42,-30}}, color={255,0,255}));
+      connect(u.y, stable1.u) annotation (Line(points={{-59,20},{-54,20},{-54,56},{-42,56}}, color={0,0,127}));
+      connect(u.y, stable2.u) annotation (Line(points={{-59,20},{-54,20},{-54,16},{-42,16}}, color={0,0,127}));
+      connect(u.y, stable3.u) annotation (Line(points={{-59,20},{-54,20},{-54,-24},{-42,-24}}, color={0,0,127}));
+      when sample(0, 0.1) then
+        if noEvent(time < 39.99) then
+          assert(noEvent(stable1.y == Property.Undecided and stable2.y == Property.Undecided and stable3.y == Property.Undecided),
+            "StableSignal: not Undecided during the first window");
+          assert(noEvent(abs(stable1.rateAverage) < 1e-15), "StableSignal: rateAverage is not 0 during the first window");
+        elseif noEvent(time > 42 and time < 99) then
+          assert(noEvent(abs(stable1.rateAverage - average) < 2e-4), "StableSignal: rateAverage is not 2/pi times the amplitude of du/dt");
+          assert(noEvent(abs(stable1.margin - (0.25 - average)/0.05) < 5e-3), "StableSignal: stable1's margin is not (upperLimit - rateAverage)/scale");
+          assert(noEvent(abs(stable2.margin - (0.15 - average)/0.05) < 5e-3), "StableSignal: stable2's margin is not (upperLimit - rateAverage)/scale");
+          assert(noEvent(stable1.y == Property.Satisfied and stable2.y == Property.Violated and stable3.y == Property.Violated),
+            "StableSignal: wrong verdict while the sine runs");
+        end if;
+        if noEvent(time > 40.01) then
+          assert(noEvent(stable2.y <> Property.Satisfied or stable2.margin >= -1e-6), "StableSignal: satisfied with a negative margin (h = 0)");
+          assert(noEvent(stable2.y <> Property.Violated or stable2.margin <= 1e-6), "StableSignal: violated with a positive margin (h = 0)");
+        end if;
+      end when;
+      when time >= 115 then
+        assert(noEvent(stable2.y == Property.Satisfied), "StableSignal: stable2 not satisfied once the average fell below 0.15");
+        assert(noEvent(stable3.y == Property.Violated and stable3.margin > 0),
+          "StableSignal: stable3 not still violated (with a positive margin) above upperLimit - h = 0.09");
+      end when;
+      when time >= 145 then
+        assert(noEvent(stable3.y == Property.Satisfied), "StableSignal: stable3 not satisfied once the average fell below 0.09");
+      end when;
+      annotation (experiment(StopTime=150, Interval=0.1), Documentation(info="<html>
+<p>u = sin(2&pi;t / 20 s) until 100 s, 0 after, against <a href=\"modelica://Requirements.ChecksInFixedWindow.StableSignal\">StableSignal</a>
+with a 40 s window (two periods) and the derivative filter's time constant Td = 0.1 s. Over whole periods the moving
+average of |du/dt| is (2/&pi;) &omega;/&radic;(1 + (&omega; Td)<sup>2</sup>) = 0.1999 s<sup>-1</sup> with &omega; = 2&pi;/20 s,
+asserted from 42 s (after the filter's start-up has left the window) until the sine stops:</p>
+<ul>
+<li>during the first 40 s all three checks are Undecided and rateAverage is 0;</li>
+<li><code>stable1</code> (limit 0.25) is satisfied with margin (0.25 &minus; 0.1999)/0.05 = 1.0, <code>stable2</code> (limit 0.15)
+    violated with margin &minus;1.0, and the sign of stable2's margin is its verdict throughout;</li>
+<li>after 100 s the oscillation slides out of the window and the average falls. At 115 s it is about 0.12: stable2 is
+    satisfied again, while <code>stable3</code>, the same check with hysteresis h = 0.06, is still violated although its
+    margin is already positive -- the documented price of a hysteresis. At 145 s, with the average below 0.09, it is
+    satisfied too.</li>
+</ul>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+    end StableSignal;
     annotation (Documentation(info="<html>
 <p>Every check block of the library carries a <code>margin</code> output since version 0.9.0: the signed distance of the check to its limit divided by the block's <code>scale</code> (the
 requirement's tolerance), &ge; 0 exactly when the check holds. These examples assert the margins against
