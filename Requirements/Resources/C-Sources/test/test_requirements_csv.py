@@ -2,7 +2,7 @@
 
 """
 The C reader (../../Include/RequirementsCsv.h) tested against ModCheck's
-Python reader (mahscsv.py) through ctypes, on a locally compiled shared
+Python reader (Chaperone's mahscsv.py) through ctypes, on a locally compiled shared
 library with stub ModelicaError/ModelicaFormatError (RequirementsCsvTest.c).
 
     python test_requirements_csv.py            # build + run
@@ -11,7 +11,7 @@ library with stub ModelicaError/ModelicaFormatError (RequirementsCsvTest.c).
 The build needs a C compiler and ModelicaUtilities.h: gcc on PATH, or the
 gcc shipped with OpenModelica ($OPENMODELICAHOME/tools/msys/ucrt64/bin on
 Windows), and the header from $OPENMODELICAHOME/include/omc/c. mahscsv.py is
-found through $MODCHECK_DIR or the sibling checkout ../../../../../ModCheck.
+found through $CHAPERONE_DIR or the sibling checkout ../../../../../Chaperone.
 
 What is asserted, per corpus file:
   * the C reader opens exactly the files the Python reader opens, and refuses
@@ -19,7 +19,11 @@ What is asserted, per corpus file:
     time, ragged row, bad lexeme, array field);
   * bit-identical Real values at every stored row (repr -> strtod round trip);
   * identical Boolean/Integer values at every row;
-  * identical event lists and nextTimeEvent() at every row time and between;
+  * identical event lists and nextTimeEvent() at every row time and between,
+    and a hair before every event;
+  * rows a few ulps apart in time are one event group (a relative 1e-10): the
+    TIER year's two event rows 3.1e-10 s apart at 28248 s are one event, the
+    next event is the following one, and the later row's value applies;
   * identical value(t, tNext, tPre) at a grid of instants including every
     event time on both sides of the bracket, between rows, and outside the
     range (hold), and the same refusal outside the range without hold;
@@ -42,15 +46,15 @@ HERE = Path(__file__).resolve().parent
 LIB_ROOT = HERE.parents[2]          # Requirements/
 
 
-def _find_modcheck() -> Path:
-    for cand in [os.environ.get("MODCHECK_DIR"),
-                 LIB_ROOT.parents[1] / "ModCheck"]:
-        if cand and (Path(cand) / "ModCheck" / "Resources" / "Requirements" / "mahscsv.py").is_file():
-            return Path(cand) / "ModCheck" / "Resources" / "Requirements"
-    raise SystemExit("mahscsv.py not found: set MODCHECK_DIR to the ModCheck checkout")
+def _find_chaperone() -> Path:
+    for cand in [os.environ.get("CHAPERONE_DIR"),
+                 LIB_ROOT.parents[1] / "Chaperone"]:
+        if cand and (Path(cand) / "chaperone" / "mahscsv.py").is_file():
+            return Path(cand) / "chaperone"
+    raise SystemExit("mahscsv.py not found: set CHAPERONE_DIR to the Chaperone checkout")
 
 
-sys.path.insert(0, str(_find_modcheck()))
+sys.path.insert(0, str(_find_chaperone()))
 import mahscsv  # noqa: E402
 
 
@@ -202,6 +206,10 @@ def corpus(tmp: Path) -> list[dict]:
     add("three_row_event.csv",
         "time,x,s\n0,0,false\n1,1,false\n1,2,true\n1,3,true\n2,4,true\n",
         ["x"], ["s"], [])
+    add("near_coincident_group.csv",
+        "time,x,s,n\n0,0,false,0\n1,1,false,0\n1.00000000005,2,true,1\n1.0000000001,3,true,2\n"
+        "1.0000000003,4,false,2\n2,5,false,3\n28248.026729088244,6,false,3\n28248.026729088557,7,true,4\n3e4,8,true,4\n",
+        ["x"], ["s"], ["n"])
     add("single_row.csv", "time,x,s\n1.5,2,true\n", ["x"], ["s"], [])
     add("event_at_start.csv", "time,x,s\n0,0,false\n0,1,true\n1,2,true\n", ["x"], ["s"], [])
     # round-trip corpus written by the Python writer from random data with events
@@ -266,7 +274,7 @@ def check_item(c: CReader, item) -> list[str]:
         failures.append(f"{name}: row count C {c.lib.test_rows(h)} != python {n}")
     tmin, tmax = ctypes.c_double(), ctypes.c_double()
     c.lib.test_timeRange(h, ctypes.byref(tmin), ctypes.byref(tmax))
-    if (tmin.value, tmax.value) != (sig.time[0], sig.time[-1]):
+    if (tmin.value, tmax.value) != (sig.group_time[0], sig.group_time[-1]):
         failures.append(f"{name}: time range differs")
 
     kinds = [(mahscsv.REAL, item["real"]), (mahscsv.BOOLEAN, item["boolean"]), (mahscsv.INTEGER, item["integer"])]
@@ -277,11 +285,14 @@ def check_item(c: CReader, item) -> list[str]:
     c_ev = c.lib.test_events(h)
     if c_ev != ev.size:
         failures.append(f"{name}: event count C {c_ev} != python {ev.size} {ev}")
-    probes = set(sig.time.tolist()) | set(ev.tolist())
-    tt = sig.time
+    probes = set(sig.time.tolist()) | set(sig.group_time.tolist()) | set(ev.tolist())
+    tt = sig.group_time
     for a, b_ in zip(tt[:-1], tt[1:]):
         if b_ > a:
             probes.add(float(a + (b_ - a) * 0.37))
+    for e in ev.tolist():                 # a solver's event instant, a hair early: within and beyond the tolerance
+        probes |= {e - 0.2 * mahscsv.EVENT_EPS * max(abs(e), 1.0), e + 0.2 * mahscsv.EVENT_EPS * max(abs(e), 1.0),
+                   e - 5.0 * mahscsv.EVENT_EPS * max(abs(e), 1.0), e + 5.0 * mahscsv.EVENT_EPS * max(abs(e), 1.0)}
     span = max(tt[-1] - tt[0], 1.0)
     probes |= {float(tt[0] - 0.5 * span), float(tt[-1] + 0.5 * span)}
     big = float(np.finfo(float).max)
@@ -332,6 +343,30 @@ def check_item(c: CReader, item) -> list[str]:
     return failures
 
 
+def check_near_coincident(c: CReader, tmp: Path) -> list[str]:
+    """The TIER year's run 2 (2026-10-21): the plant's result has event rows at
+    28248.026729088244 s and 28248.026729088557 s. As two events, OCT dropped the second as
+    already past, the reader's when-clause never fired again and every Boolean froze for the
+    rest of the year. They are one event group."""
+    f = tmp / "near_coincident.csv"
+    f.write_text("time,on\n0,false\n28248.026729088244,false\n28248.026729088557,true\n28454.553253635575,false\n",
+                 encoding="utf-8")
+    h = c.open(f, [], ["on"], [])
+    t = 28248.026729088244
+    failures = []
+    if c.lib.test_events(h) != 2:
+        failures.append(f"near_coincident: {c.lib.test_events(h)} events, not 2 (the two rows 3.1e-10 s apart are one)")
+    nxt = c.lib.test_nextTimeEvent(h, t)
+    if nxt != 28454.553253635575:
+        failures.append(f"near_coincident: nextTimeEvent({t!r}) = {nxt!r}, not the following event 28454.553253635575")
+    if c.get(mahscsv.BOOLEAN, h, 1, t, t, t) is not False:
+        failures.append("near_coincident: the left side of the event is not the old value")
+    if c.get(mahscsv.BOOLEAN, h, 1, t, nxt, t) is not True:
+        failures.append("near_coincident: the right side of the event is not the later row's value")
+    c.lib.test_close(h)
+    return failures
+
+
 def main(argv):
     out = HERE / "build"
     out.mkdir(exist_ok=True)
@@ -349,7 +384,12 @@ def main(argv):
         for line in f[:5]:
             print("      " + line)
         failures += f
-    print(f"\n{len(items)} corpus files, {len(failures)} failures")
+    f = check_near_coincident(c, tmp)
+    print(f"{'ok  ' if not f else 'FAIL'} near_coincident.csv (two event rows 3.1e-10 s apart)")
+    for line in f:
+        print("      " + line)
+    failures += f
+    print(f"\n{len(items) + 1} corpus files, {len(failures)} failures")
     return 1 if failures else 0
 
 

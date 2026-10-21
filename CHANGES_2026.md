@@ -2,7 +2,7 @@
 
 This file summarizes what changed in the Modelica **Requirements** library
 (package folder [`Requirements/`](Requirements/)) during 2026. The library went from
-**0.7.0** (Feb. 2025) to **0.13.0** (2026-10-20) in ten releases.
+**0.7.0** (Feb. 2025) to **0.13.1** (2026-10-21) in eleven releases.
 
 The full release notes are in the library itself, under
 `Requirements.UsersGuide.ReleaseNotes`. The same summary is in the library documentation,
@@ -21,6 +21,7 @@ tool-by-tool measurements are kept beside the library (see `Requirements.UsersGu
 | 0.12.0 | 2026-10-19 | Violation statistics: how often, how long and how badly a requirement was violated |
 | 0.12.1 | 2026-10-19 | Bug fix: `DelayedRising` stayed true after its input fell, when the fall coincided with the end of the duration |
 | 0.13.0 | 2026-10-20 | Three check blocks ported from the Modelica Buildings_Requirements library: `WithinBand`, `GreaterEqual`, `StableSignal` |
+| 0.13.1 | 2026-10-21 | Bug fix: the CSV reader froze every Boolean and Integer column for the rest of a run after two event rows a few ulps apart in time |
 
 No release needs a model conversion. Each one declares `conversion(noneFromVersion=...)`
 for the version before it. One exception: from 0.8.0 on, code that reads a stored
@@ -202,6 +203,15 @@ This release changes requirement semantics.
     tools.
 - The repository [MBILLC/Requirements](https://github.com/MBILLC/Requirements) is public;
   the User's Guide and the Contact page link to it.
+
+## 0.13.1 — CSV reader: event rows a few ulps apart
+
+- **The MA-HS-CSV reader** (`Sources.PartialSignalsFromFile`) treats rows within a relative 1e-10 in time as one event
+  group at the first row's time (the tolerance of `Modelica.Blocks.Tables`). A simulator's result can hold two event
+  rows a few ulps apart (3.1e-10 s at 28248 s in a year of the TIER plant). As two time events, OCT dropped the second
+  as already past, the reader's when-clause never fired again, and every Boolean and Integer column held its value for
+  the rest of the run, without an error or a warning.
+- The C reader's test checks the new rule against its Python twin, which now lives in Chaperone (`$CHAPERONE_DIR`).
 
 ## 0.13.0 — Check blocks from Buildings_Requirements
 

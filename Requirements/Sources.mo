@@ -331,6 +331,9 @@ Columns not named are skipped. A name that is not in the header, or a header nam
     <a href=\"modelica://Modelica.Blocks.Sources.CombiTimeTable\">CombiTimeTable</a> does, so the value on either side of an event is
     unambiguous during event iteration: before the when-clause has fired at the event instant the left value applies
     (a Real: the group's first row; a Boolean/Integer: the last row before the group), afterwards the right value.</li>
+<li><b>Groups</b>: rows whose times are within a relative 1e-10 of the first row of their group (equal, or a few ulps apart, as a
+    simulator's result can hold) are one instant at that row's time. Two time events that close would be one the tool cannot
+    schedule: the second would be dropped as already past, and the Boolean and Integer outputs would never change again.</li>
 <li>Outside the file's time range the first/last row is held (<code>extrapolateHold=true</code>, the default), or an error is raised.</li>
 </ul>
 

@@ -19,6 +19,9 @@
               functions take the event bracket (nextTimeEvent, pre(nextTimeEvent))
               so the value on either side of an event is unambiguous during event
               iteration, exactly as Modelica.Blocks.Sources.CombiTimeTable does.
+     Groups   are rows whose times are within a relative 1e-10 of the group's first
+              row (exactly equal, or a few ulps apart): one instant, the first row's
+              time.
      Outside  the file's time range the first/last row is held (extrapolateHold),
               or an error is raised.
 
@@ -34,6 +37,8 @@
 */
 #ifndef REQUIREMENTS_CSV_H
 #define REQUIREMENTS_CSV_H
+
+#define REQUIREMENTS_CSV_EPS 1e-10   /* rows this close in time (relative) are one event group */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -258,7 +263,7 @@ void* RequirementsCsv_open(const char* fileName,
     FILE* fp;
     char* text;
     const char* p;
-    size_t length, nCols = 0, nRows = 0, j, c, k;
+    size_t length, nCols = 0, nRows = 0, j, c, k, g;
     char** header = NULL;
     long* realCol = NULL;
     long* booleanCol = NULL;
@@ -392,6 +397,19 @@ void* RequirementsCsv_open(const char* fileName,
         if (col != nCols) {
             ModelicaFormatError("RequirementsCsv: data row %lu of \"%s\" has %lu fields, the header has %lu\n", (unsigned long)(k + 1), fileName, (unsigned long)col, (unsigned long)nCols);
         }
+    }
+
+    /* ---- rows closer in time than a relative REQUIREMENTS_CSV_EPS are one event group: each
+       takes the time of the group's first row. A simulator's result can hold two event instants
+       a few ulps apart (3.1e-10 s at 28248 s in a year of the TIER plant); as two time events, the
+       second is due before the solver can move, OCT drops it as already past, the when-clause of
+       PartialSignalsFromFile never fires again and every Boolean and Integer column holds its value
+       for the rest of the run. The tolerance is Modelica.Blocks.Tables' (1e-10, relative). */
+    for (k = 1, g = 0; k < nRows; k++) {
+        if (f->time[k] - f->time[g] <= REQUIREMENTS_CSV_EPS * (fabs(f->time[g]) > 1.0 ? fabs(f->time[g]) : 1.0))
+            f->time[k] = f->time[g];
+        else
+            g = k;
     }
 
     /* ---- event times */

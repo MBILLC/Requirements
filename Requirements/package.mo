@@ -1,5 +1,5 @@
 within ;
-package Requirements "Requirements (Version 0.13.0) - Defining requirements formally and checking them when simulating"
+package Requirements "Requirements (Version 0.13.1) - Defining requirements formally and checking them when simulating"
   extends Modelica.Icons.Package;
 
 
@@ -14,7 +14,7 @@ package ReleaseNotes "Release notes"
 
     annotation (Documentation(info="<html>
 <p>
-In 2026 the library went from version 0.7.0 (Feb. 2025) to <b>0.13.0</b> (2026-10-20) in ten
+In 2026 the library went from version 0.7.0 (Feb. 2025) to <b>0.13.1</b> (2026-10-21) in eleven
 releases. This page summarizes them; the release note of each version has the details.
 The same summary is kept as Markdown in
 <a href=\"https://github.com/MBILLC/Requirements/blob/HEAD/CHANGES_2026.md\">CHANGES_2026.md</a>
@@ -45,6 +45,8 @@ The regression baselines and the tool-by-tool measurements are kept beside the l
     <td>Bug fix: <code>DelayedRising</code> stayed true after its input fell, when the fall coincided with the end of the duration</td></tr>
 <tr><td><a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Version_0_13_0\">0.13.0</a></td><td>2026-10-20</td>
     <td>Three check blocks ported from the Modelica Buildings_Requirements library: <code>WithinBand</code>, <code>GreaterEqual</code>, <code>StableSignal</code></td></tr>
+<tr><td><a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Version_0_13_1\">0.13.1</a></td><td>2026-10-21</td>
+    <td>Bug fix: the CSV reader froze every Boolean and Integer column for the rest of a run after two event rows a few ulps apart in time</td></tr>
 </table>
 
 <p>
@@ -276,6 +278,14 @@ This release changes requirement semantics.
      </ul></li>
 </ul>
 
+<h4>0.13.1 &mdash; CSV reader: event rows a few ulps apart</h4>
+<ul>
+<li> The MA-HS-CSV reader behind <a href=\"modelica://Requirements.Sources.PartialSignalsFromFile\">Sources.PartialSignalsFromFile</a>
+     treats rows within a relative 1e-10 in time as one event group. Two event rows 3.1e-10 s apart in a simulator's
+     result were two time events; OCT dropped the second as already past, and every Boolean and Integer column held its
+     value for the rest of the run.</li>
+</ul>
+
 <h4>0.13.0 &mdash; Check blocks from Buildings_Requirements</h4>
 <ul>
 <li> Three blocks of LBNL's <a href=\"https://github.com/lbl-srg/modelica-buildings-requirements\">Buildings_Requirements</a>
@@ -325,6 +335,43 @@ This release changes requirement semantics.
 </ul>
 </html>"));
   end Summary2026;
+
+  class Version_0_13_1 "Version 0.13.1 (Oct. 21, 2026)"
+  extends Modelica.Icons.ReleaseNotes;
+
+    annotation (Documentation(info="<html>
+<p>
+<b>Bug fix: the CSV reader at event rows a few ulps apart.</b>
+<a href=\"modelica://Requirements.Sources.PartialSignalsFromFile\">Sources.PartialSignalsFromFile</a> updates its Boolean and
+Integer outputs in <code>when {time &gt;= pre(nextTimeEvent), initial()}</code>, and the reader's
+<code>nextTimeEvent(t)</code> returns the first event strictly after <code>t</code>. A simulator's result can hold two event
+instants a few ulps apart: the TIER plant's year has rows at 28248.026729088244 s and 28248.026729088557 s, 3.1e-10 s
+apart. At the first, the when-clause set the next time event to the second; OCT treated a time event that close as
+already past and did not schedule it, the condition never fired again, and every Boolean and Integer column held its
+value for the rest of the run. Real columns were unaffected. The verdicts of every requirement with a Boolean condition
+were wrong from that instant on, without an error or a warning.
+</p>
+<p>
+The reader now treats rows whose times are within a relative 1e-10 (the tolerance of
+<code>Modelica.Blocks.Tables</code>) of the first row of their group as one event group at that row's time, as if they
+had the same time. The file itself is not changed. Events, values on either side of an event and slopes follow from the
+groups as before. A file without such rows reads exactly as before.
+</p>
+<h4>Where it showed</h4>
+<ul>
+<li> The TIER plant study (Chaperone, two-run workflow): over a year, every requirement condition read from a Boolean
+     column froze after 28248 s, some true and some false for the rest of the year. The week's file has no such rows. With the fix,
+     a week of the year's file gives the same condition changes as the plant's data.</li>
+<li> <code>Resources/C-Sources/test/test_requirements_csv.py</code> checks the C reader against its Python twin
+     (Chaperone's <code>mahscsv.py</code>, which has the same rule): a corpus file with rows a few ulps apart, probes just
+     before and after every event, and the TIER case itself. It found the twin through ModCheck, where it no longer is;
+     it now looks in Chaperone (<code>$CHAPERONE_DIR</code> or the sibling checkout).</li>
+</ul>
+<p>
+No model conversion is needed: <code>conversion(noneFromVersion=\"0.13.0\")</code>.
+</p>
+</html>"));
+  end Version_0_13_1;
 
   class Version_0_13_0 "Version 0.13.0 (Oct. 20, 2026)"
   extends Modelica.Icons.ReleaseNotes;
@@ -1243,10 +1290,10 @@ end UsersGuide;
 
   annotation (preferredView="info",
   uses(Modelica(version="4.1.0")),
-version="0.13.0",
-versionDate="2026-10-20",
+version="0.13.1",
+versionDate="2026-10-21",
 dateModified = "2026-10-20",
-conversion(noneFromVersion="0.7.1", noneFromVersion="0.8.0", noneFromVersion="0.9.0", noneFromVersion="0.9.1", noneFromVersion="0.10.0", noneFromVersion="0.11.0", noneFromVersion="0.11.1", noneFromVersion="0.12.0", noneFromVersion="0.12.1"),
+conversion(noneFromVersion="0.7.1", noneFromVersion="0.8.0", noneFromVersion="0.9.0", noneFromVersion="0.9.1", noneFromVersion="0.10.0", noneFromVersion="0.11.0", noneFromVersion="0.11.1", noneFromVersion="0.12.0", noneFromVersion="0.12.1", noneFromVersion="0.13.0"),
 revisionId="$Id:: package.mo 9390 2016-06-21 06:35:11Z #$",
 Documentation(info="<html>
 <p>
