@@ -1,8 +1,8 @@
 # Copyright © 2026 Model Based Innovation LLC. All rights reserved.
 
 """
-The C reader (../../Include/RequirementsCsv.h) tested against ModCheck's
-Python reader (Chaperone's mahscsv.py) through ctypes, on a locally compiled shared
+The C reader (../../Include/RequirementsCsv.h) tested against the Python
+reader of the requirements toolchain (Chaperone's mahscsv.py) through ctypes, on a locally compiled shared
 library with stub ModelicaError/ModelicaFormatError (RequirementsCsvTest.c).
 
     python test_requirements_csv.py            # build + run
