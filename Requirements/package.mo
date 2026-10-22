@@ -1296,9 +1296,8 @@ requirements-verification framework. ModCheck generates check models from requir
 two-run workflow above, parameter sweeps and linearizations across Modelica tools, and evaluates some
 requirement families (step-response metrics, eigenvalue predicates) on the stored trajectories in Python as
 well, with this library's blocks as an independent cross-check. The regression baselines of the library's
-examples on Dymola, OpenModelica and Modelon Impact were produced with it and are kept in
-<code>Resources/ModCheck/</code>. Nothing in the library depends on ModCheck, and the rest of this
-documentation does not refer to it.
+examples on Dymola, OpenModelica and Modelon Impact were produced with it and are kept with ModCheck, not
+here. Nothing in the library depends on ModCheck, and the rest of this documentation does not refer to it.
 </p>
 </html>"));
 end UsersGuide;
