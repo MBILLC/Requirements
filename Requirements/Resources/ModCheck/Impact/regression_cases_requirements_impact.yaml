@@ -427,7 +427,7 @@ cases:
     enabled: true
     # terminate1.delay: Impact stores only the pre-event state at a terminate()
     # instant, so without a delay the verdict this example takes as it stops
-    # would be missing from its result (DEVMI_DIFFERENCES.md section 3a).
+    # would be missing from its result (DEVMI_DIFFERENCES.md section 3a, in the history at 6461488).
     model: Requirements.Examples.Elementary.ChecksInFixedWindow_withFFT.WithinAbsoluteDomain1
     start_time: 0.0
     final_time: 6.0
@@ -456,7 +456,7 @@ cases:
     enabled: true
     # terminate1.delay: Impact stores only the pre-event state at a terminate()
     # instant, so without a delay the verdict this example takes as it stops
-    # would be missing from its result (DEVMI_DIFFERENCES.md section 3a).
+    # would be missing from its result (DEVMI_DIFFERENCES.md section 3a, in the history at 6461488).
     model: Requirements.Examples.Elementary.ChecksInFixedWindow_withFFT.WithinRelativeDomain1
     start_time: 0.0
     final_time: 6.0

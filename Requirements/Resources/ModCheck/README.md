@@ -34,7 +34,8 @@ for these: its results matched the Dymola references exactly on every case both 
 The fork's library (upstream's sliding-window refactor, `uses Modelica 4.1.0`)
 imports into an Impact workspace as a project and its sliding-window examples
 run there with results matching the Dymola baseline — see
-`DEVMI_DIFFERENCES.md` §2 for the measurement. Impact evaluates `terminal()`
+`DEVMI_DIFFERENCES.md` §2 for the measurement (that file was removed on 2026-10-22; it is in
+the history: `git show 6461488:Requirements/Resources/ModCheck/DEVMI_DIFFERENCES.md`). Impact evaluates `terminal()`
 to `false`, so a requirement model there needs
 `printViolations(useEvaluationTime=true)` to print its verdict; every example
 carries `evaluationTime = StopTime` for that purpose. The FFT checks needed
