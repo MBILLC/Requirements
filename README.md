@@ -27,6 +27,27 @@ The current version of the library uses a buffer for the implementation of slidi
 
 **This package is not yet finalized. A redesign is planned. The redesigned library (with improved implementations of models and new functionality) should be backwards compatible to this version, but it is not guaranteed. If non-backwards compatible changes are introduced, most likely automatic conversions will not be provided.**
 
+## Tool support
+
+Every example builds and simulates in **Dymola**, **OpenModelica** and **Modelon Impact**. Dymola's only limit is its license: the examples above about 1000 unknowns are refused by a license with that cap ("too complex for the current license"), not by the library.
+
+| Tool | Examples |
+|---|---|
+| Dymola 2026x | all (license cap aside) |
+| OpenModelica 1.27.1 | all, new and old frontend (since October 2026, see below) |
+| Modelon Impact | all |
+
+The regression baselines of all three tools are kept in [ModCheck](https://github.com/MBILLC/ModCheck), `ModCheck/Resources/RequirementsLibrary/`. Every example has a reference in each tool's list: the tool's own result where it was stored, Modelon Impact's otherwise (`reference_from: impact`).
+
+## OpenModelica builds every example (October 2026, after 0.13.1)
+
+Two code-generation limits of OpenModelica 1.27.1 kept 21 examples from building: the 14 that use a sliding-window block and the 7 that use an FFT check. Both are worked around without changing what any block computes:
+
+* `ChecksInSlidingWindow`: the 12 when-clauses that assign the sliding-window `Buffer` record (array fields) are in algorithm sections. omc has no runtime support for a record equation with array components in a when-equation ("No runtime support for this record assignment"); the assignment form is supported.
+* `ChecksInFixedWindow_withFFT.Internal.FFT`: the FFT-computation when-clause is in the existing algorithm section, after the statement that stores the last sample, the order the equation sorting gave it before. omc's `lowerWhenEqn` could not lower the if-equation around `saveFFTonFile` inside a when-equation.
+
+The results do not move: Dymola 2026x passes the full suite (317/317) against the stored references, and Modelon Impact passes its full suite (649/649 checks, 91 cases at the 100x rtol spread) with the change, and its trajectories are bit-identical to those of the library before it on all 91 cases (2026-10-23). No model conversion is needed and the version stays 0.13.1.
+
 ## Changes in version 0.13.1 (October 2026)
 
 **Bug fix: the CSV reader stopped at an event due a few ulps after another.** `Sources.PartialSignalsFromFile` woke at the file's events on a time event; due a few ulps after another event of the model, OCT dropped it as already past, and every Boolean and Integer column held its value for the rest of the run, with no error or warning. Found twice in a year of the TIER plant. The reader now wakes on a state event, `fileEvent` (an extending block reads its Boolean and Integer columns in `when {fileEvent, initial()}`), and times within a relative 1e-10 are one instant. Full account: `UsersGuide.ReleaseNotes.Version_0_13_1`.
@@ -74,4 +95,4 @@ A maintenance release with no change in requirement semantics: the library now r
 
 * **`Units`** (September 2026): `Units.NonSI` type definitions and `Units.Conversions` functions in the manner of `Modelica.Units`, for the units the Modelica Standard Library lacks and that requirements in engineering practice use -- ms, mm, cm, km, ft, kft (thousands of feet), g, kg/min, ft/s, ft/min, kPa, mbar, kW, kJ; `from_<unit>` to SI and `to_<unit>` back, inlined. A generated check model writes every quantity of a requirement as `from_<unit>(<value as written>)` and converts a plant variable that is in a non-SI unit into an SI output that keeps the original as `displayUnit`, so the conversion is one factor in one place. `Examples.Elementary.Units.Conversions` asserts every factor.
 
-**Three tools compared.** Dymola simulates 60 of the 68 examples (8 refused by the license used, "too complex for the current license"); OpenModelica 48 (20 do not build: the 14 sliding-window examples, "No runtime support for this record assignment", and the 6 FFT examples, "lowerWhenEqn: equation not handled"); Modelon Impact all 68. On the 45 examples OpenModelica and Dymola both run, every continuous signal agrees to better than 1e-4 of its range and every Boolean and Property signal switches at identical instants. On the 63 examples with a Dymola or OpenModelica reference, Modelon Impact passes all 296 signal checks.
+**Three tools compared** (the 0.7.1 measurement; since October 2026 OpenModelica builds all 68, see above). Dymola simulates 60 of the 68 examples (8 refused by the license used, "too complex for the current license"); OpenModelica 48 (20 do not build: the 14 sliding-window examples, "No runtime support for this record assignment", and the 6 FFT examples, "lowerWhenEqn: equation not handled"); Modelon Impact all 68. On the 45 examples OpenModelica and Dymola both run, every continuous signal agrees to better than 1e-4 of its range and every Boolean and Property signal switches at identical instants. On the 63 examples with a Dymola or OpenModelica reference, Modelon Impact passes all 296 signal checks.
