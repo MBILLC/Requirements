@@ -37,8 +37,9 @@ package ChecksInSlidingWindow
        first = false;
     end when;
 
+  algorithm
     when change(check) then
-      buffer = SlidingWindow.push(
+      buffer := SlidingWindow.push(
         Requirements.Internal.SlidingWindow.Buffer(
           T=pre(buffer.T),
           t0=pre(buffer.t0),
@@ -50,6 +51,7 @@ package ChecksInSlidingWindow
         time,
         check);
     end when;
+  equation
 
     maxDuration = SlidingWindow.maxDuration(buffer, time, check);
     y = if maxDuration >= lowerLimit then Property.Satisfied else
@@ -171,8 +173,9 @@ Before the end of the first window the margin is provisional; a consumer takes t
        first = false;
     end when;
 
+  algorithm
     when change(check) then
-      buffer = SlidingWindow.push(
+      buffer := SlidingWindow.push(
         Requirements.Internal.SlidingWindow.Buffer(
           T=pre(buffer.T),
           t0=pre(buffer.t0),
@@ -184,6 +187,7 @@ Before the end of the first window the margin is provisional; a consumer takes t
         time,
         check);
     end when;
+  equation
 
     accumulatedDuration = SlidingWindow.accumulatedDuration(buffer, time, check);
     y = if accumulatedDuration >= lowerLimit then Property.Satisfied else
@@ -292,8 +296,9 @@ Before the end of the first window the margin is provisional; a consumer takes t
   equation
     assert(lowerLimit < window, "lowerLimit < window required");
 
+  algorithm
     when change(check) then
-      buffer = SlidingWindow.push(
+      buffer := SlidingWindow.push(
         Requirements.Internal.SlidingWindow.Buffer(
           T=pre(buffer.T),
           t0=pre(buffer.t0),
@@ -305,6 +310,7 @@ Before the end of the first window the margin is provisional; a consumer takes t
         time,
         check);
     end when;
+  equation
 
     accumulatedDuration = SlidingWindow.accumulatedDuration(buffer, time, check);
     y = accumulatedDuration >= lowerLimit;
@@ -410,8 +416,9 @@ Before the end of the first window the margin is provisional; a consumer takes t
   equation
     assert(upperLimit < window, "upperLimit < window required");
 
+  algorithm
     when change(check) then
-      buffer = SlidingWindow.push(
+      buffer := SlidingWindow.push(
         Requirements.Internal.SlidingWindow.Buffer(
           T=pre(buffer.T),
           t0=pre(buffer.t0),
@@ -423,6 +430,7 @@ Before the end of the first window the margin is provisional; a consumer takes t
         time,
         check);
     end when;
+  equation
 
     maxDuration = SlidingWindow.maxDuration(buffer, time, check);
     y = maxDuration <= upperLimit;
@@ -531,8 +539,9 @@ Before the end of the first window the margin is provisional; a consumer takes t
   equation
     assert(upperLimit < window, "upperLimit < window required");
 
+  algorithm
     when change(check) then
-      buffer = SlidingWindow.push(
+      buffer := SlidingWindow.push(
         Requirements.Internal.SlidingWindow.Buffer(
           T=pre(buffer.T),
           t0=pre(buffer.t0),
@@ -544,6 +553,7 @@ Before the end of the first window the margin is provisional; a consumer takes t
         time,
         check);
     end when;
+  equation
 
     accumulatedDuration = SlidingWindow.accumulatedDuration(buffer, time, check);
     y = accumulatedDuration <= upperLimit;
@@ -667,8 +677,9 @@ Before the end of the first window the margin is provisional; a consumer takes t
        first = false;
     end when;
 
+  algorithm
     when change(check) then
-      buffer = SlidingWindow.push(
+      buffer := SlidingWindow.push(
         Requirements.Internal.SlidingWindow.Buffer(
           T=pre(buffer.T),
           t0=pre(buffer.t0),
@@ -680,6 +691,7 @@ Before the end of the first window the margin is provisional; a consumer takes t
         time,
         check);
     end when;
+  equation
 
     maxDuration = SlidingWindow.maxDuration(buffer, time, check);
     y = if maxDuration >= lowerLimit and maxDuration <= upperLimit then Property.Satisfied else
@@ -802,8 +814,9 @@ Before the end of the first window the margin is provisional; a consumer takes t
        first = false;
     end when;
 
+  algorithm
     when change(check) then
-      buffer = SlidingWindow.push(
+      buffer := SlidingWindow.push(
         Requirements.Internal.SlidingWindow.Buffer(
           T=pre(buffer.T),
           t0=pre(buffer.t0),
@@ -815,6 +828,7 @@ Before the end of the first window the margin is provisional; a consumer takes t
         time,
         check);
     end when;
+  equation
 
     accumulatedDuration = SlidingWindow.accumulatedDuration(buffer, time, check);
     y = if accumulatedDuration >= lowerLimit and accumulatedDuration <= upperLimit then Property.Satisfied else
@@ -941,8 +955,9 @@ Before the end of the first window the margin is provisional; a consumer takes t
     end when;
 
     checkRising = edge(check);
+  algorithm
     when {checkRising, time >= pre(t_next)} then
-       buffer = if checkRising then
+       buffer := if checkRising then
           SlidingWindow.push(
             Requirements.Internal.SlidingWindow.Buffer(
               T=pre(buffer.T),
@@ -964,11 +979,12 @@ Before the end of the first window the margin is provisional; a consumer takes t
               last=pre(buffer.last),
               nElem=pre(buffer.nElem)),
             time);
-       nRising = SlidingWindow.numberOfValues(buffer);
-       t_next = SlidingWindow.nextLeaving(buffer, time);
-       y = if nRising >= nRisingMin then Property.Satisfied else
+       nRising := SlidingWindow.numberOfValues(buffer);
+       t_next := SlidingWindow.nextLeaving(buffer, time);
+       y := if nRising >= nRisingMin then Property.Satisfied else
            (if first then Property.Undecided else Property.Violated);
     end when;
+  equation
     robustness = nRising - nRisingMin;
 
     annotation(defaultComponentName="minRising1", Documentation(info="<html>
@@ -1077,8 +1093,9 @@ Before the end of the first window the margin is provisional; a consumer takes t
 
   equation
     checkRising = edge(check);
+  algorithm
     when {checkRising, time >= pre(t_next)} then
-       buffer = if checkRising then
+       buffer := if checkRising then
         SlidingWindow.push(
           Requirements.Internal.SlidingWindow.Buffer(
             T=pre(buffer.T),
@@ -1100,10 +1117,11 @@ Before the end of the first window the margin is provisional; a consumer takes t
             last=pre(buffer.last),
             nElem=pre(buffer.nElem)),
           time);
-       nRising = SlidingWindow.numberOfValues(buffer);
-       t_next = SlidingWindow.nextLeaving(buffer, time);
-       y = nRising <= nRisingMax;
+       nRising := SlidingWindow.numberOfValues(buffer);
+       t_next := SlidingWindow.nextLeaving(buffer, time);
+       y := nRising <= nRisingMax;
     end when;
+  equation
     robustness = nRisingMax - nRising;
 
   annotation (defaultComponentName="maxRising1", Documentation(info="<html>
@@ -1220,8 +1238,9 @@ Before the end of the first window the margin is provisional; a consumer takes t
     end when;
 
     checkRising = edge(check);
+  algorithm
     when {checkRising, time >= pre(t_next)} then
-       buffer = if checkRising then
+       buffer := if checkRising then
           SlidingWindow.push(
             Requirements.Internal.SlidingWindow.Buffer(
               T=pre(buffer.T),
@@ -1243,11 +1262,12 @@ Before the end of the first window the margin is provisional; a consumer takes t
               last=pre(buffer.last),
               nElem=pre(buffer.nElem)),
             time);
-       nRising = SlidingWindow.numberOfValues(buffer);
-       t_next = SlidingWindow.nextLeaving(buffer, time);
-       y = if nRising >= nRisingMin and nRising <= nRisingMax then Property.Satisfied else
+       nRising := SlidingWindow.numberOfValues(buffer);
+       t_next := SlidingWindow.nextLeaving(buffer, time);
+       y := if nRising >= nRisingMin and nRising <= nRisingMax then Property.Satisfied else
            (if first and nRising <= nRisingMax then Property.Undecided else Property.Violated);
     end when;
+  equation
     robustness = min(nRising - nRisingMin, nRisingMax - nRising);
 
     annotation(defaultComponentName="bandRising1", Documentation(info="<html>
@@ -1365,8 +1385,9 @@ Before the end of the first window the margin is provisional; a consumer takes t
 
   equation
     checkChanging = change(check);
+  algorithm
     when {checkChanging, time >= pre(t_next)} then
-       buffer = if checkChanging then
+       buffer := if checkChanging then
         SlidingWindow.push(
           Requirements.Internal.SlidingWindow.Buffer(
             T=pre(buffer.T),
@@ -1388,11 +1409,12 @@ Before the end of the first window the margin is provisional; a consumer takes t
               last=pre(buffer.last),
               nElem=pre(buffer.nElem)),
             time);
-       nCrossing = SlidingWindow.numberOfValues(buffer);
-       freqHzMean = meanFrequency(nCrossing, window);
-       t_next = SlidingWindow.nextLeaving(buffer, time);
-       y = freqHzMean <= freqHzMeanMax;
+       nCrossing := SlidingWindow.numberOfValues(buffer);
+       freqHzMean := meanFrequency(nCrossing, window);
+       t_next := SlidingWindow.nextLeaving(buffer, time);
+       y := freqHzMean <= freqHzMeanMax;
     end when;
+  equation
     robustness = freqHzMeanMax - freqHzMean;
 
 
@@ -1538,8 +1560,9 @@ Before the end of the first window the margin is provisional; a consumer takes t
 
   equation
     checkRising = edge(check);
+  algorithm
     when {checkRising, time >= pre(t_next)} then
-       buffer = if checkRising then
+       buffer := if checkRising then
           SlidingWindow.push(
             Requirements.Internal.SlidingWindow.Buffer(
               T=pre(buffer.T),
@@ -1561,11 +1584,12 @@ Before the end of the first window the margin is provisional; a consumer takes t
               last=pre(buffer.last),
               nElem=pre(buffer.nElem)),
             time);
-       nRising = SlidingWindow.numberOfValues(buffer);
-       freqHzMean = meanFrequency(nRising, window);
-       t_next = SlidingWindow.nextLeaving(buffer, time);
-       y = freqHzMean <= freqHzMeanMax;
+       nRising := SlidingWindow.numberOfValues(buffer);
+       freqHzMean := meanFrequency(nRising, window);
+       t_next := SlidingWindow.nextLeaving(buffer, time);
+       y := freqHzMean <= freqHzMeanMax;
     end when;
+  equation
     robustness = freqHzMeanMax - freqHzMean;
 
 

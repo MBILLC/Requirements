@@ -877,21 +877,22 @@ As can be seen, the first FFT fulfills the check (THD &lt; THDmax), whereas the 
            FFT_computation = iTick>=1 and iTick < ns;
         end when;
 
+      algorithm
+
+        // Store actual value of u in buffer
+        when {condition, time >= pre(nextTime)} then
+          u_buf[iTick] := u;
+        end when;
+
         // After the value of u is stored at the last sample point or when
         // the simulation is terminated and one or more u-values already stored,
         // perform an FFT computation
         when {iTick == ns, terminal() and time < nextTime} then
-           (A_buf, periods_ok) = Internal.fftScaled(u_buf, np, iTick, Ts, pre(periods_ok), instanceName);
-           fileIndex           = pre(fileIndex) + 1;
+           (A_buf, periods_ok) := Internal.fftScaled(u_buf, np, iTick, Ts, pre(periods_ok), instanceName);
+           fileIndex           := pre(fileIndex) + 1;
            if storeFFTonFile and iTick > 1 then
               Internal.saveFFTonFile(resultDirectory, filePrefix, fileIndex, f_max_plot, A_buf, iTick);
            end if;
-        end when;
-
-      algorithm
-        // Store actual value of u in buffer
-        when {condition, time >= pre(nextTime)} then
-          u_buf[iTick] := u;
         end when;
 
         annotation(Diagram(coordinateSystem(preserveAspectRatio=false,extent={{-300,-300},{300,300}})),
