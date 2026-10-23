@@ -27,6 +27,16 @@ No release needs a model conversion. Each one declares `conversion(noneFromVersi
 for the version before it. One exception: from 0.8.0 on, code that reads a stored
 `Property` result has to accept the value 4.
 
+**After 0.13.1 (October 2026): OpenModelica builds every example.** The 21 examples
+OpenModelica 1.27.1 could not build (the 14 that use a sliding-window block, the 7 that use
+an FFT check) build and simulate in it, with the new and the old frontend. The
+`ChecksInSlidingWindow` when-clauses that assign the buffer record are in algorithm sections
+("No runtime support for this record assignment"), and the FFT-computation when-clause of
+`ChecksInFixedWindow_withFFT.Internal.FFT` is in its algorithm section ("lowerWhenEqn:
+equation not handled"). No block computes anything different: Dymola 2026x and Modelon
+Impact pass their full regression suites against the stored references, and Impact's
+trajectories are bit-identical to those before the change on all 91 cases. The version stays 0.13.1.
+
 ---
 
 ## Origin and rename (2026-09-14)
@@ -77,7 +87,7 @@ requirement semantics.
   | Tool | Simulated | Not simulated |
   |---|---|---|
   | Dymola 2026x | 60 | 8 refused by the license |
-  | OpenModelica 1.27.1 | 48 | 20 don't build (14 sliding-window, 6 FFT) |
+  | OpenModelica 1.27.1 | 48 | 20 don't build (14 sliding-window, 6 FFT); all build since October 2026 |
   | Modelon Impact (Sept. 2026) | 68 | — |
 
   - Impact vs. Dymola/OpenModelica: all 296 signal checks pass.

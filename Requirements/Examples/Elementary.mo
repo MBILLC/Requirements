@@ -3738,7 +3738,7 @@ window is <code>t</code> while the window still reaches back to the start (u(t &
 2 from t = 2 s on, so the margin is <code>3 &minus; min(t, 2)</code>, asserted to 1e-3 (the delayed signal is
 interpolated). Satisfied throughout with one unit of headroom. The sliding-window checks with a buffer
 (<code>SlidingWindow.push</code>) carry the same <code>margin</code> output; this example uses the one block of
-the family OpenModelica builds.</p>
+the family that has no buffer (which was, until October 2026, the one OpenModelica built).</p>
 <p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
 </html>"));
     end SlidingIncrease;
@@ -3782,7 +3782,7 @@ the family OpenModelica builds.</p>
 block: the FFT completes at t = 4.975 s, the property is Satisfied and the margin is <code>scaledDistance/scale</code>,
 positive -- the FFT blocks' <code>scaledDistance</code> is their robustness. The
 value itself is not closed-form (leakage); it is the stored reference of this example in the regression lists.
-OpenModelica does not build the FFT checks; the example runs on Dymola and Modelon Impact.</p>
+The example runs on Dymola, OpenModelica and Modelon Impact.</p>
 <p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
 </html>"));
     end FFT;

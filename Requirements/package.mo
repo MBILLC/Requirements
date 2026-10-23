@@ -55,6 +55,20 @@ version before it. One exception: from 0.8.0 on, code that reads a stored <code>
 has to accept the value 4.
 </p>
 
+<h4>OpenModelica builds every example (October 2026, after 0.13.1)</h4>
+<p>
+The 21 examples OpenModelica 1.27.1 could not build (the 14 that use a sliding-window block, the 7 that use an
+FFT check) build and simulate in it, with the new and the old frontend. Two code-generation limits of omc are
+worked around without changing what any block computes: the when-clauses of
+<a href=\"modelica://Requirements.ChecksInSlidingWindow\">ChecksInSlidingWindow</a> that assign the sliding-window
+buffer record (array fields) are in algorithm sections (omc: \"No runtime support for this record assignment\"),
+and the FFT-computation when-clause of <code>ChecksInFixedWindow_withFFT.Internal.FFT</code> is in its algorithm
+section after the statement that stores the last sample (omc: \"lowerWhenEqn: equation not handled\"). No result
+moves: Dymola 2026x and Modelon Impact pass their full regression suites against the stored references,
+and Impact's trajectories are bit-identical to those before the change on all 91 cases. Every
+example now runs in Dymola (within its license), OpenModelica and Modelon Impact. The version stays 0.13.1.
+</p>
+
 <h4>Origin and rename (2026-09-14)</h4>
 <ul>
 <li> The library was renamed from <code>Modelica_Requirements</code> to <b>Requirements</b>. It is Model
@@ -115,7 +129,7 @@ The release made the library run in Modelon Impact. None of its changes alter re
      <table border=1 cellspacing=0 cellpadding=2>
      <tr><th>Tool</th><th>Simulated</th><th>Not simulated</th></tr>
      <tr><td>Dymola 2026x</td><td>60</td><td>8 refused by the license</td></tr>
-     <tr><td>OpenModelica 1.27.1</td><td>48</td><td>20 don't build (14 sliding-window, 6 FFT)</td></tr>
+     <tr><td>OpenModelica 1.27.1</td><td>48</td><td>20 don't build (14 sliding-window, 6 FFT); all build since October 2026</td></tr>
      <tr><td>Modelon Impact (Sept. 2026)</td><td>68</td><td>&mdash;</td></tr>
      </table>
      <ul>
@@ -1020,7 +1034,9 @@ regression baselines, not to the library's packages.
     <td valign=\"top\">20 do not build: the 14 examples using a sliding-window block
         (\"No runtime support for this record assignment\" for the buffer record returned by
         <code>Internal.SlidingWindow.push</code>) and the 6 FFT examples
-        (\"Internal error BackendDAECreate.lowerWhenEqn: equation not handled\").</td></tr>
+        (\"Internal error BackendDAECreate.lowerWhenEqn: equation not handled\").
+        Since October 2026 all of them build (see the
+        <a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Summary2026\">2026 summary</a>).</td></tr>
 <tr><td valign=\"top\">Modelon Impact (Sept. 2026)</td>
     <td valign=\"top\">68 (63 of them with a reference to compare against)</td>
     <td valign=\"top\">&mdash;</td></tr>
