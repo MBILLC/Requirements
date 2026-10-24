@@ -1,5 +1,5 @@
 within ;
-package Requirements "Requirements (Version 0.13.1) - Defining requirements formally and checking them when simulating"
+package Requirements "Requirements (Version 0.13.2) - Defining requirements formally and checking them when simulating"
   extends Modelica.Icons.Package;
 
 
@@ -14,7 +14,7 @@ package ReleaseNotes "Release notes"
 
     annotation (Documentation(info="<html>
 <p>
-In 2026 the library went from version 0.7.0 (Feb. 2025) to <b>0.13.1</b> (2026-10-21) in eleven
+In 2026 the library went from version 0.7.0 (Feb. 2025) to <b>0.13.2</b> (2026-10-24) in twelve
 releases. This page summarizes them; the release note of each version has the details.
 The same summary is kept as Markdown in
 <a href=\"https://github.com/MBILLC/Requirements/blob/HEAD/CHANGES_2026.md\">CHANGES_2026.md</a>
@@ -47,26 +47,14 @@ The regression baselines and the tool-by-tool measurements are kept beside the l
     <td>Three check blocks ported from the Modelica Buildings_Requirements library: <code>WithinBand</code>, <code>GreaterEqual</code>, <code>StableSignal</code></td></tr>
 <tr><td><a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Version_0_13_1\">0.13.1</a></td><td>2026-10-21</td>
     <td>Bug fix: the CSV reader stopped (every Boolean and Integer column held) at an event due a few ulps after another</td></tr>
+<tr><td><a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Version_0_13_2\">0.13.2</a></td><td>2026-10-24</td>
+    <td>OpenModelica builds every example; no block computes anything different</td></tr>
 </table>
 
 <p>
 No release needs a model conversion. Each one declares <code>conversion(noneFromVersion=...)</code> for the
 version before it. One exception: from 0.8.0 on, code that reads a stored <code>Property</code> result
 has to accept the value 4.
-</p>
-
-<h4>OpenModelica builds every example (October 2026, after 0.13.1)</h4>
-<p>
-The 21 examples OpenModelica 1.27.1 could not build (the 14 that use a sliding-window block, the 7 that use an
-FFT check) build and simulate in it, with the new and the old frontend. Two code-generation limits of omc are
-worked around without changing what any block computes: the when-clauses of
-<a href=\"modelica://Requirements.ChecksInSlidingWindow\">ChecksInSlidingWindow</a> that assign the sliding-window
-buffer record (array fields) are in algorithm sections (omc: \"No runtime support for this record assignment\"),
-and the FFT-computation when-clause of <code>ChecksInFixedWindow_withFFT.Internal.FFT</code> is in its algorithm
-section after the statement that stores the last sample (omc: \"lowerWhenEqn: equation not handled\"). No result
-moves: Dymola 2026x and Modelon Impact pass their full regression suites against the stored references,
-and Impact's trajectories are bit-identical to those before the change on all 91 cases. Every
-example now runs in Dymola (within its license), OpenModelica and Modelon Impact. The version stays 0.13.1.
 </p>
 
 <h4>Origin and rename (2026-09-14)</h4>
@@ -292,6 +280,16 @@ This release changes requirement semantics.
      </ul></li>
 </ul>
 
+<h4>0.13.2 &mdash; OpenModelica builds every example</h4>
+<ul>
+<li> The 21 examples OpenModelica 1.27.1 could not build (the 14 that use a sliding-window block, the 7 that use an FFT
+     check) build and simulate in it, with the new and the old frontend. Two code-generation limits of omc are worked
+     around in <a href=\"modelica://Requirements.ChecksInSlidingWindow\">ChecksInSlidingWindow</a> and
+     <code>ChecksInFixedWindow_withFFT.Internal.FFT</code>.</li>
+<li> No block computes anything different: the stored references of all three tools stand. Every example now runs in
+     Dymola (within its license), OpenModelica and Modelon Impact.</li>
+</ul>
+
 <h4>0.13.1 &mdash; CSV reader: event rows a few ulps apart</h4>
 <ul>
 <li> The MA-HS-CSV reader behind <a href=\"modelica://Requirements.Sources.PartialSignalsFromFile\">Sources.PartialSignalsFromFile</a>
@@ -349,6 +347,37 @@ This release changes requirement semantics.
 </ul>
 </html>"));
   end Summary2026;
+
+  class Version_0_13_2 "Version 0.13.2 (Oct. 24, 2026)"
+  extends Modelica.Icons.ReleaseNotes;
+
+    annotation (Documentation(info="<html>
+<p>
+<b>OpenModelica builds every example.</b> The 21 examples OpenModelica 1.27.1 could not build (the 14 that use a
+sliding-window block, the 7 that use an FFT check) build and simulate in it, with the new and the old frontend. Two
+code-generation limits of omc are worked around without changing what any block computes:
+</p>
+<ul>
+<li> <a href=\"modelica://Requirements.ChecksInSlidingWindow\">ChecksInSlidingWindow</a>: the 12 when-clauses that assign
+     the sliding-window buffer record (array fields) are in algorithm sections. omc has no runtime support for a record
+     equation with array components in a when-equation (\"No runtime support for this record assignment\"); the
+     assignment form is supported.</li>
+<li> <code>ChecksInFixedWindow_withFFT.Internal.FFT</code>: the FFT-computation when-clause is in the block's algorithm
+     section, after the statement that stores the last sample, the order the equation sorting gave it before. omc could
+     not lower the if-equation around <code>saveFFTonFile</code> inside a when-equation
+     (\"lowerWhenEqn: equation not handled\").</li>
+</ul>
+<p>
+No result moves: Dymola 2026x passes its full regression suite (317/317) against the stored references, and Modelon
+Impact passes its full suite (649/649 checks, 91 cases at the 100x rtol spread), with trajectories bit-identical to those
+before the change on all 91 cases (2026-10-23). Every example now runs in Dymola (within its license), OpenModelica and
+Modelon Impact. The version is raised to mark the change of code, not of capability.
+</p>
+<p>
+No model conversion is needed: <code>conversion(noneFromVersion=\"0.13.1\")</code>.
+</p>
+</html>"));
+  end Version_0_13_2;
 
   class Version_0_13_1 "Version 0.13.1 (Oct. 21, 2026)"
   extends Modelica.Icons.ReleaseNotes;
@@ -1117,7 +1146,7 @@ First version of the library provided to the public.
 <p>
 This section summarizes the changes that have been performed
 on package Requirements. An overview of all changes and additions made in 2026
-(versions 0.7.1 to 0.13.0) is given in
+(versions 0.7.1 to 0.13.2) is given in
 <a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Summary2026\">Summary of 2026</a>.
 </p>
 </html>"));
@@ -1320,10 +1349,10 @@ end UsersGuide;
 
   annotation (preferredView="info",
   uses(Modelica(version="4.1.0")),
-version="0.13.1",
-versionDate="2026-10-21",
-dateModified = "2026-10-20",
-conversion(noneFromVersion="0.7.1", noneFromVersion="0.8.0", noneFromVersion="0.9.0", noneFromVersion="0.9.1", noneFromVersion="0.10.0", noneFromVersion="0.11.0", noneFromVersion="0.11.1", noneFromVersion="0.12.0", noneFromVersion="0.12.1", noneFromVersion="0.13.0"),
+version="0.13.2",
+versionDate="2026-10-24",
+dateModified = "2026-10-24",
+conversion(noneFromVersion="0.7.1", noneFromVersion="0.8.0", noneFromVersion="0.9.0", noneFromVersion="0.9.1", noneFromVersion="0.10.0", noneFromVersion="0.11.0", noneFromVersion="0.11.1", noneFromVersion="0.12.0", noneFromVersion="0.12.1", noneFromVersion="0.13.0", noneFromVersion="0.13.1"),
 revisionId="$Id:: package.mo 9390 2016-06-21 06:35:11Z #$",
 Documentation(info="<html>
 <p>

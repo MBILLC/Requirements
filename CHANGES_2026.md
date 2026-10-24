@@ -2,7 +2,7 @@
 
 This file summarizes what changed in the Modelica **Requirements** library
 (package folder [`Requirements/`](Requirements/)) during 2026. The library went from
-**0.7.0** (Feb. 2025) to **0.13.1** (2026-10-21) in eleven releases.
+**0.7.0** (Feb. 2025) to **0.13.2** (2026-10-24) in twelve releases.
 
 The full release notes are in the library itself, under
 `Requirements.UsersGuide.ReleaseNotes`. The same summary is in the library documentation,
@@ -22,20 +22,11 @@ tool-by-tool measurements are kept beside the library (see `Requirements.UsersGu
 | 0.12.1 | 2026-10-19 | Bug fix: `DelayedRising` stayed true after its input fell, when the fall coincided with the end of the duration |
 | 0.13.0 | 2026-10-20 | Three check blocks ported from the Modelica Buildings_Requirements library: `WithinBand`, `GreaterEqual`, `StableSignal` |
 | 0.13.1 | 2026-10-21 | Bug fix: the CSV reader stopped (every Boolean and Integer column held) at an event due a few ulps after another |
+| 0.13.2 | 2026-10-24 | OpenModelica builds every example; no block computes anything different |
 
 No release needs a model conversion. Each one declares `conversion(noneFromVersion=...)`
 for the version before it. One exception: from 0.8.0 on, code that reads a stored
 `Property` result has to accept the value 4.
-
-**After 0.13.1 (October 2026): OpenModelica builds every example.** The 21 examples
-OpenModelica 1.27.1 could not build (the 14 that use a sliding-window block, the 7 that use
-an FFT check) build and simulate in it, with the new and the old frontend. The
-`ChecksInSlidingWindow` when-clauses that assign the buffer record are in algorithm sections
-("No runtime support for this record assignment"), and the FFT-computation when-clause of
-`ChecksInFixedWindow_withFFT.Internal.FFT` is in its algorithm section ("lowerWhenEqn:
-equation not handled"). No block computes anything different: Dymola 2026x and Modelon
-Impact pass their full regression suites against the stored references, and Impact's
-trajectories are bit-identical to those before the change on all 91 cases. The version stays 0.13.1.
 
 ---
 
@@ -213,6 +204,18 @@ This release changes requirement semantics.
     tools.
 - The repository [MBILLC/Requirements](https://github.com/MBILLC/Requirements) is public;
   the User's Guide and the Contact page link to it.
+
+## 0.13.2 — OpenModelica builds every example
+
+- The 21 examples OpenModelica 1.27.1 could not build (the 14 that use a sliding-window block, the 7 that use an FFT
+  check) build and simulate in it, with the new and the old frontend.
+- `ChecksInSlidingWindow`: the when-clauses that assign the buffer record are in algorithm sections ("No runtime
+  support for this record assignment").
+- `ChecksInFixedWindow_withFFT.Internal.FFT`: the FFT-computation when-clause is in its algorithm section
+  ("lowerWhenEqn: equation not handled").
+- No block computes anything different: Dymola 2026x and Modelon Impact pass their full regression suites against the
+  stored references, and Impact's trajectories are bit-identical to those before the change on all 91 cases.
+  `conversion(noneFromVersion="0.13.1")`.
 
 ## 0.13.1 — CSV reader: event rows a few ulps apart
 

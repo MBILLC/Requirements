@@ -34,19 +34,19 @@ Every example builds and simulates in **Dymola**, **OpenModelica** and **Modelon
 | Tool | Examples |
 |---|---|
 | Dymola 2026x | all (license cap aside) |
-| OpenModelica 1.27.1 | all, new and old frontend (since October 2026, see below) |
+| OpenModelica 1.27.1 | all, new and old frontend (since 0.13.2, see below) |
 | Modelon Impact | all |
 
 The regression baselines of all three tools are kept in [ModCheck](https://github.com/MBILLC/ModCheck), `ModCheck/Resources/RequirementsLibrary/`. Every example has a reference in each tool's list: the tool's own result where it was stored, Modelon Impact's otherwise (`reference_from: impact`).
 
-## OpenModelica builds every example (October 2026, after 0.13.1)
+## Changes in version 0.13.2 (October 2026): OpenModelica builds every example
 
 Two code-generation limits of OpenModelica 1.27.1 kept 21 examples from building: the 14 that use a sliding-window block and the 7 that use an FFT check. Both are worked around without changing what any block computes:
 
 * `ChecksInSlidingWindow`: the 12 when-clauses that assign the sliding-window `Buffer` record (array fields) are in algorithm sections. omc has no runtime support for a record equation with array components in a when-equation ("No runtime support for this record assignment"); the assignment form is supported.
 * `ChecksInFixedWindow_withFFT.Internal.FFT`: the FFT-computation when-clause is in the existing algorithm section, after the statement that stores the last sample, the order the equation sorting gave it before. omc's `lowerWhenEqn` could not lower the if-equation around `saveFFTonFile` inside a when-equation.
 
-The results do not move: Dymola 2026x passes the full suite (317/317) against the stored references, and Modelon Impact passes its full suite (649/649 checks, 91 cases at the 100x rtol spread) with the change, and its trajectories are bit-identical to those of the library before it on all 91 cases (2026-10-23). No model conversion is needed and the version stays 0.13.1.
+The results do not move: Dymola 2026x passes the full suite (317/317) against the stored references, and Modelon Impact passes its full suite (649/649 checks, 91 cases at the 100x rtol spread) with the change, and its trajectories are bit-identical to those of the library before it on all 91 cases (2026-10-23). No model conversion is needed. Full account: `UsersGuide.ReleaseNotes.Version_0_13_2`.
 
 ## Changes in version 0.13.1 (October 2026)
 
