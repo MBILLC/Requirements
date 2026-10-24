@@ -59,12 +59,14 @@ on every row, and the hottest wall node sits at the hotter inlet, half a toleran
       annotation (Placement(transformation(extent={{-100,80},{-80,100}})));
     SignalAnalysis.ApproximateDerivativeWithFilter derT_out2(f_cut=0.1) "Rate of change of T_out2"
       annotation (Placement(transformation(extent={{-70,80},{-50,100}})));
-    Boolean steady = time >= tSettled and abs(derT_out1.y) <= dTdtMax and abs(derT_out2.y) <= dTdtMax
+    Boolean lastQuarter = time >= tSettled
+      "= true in the last quarter of the run (a variable of its own, so that every tool switches it at an event)";
+    Boolean steady = lastQuarter and abs(derT_out1.y) <= dTdtMax and abs(derT_out2.y) <= dTdtMax
       "= true when the run is in its last quarter and both outlet temperatures have stopped moving";
 
     Verify.Requirement R0_settled(
       text="The run shall have settled over its last quarter: both outlet temperatures change by at most dTdtMax",
-      property=during(time >= tSettled, abs(derT_out1.y) <= dTdtMax and abs(derT_out2.y) <= dTdtMax))
+      property=during(lastQuarter, abs(derT_out1.y) <= dTdtMax and abs(derT_out2.y) <= dTdtMax))
       annotation (Placement(transformation(extent={{-30,80},{30,100}})));
     Verify.Requirement R1_outletTemperature(
       text="In steady state, the outlet temperature of side 1 shall be at most T_out1_max (80 degC)",

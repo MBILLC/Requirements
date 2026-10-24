@@ -450,10 +450,9 @@ For an example to use the Requirement block in textual form, see
 
   algorithm
     when violated then
-      if episode > 0 and time - tEpisodeEnd <= mergeGap then
-        // Within mergeGap of the previous violation: the same episode goes on.
-      else
-        // A new episode; the previous one is final now.
+      // Within mergeGap of the previous violation the same episode goes on;
+      // otherwise a new episode starts and the previous one is final now.
+      if not (episode > 0 and time - tEpisodeEnd <= mergeGap) then
         if episode > 0 and tEpisodeEnd - tEpisodeStart >= minDuration then
           nClosed := nClosed + 1;
           if tEpisodeEnd - tEpisodeStart > longestClosed then

@@ -2340,6 +2340,8 @@ see <a href=\"modelica://Requirements.UsersGuide.BuildingsLicense\">UsersGuide.B
       u=u) "Approximate du/dt, started in steady state and fed u at all times: no spike at the start of a phase";
     Real I(start=0, fixed=true)
       "Integral of |du/dt| since the start of the current phase";
+    Real I_delayed = delay(I, window, window)
+      "I one window ago (outside the if below, so that every tool keeps its history at all times)";
     Boolean unstable "= true, if the moving average is above the limit (with hysteresis h)";
   initial equation
     pre(unstable) = false;
@@ -2351,7 +2353,7 @@ see <a href=\"modelica://Requirements.UsersGuide.BuildingsLicense\">UsersGuide.B
     // the exact moving average over the last window: a difference of the integral, whose numerical error does
     // not accumulate (an integrator of u - delay(u, window), as SignalAnalysis.MovingAverage is, keeps every error
     // forever, and the derivative's spike at the start of a phase is never cancelled exactly by its delayed copy)
-    rateAverage = if windowFilled.y then (I - delay(I, window))/window else 0;
+    rateAverage = if windowFilled.y then (I - I_delayed)/window else 0;
     unstable = not pre(unstable) and rateAverage > upperLimit or pre(unstable) and rateAverage > upperLimit - h;
     y = if not active then Property.Undefined elseif not windowFilled.y then Property.Undecided
         elseif check then Property.Satisfied else Property.Violated;

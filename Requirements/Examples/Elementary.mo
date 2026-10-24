@@ -3819,6 +3819,7 @@ The example runs on Dymola, OpenModelica and Modelon Impact.</p>
       connect(lower.y, greaterEqual1.u_min) annotation (Line(points={{-59,-30},{-50,-30},{-50,-16},{-42,-16}}, color={0,0,127}));
       connect(withinBand1.y, statistics.property) annotation (Line(points={{1,50},{16,50},{16,54},{28,54}}, color={0,0,255}));
       connect(withinBand1.margin, statistics.margin) annotation (Line(points={{1,41},{16,41},{16,46},{28,46}}, color={0,127,0}));
+    algorithm
       when sample(0, 0.01) then
         if noEvent(tm > 1.001 and tm < 4.999) then
           assert(noEvent(abs(withinBand1.margin - min(s + 0.8, 0.8 - s)/0.2) < 1e-6), "Gated: WithinBand's margin is not min(u - u_min, u_max - u)/scale");
@@ -3834,6 +3835,7 @@ The example runs on Dymola, OpenModelica and Modelon Impact.</p>
             "Gated: an inactive check does not have the margin of the middle of the band (WithinBand) or 0 (GreaterEqual)");
         end if;
       end when;
+    equation
       when time >= 19.9 then
         assert(noEvent(statistics.nViolations == 2), "Gated: one violation in each of the two active phases");
         assert(noEvent(abs(statistics.totalDuration - 2*(5 - 2*t1)) < 1e-3), "Gated: total violated time is not 2 (5 s - 2 t1)");
@@ -3898,6 +3900,7 @@ The example runs on Dymola, OpenModelica and Modelon Impact.</p>
       connect(u.y, stable1.u) annotation (Line(points={{-59,20},{-54,20},{-54,56},{-42,56}}, color={0,0,127}));
       connect(u.y, stable2.u) annotation (Line(points={{-59,20},{-54,20},{-54,16},{-42,16}}, color={0,0,127}));
       connect(u.y, stable3.u) annotation (Line(points={{-59,20},{-54,20},{-54,-24},{-42,-24}}, color={0,0,127}));
+    algorithm
       when sample(0, 0.1) then
         if noEvent(time < 39.99) then
           assert(noEvent(stable1.y == Property.Undecided and stable2.y == Property.Undecided and stable3.y == Property.Undecided),
@@ -3915,6 +3918,7 @@ The example runs on Dymola, OpenModelica and Modelon Impact.</p>
           assert(noEvent(stable2.y <> Property.Violated or stable2.margin <= 1e-6), "StableSignal: violated with a positive margin (h = 0)");
         end if;
       end when;
+    equation
       when time >= 115 then
         assert(noEvent(stable2.y == Property.Satisfied), "StableSignal: stable2 not satisfied once the average fell below 0.15");
         assert(noEvent(stable3.y == Property.Violated and stable3.margin > 0),
