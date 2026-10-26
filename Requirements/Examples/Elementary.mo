@@ -3383,13 +3383,14 @@ expression over Property values</b>: a diagram of Property blocks is evaluated a
           annotation (Placement(transformation(extent={{100,-70},{120,-50}})));
       equation
         // Boolean and Integer columns change only at the file's events, so they
-        // are read in the when-clause that fires there (as BooleanTable does)
-        when {time >= pre(nextTimeEvent), initial()} then
+        // are read in the when-clause that fires there: the base block's fileEvent,
+        // a state event (a time event here can be dropped by a tool, see 0.13.1)
+        when {fileEvent, initial()} then
           packOn = Requirements.Internal.CSV.getBoolean(file, 1, time, nextTimeEvent, pre(nextTimeEvent));
           flightPhase = Requirements.Internal.CSV.getInteger(file, 1, time, nextTimeEvent, pre(nextTimeEvent));
         end when;
         annotation(Documentation(info="<html>
-<p>The documented pattern for reading a MA-HS-CSV file without the generator: the three name lists fix the column types, one output per column, the column index passed to the C reader fixed at authoring time; Real outputs as declaration equations, Boolean and Integer outputs assigned in the when-clause that fires at the file's events.</p>
+<p>The documented pattern for reading a MA-HS-CSV file without the generator: the three name lists fix the column types, one output per column, the column index passed to the C reader fixed at authoring time; Real outputs as declaration equations, Boolean and Integer outputs assigned in the when-clause that fires at the file's events, <code>when {fileEvent, initial()}</code> (since 0.14.0; before, the example used the time event <code>time &gt;= pre(nextTimeEvent)</code> that the reader itself left in 0.13.1).</p>
 <p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
 </html>"));
       end CabinReader;

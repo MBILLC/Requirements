@@ -255,11 +255,16 @@ in the parameter menu.
       annotation(Dialog(loadSelector(filter="MA-HS-CSV files (*.csv)", caption="Open MA-HS-CSV file")));
     parameter Boolean extrapolateHold = true
       "= true: hold the first/last row outside the file's time range; = false: error";
+    parameter String runTimeFileName = ""
+      "If not empty: the file read instead of fileName, an absolute path set at run time (e.g. a parameter of an exported FMU)"
+      annotation(Evaluate=false, Dialog(group="Run time", loadSelector(filter="MA-HS-CSV files (*.csv)", caption="Open MA-HS-CSV file")));
   protected
     parameter String realNames[:] = fill("", 0) "Header names of the columns read as Real, set by the extending block";
     parameter String booleanNames[:] = fill("", 0) "Header names of the columns read as Boolean, set by the extending block";
     parameter String integerNames[:] = fill("", 0) "Header names of the columns read as Integer, set by the extending block";
-    parameter String fileNameResolved = Modelica.Utilities.Files.loadResource(fileName) "fileName with a modelica:// URI resolved";
+    parameter String fileNameResolved = if Modelica.Utilities.Strings.isEmpty(runTimeFileName)
+      then Modelica.Utilities.Files.loadResource(fileName) else runTimeFileName
+      "The file read: runTimeFileName if set, else fileName with a modelica:// URI resolved";
     parameter Requirements.Internal.CSV.File file = Requirements.Internal.CSV.File(
       fileNameResolved, realNames, booleanNames, integerNames, extrapolateHold) "The file, read once";
     discrete Real nextTimeEvent(start=0, fixed=true) "Next instant at which a column of the file changes";
@@ -348,6 +353,26 @@ Columns not named are skipped. A name that is not in the header, or a header nam
 <li>Outside the file's time range the first/last row is held (<code>extrapolateHold=true</code>, the default), or an error is raised.</li>
 </ul>
 
+<h4>A file chosen at run time (an exported FMU)</h4>
+<p>
+A tool resolves <code>fileName</code> when it translates the model: the file must exist then, and a tool that
+exports an FMU copies it into the FMU's <code>resources</code> directory and reads it from there. Two ways to read
+other data with the same translated model or FMU, without translating again:
+</p>
+<ul>
+<li><b><code>runTimeFileName</code></b>: an absolute path. It is not evaluated (<code>Evaluate=false</code>), so it
+    stays a parameter of the translated model (in an FMU <code>causality=\"parameter\"</code>,
+    <code>variability=\"fixed\"</code>) and is set before initialization. When it is not empty it replaces
+    <code>fileName</code>.</li>
+<li><b>Replacing the packaged file</b> in the FMU's <code>resources</code> directory (the copy of
+    <code>fileName</code>) with a file of the same name.</li>
+</ul>
+<p>
+The file is opened at initialization either way, so a file the run did not supply can be made to fail loudly:
+package a file with the header row only, which the reader rejects at initialization (no rows), and the FMU never
+runs on placeholder data.
+</p>
+
 <p>
 <code>fileName</code> may be a <code>modelica://</code> URI (resolved with
 <a href=\"modelica://Modelica.Utilities.Files.loadResource\">loadResource</a>) or an absolute path. The C reader
@@ -359,6 +384,8 @@ Columns not named are skipped. A name that is not in the header, or a header nam
 </html>", revisions="<html>
 <table border=1 cellspacing=0 cellpadding=2>
 <tr><th>Date</th> <th align=\"left\">Description</th></tr>
+<tr><td valign=\"top\"> Oct. 26, 2026 </td>
+    <td valign=\"top\"> <code>runTimeFileName</code>: a file chosen at run time, also in an exported FMU (version 0.14.0)</td></tr>
 <tr><td valign=\"top\"> Sept. 14, 2026 </td>
     <td valign=\"top\"> First version (H. Tummescheit, Model Based Innovation LLC)</td></tr>
 </table>
