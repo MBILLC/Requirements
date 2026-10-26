@@ -2,7 +2,7 @@
 
 This file summarizes what changed in the Modelica **Requirements** library
 (package folder [`Requirements/`](Requirements/)) during 2026. The library went from
-**0.7.0** (Feb. 2025) to **0.13.2** (2026-10-24) in twelve releases.
+**0.7.0** (Feb. 2025) to **0.14.0** (2026-10-26) in thirteen releases.
 
 The full release notes are in the library itself, under
 `Requirements.UsersGuide.ReleaseNotes`. The same summary is in the library documentation,
@@ -23,6 +23,7 @@ tool-by-tool measurements are kept beside the library (see `Requirements.UsersGu
 | 0.13.0 | 2026-10-20 | Three check blocks ported from the Modelica Buildings_Requirements library: `WithinBand`, `GreaterEqual`, `StableSignal` |
 | 0.13.1 | 2026-10-21 | Bug fix: the CSV reader stopped (every Boolean and Integer column held) at an event due a few ulps after another |
 | 0.13.2 | 2026-10-24 | OpenModelica builds every example; no block computes anything different |
+| 0.14.0 | 2026-10-26 | A file chosen at run time: the CSV reader in an exported FMU |
 
 No release needs a model conversion. Each one declares `conversion(noneFromVersion=...)`
 for the version before it. One exception: from 0.8.0 on, code that reads a stored
@@ -204,6 +205,20 @@ This release changes requirement semantics.
     tools.
 - The repository [MBILLC/Requirements](https://github.com/MBILLC/Requirements) is public;
   the User's Guide and the Contact page link to it.
+
+## 0.14.0 — A file chosen at run time: the CSV reader in an exported FMU
+
+- `Sources.PartialSignalsFromFile` has a new parameter `runTimeFileName`: an absolute path, not evaluated
+  (`Evaluate=false`), that replaces `fileName` when it is not empty.
+- Why: a tool resolves `fileName` with `loadResource` at translation. Modelon Impact fails the translation when the
+  file does not exist yet, and exports a String parameter as a constant. A check model could not be compiled once and
+  run on data produced later.
+- In an FMU exported by Modelon Impact the new parameter is settable before initialization (FMI 2.0 and 3.0, ME and CS).
+- The block's documentation also describes replacing the copy of `fileName` packaged in an FMU's `resources`
+  directory, and a header-only placeholder that fails at initialization.
+- Bug fix in the example `Examples.Elementary.Sources.SignalsFromFile`: its reader used the time event
+  `when {time >= pre(nextTimeEvent), initial()}` that 0.13.1 replaced in the reader; it now uses `when {fileEvent, initial()}`.
+- Measured on Modelon Impact (2026-10-26): the full suite passes 649/649 checks (91 cases, 100x rtol spread), the changed example 9/9 with zero deviation; the example's FMU (FMI 2.0 and 3.0, ME and CS) reads another file through `reader.runTimeFileName` in FMPy and PyFMI. Replacing the packaged file works with FMI 2.0 FMUs; Impact's FMI 3.0 FMUs keep the importer's resource path without copying it, so FMPy finds no packaged file there. OpenModelica and Dymola were not run for this release.
 
 ## 0.13.2 — OpenModelica builds every example
 

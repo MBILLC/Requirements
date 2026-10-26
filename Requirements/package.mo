@@ -1,5 +1,5 @@
 within ;
-package Requirements "Requirements (Version 0.13.2) - Defining requirements formally and checking them when simulating"
+package Requirements "Requirements (Version 0.14.0) - Defining requirements formally and checking them when simulating"
   extends Modelica.Icons.Package;
 
 
@@ -14,7 +14,7 @@ package ReleaseNotes "Release notes"
 
     annotation (Documentation(info="<html>
 <p>
-In 2026 the library went from version 0.7.0 (Feb. 2025) to <b>0.13.2</b> (2026-10-24) in twelve
+In 2026 the library went from version 0.7.0 (Feb. 2025) to <b>0.14.0</b> (2026-10-26) in thirteen
 releases. This page summarizes them; the release note of each version has the details.
 The same summary is kept as Markdown in
 <a href=\"https://github.com/MBILLC/Requirements/blob/HEAD/CHANGES_2026.md\">CHANGES_2026.md</a>
@@ -49,6 +49,8 @@ The regression baselines and the tool-by-tool measurements are kept beside the l
     <td>Bug fix: the CSV reader stopped (every Boolean and Integer column held) at an event due a few ulps after another</td></tr>
 <tr><td><a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Version_0_13_2\">0.13.2</a></td><td>2026-10-24</td>
     <td>OpenModelica builds every example; no block computes anything different</td></tr>
+<tr><td><a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Version_0_14_0\">0.14.0</a></td><td>2026-10-26</td>
+    <td>A file chosen at run time: the CSV reader in an exported FMU</td></tr>
 </table>
 
 <p>
@@ -280,6 +282,20 @@ This release changes requirement semantics.
      </ul></li>
 </ul>
 
+<h4>0.14.0 &mdash; A file chosen at run time: the CSV reader in an exported FMU</h4>
+<ul>
+<li> <a href=\"modelica://Requirements.Sources.PartialSignalsFromFile\">Sources.PartialSignalsFromFile</a> has a new
+     parameter <code>runTimeFileName</code>: an absolute path, not evaluated, that replaces <code>fileName</code> when it
+     is not empty. A translated model or an exported FMU reads other data without being translated again.</li>
+<li> The documentation describes the second way: replacing the copy of <code>fileName</code> that a tool packages
+     in an FMU's <code>resources</code> directory.</li>
+<li> Nothing changes for a model that does not set the new parameter.</li>
+<li> Bug fix in the example <a href=\"modelica://Requirements.Examples.Elementary.Sources.SignalsFromFile\">Examples.Elementary.Sources.SignalsFromFile</a>:
+     its reader read the Boolean and Integer columns in <code>when {time &gt;= pre(nextTimeEvent), initial()}</code>, the time
+     event that 0.13.1 replaced in the reader with the state event <code>fileEvent</code>. It now uses <code>fileEvent</code>,
+     so a model copied from the example cannot freeze its discrete columns.</li>
+</ul>
+
 <h4>0.13.2 &mdash; OpenModelica builds every example</h4>
 <ul>
 <li> The 21 examples OpenModelica 1.27.1 could not build (the 14 that use a sliding-window block, the 7 that use an FFT
@@ -347,6 +363,45 @@ This release changes requirement semantics.
 </ul>
 </html>"));
   end Summary2026;
+
+  class Version_0_14_0 "Version 0.14.0 (Oct. 26, 2026)"
+  extends Modelica.Icons.ReleaseNotes;
+
+    annotation (Documentation(info="<html>
+<p>
+<b>A file chosen at run time: the CSV reader in an exported FMU.</b>
+<a href=\"modelica://Requirements.Sources.PartialSignalsFromFile\">Sources.PartialSignalsFromFile</a> has a new
+parameter, <code>runTimeFileName</code> (default <code>\"\"</code>). When it is not empty, the reader opens that file
+(an absolute path) instead of <code>fileName</code>.
+</p>
+<ul>
+<li> <b>Why.</b> A tool resolves <code>fileName</code> with <code>loadResource</code> when it translates the model, and
+     evaluates a String parameter. Modelon Impact (OCT) fails the translation when the file does not exist yet, and
+     exports <code>fileName</code> as a constant. A check model could therefore not be compiled once and run on data
+     produced later.</li>
+<li> <b>How.</b> <code>runTimeFileName</code> carries <code>Evaluate=false</code>. In an FMU exported by Modelon Impact
+     it is <code>causality=\"parameter\" variability=\"fixed\"</code> (FMI 2.0 and 3.0, Model Exchange and
+     Co-Simulation) and is set before initialization.</li>
+<li> <b>The other way</b>, documented in the block: a tool that exports an FMU copies the file named by
+     <code>fileName</code> into the FMU's <code>resources</code> directory and reads it from there at run time;
+     replacing that copy changes the data. A file with the header row only fails at initialization, so a
+     packaged placeholder never yields a result.</li>
+<li> <b>Bug fix in an example.</b> The hand-written reader of
+     <a href=\"modelica://Requirements.Examples.Elementary.Sources.SignalsFromFile\">Examples.Elementary.Sources.SignalsFromFile</a>
+     still read its Boolean and Integer columns in <code>when {time &gt;= pre(nextTimeEvent), initial()}</code>, the time event that
+     0.13.1 replaced in <code>PartialSignalsFromFile</code> because OCT can drop it as already past and then hold every discrete
+     column for the rest of the run. It now uses the base block's state event, <code>when {fileEvent, initial()}</code>, as the
+     reader's documentation and Chaperone's generated readers do. The example's own data has no near-coincident events, so
+     its result does not move.</li>
+</ul>
+<p>
+<b>Measured on Modelon Impact (2026-10-26).</b> The library's full suite passes 649/649 checks (91 cases, 100x rtol spread) on 0.14.0; the changed example's case passes 9/9 with zero deviation. The example <code>SignalsFromFile</code>, exported as an FMU by Impact (FMI 2.0 and 3.0, Model Exchange and Co-Simulation), reads another file through <code>reader.runTimeFileName</code> in FMPy 0.3.32 and PyFMI 2.23: on a file whose cabin temperature stays at or below 26 degC its first requirement turns satisfied, as it must. Replacing the packaged file works with FMI 2.0 FMUs. Impact's FMI 3.0 FMUs keep the importer's resource path without copying it, so an importer that frees it (FMPy) finds no packaged file; <code>runTimeFileName</code> does not use that path and works with both versions. OpenModelica and Dymola were not run for this release (neither is in the test container); the change adds a parameter and an if-expression in a parameter binding only.
+</p>
+<p>
+No model conversion is needed: <code>conversion(noneFromVersion=\"0.13.2\")</code>.
+</p>
+</html>"));
+  end Version_0_14_0;
 
   class Version_0_13_2 "Version 0.13.2 (Oct. 24, 2026)"
   extends Modelica.Icons.ReleaseNotes;
@@ -1146,7 +1201,7 @@ First version of the library provided to the public.
 <p>
 This section summarizes the changes that have been performed
 on package Requirements. An overview of all changes and additions made in 2026
-(versions 0.7.1 to 0.13.2) is given in
+(versions 0.7.1 to 0.14.0) is given in
 <a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Summary2026\">Summary of 2026</a>.
 </p>
 </html>"));
@@ -1349,10 +1404,10 @@ end UsersGuide;
 
   annotation (preferredView="info",
   uses(Modelica(version="4.1.0")),
-version="0.13.2",
-versionDate="2026-10-24",
-dateModified = "2026-10-24",
-conversion(noneFromVersion="0.7.1", noneFromVersion="0.8.0", noneFromVersion="0.9.0", noneFromVersion="0.9.1", noneFromVersion="0.10.0", noneFromVersion="0.11.0", noneFromVersion="0.11.1", noneFromVersion="0.12.0", noneFromVersion="0.12.1", noneFromVersion="0.13.0", noneFromVersion="0.13.1"),
+version="0.14.0",
+versionDate="2026-10-26",
+dateModified = "2026-10-26",
+conversion(noneFromVersion="0.7.1", noneFromVersion="0.8.0", noneFromVersion="0.9.0", noneFromVersion="0.9.1", noneFromVersion="0.10.0", noneFromVersion="0.11.0", noneFromVersion="0.11.1", noneFromVersion="0.12.0", noneFromVersion="0.12.1", noneFromVersion="0.13.0", noneFromVersion="0.13.1", noneFromVersion="0.13.2"),
 revisionId="$Id:: package.mo 9390 2016-06-21 06:35:11Z #$",
 Documentation(info="<html>
 <p>
