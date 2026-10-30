@@ -37,7 +37,7 @@ Every example builds and simulates in **Dymola**, **OpenModelica** and **Modelon
 | OpenModelica 1.27.1 | all, new and old frontend (since 0.13.2, see below) |
 | Modelon Impact | all |
 
-The regression baselines of all three tools are kept in [ModCheck](https://github.com/MBILLC/ModCheck), `ModCheck/Resources/RequirementsLibrary/`. Every example has a reference in each tool's list: the tool's own result where it was stored, Modelon Impact's otherwise (`reference_from: impact`).
+The regression baselines of all three tools are kept in [ModCheck](https://github.com/MBILLC/ModCheck), `ModCheck/Resources/RequirementsLibrary/`, my own, currently private regression testing tool. Every example has a reference in each tool's list: the tool's own result where it was stored, Modelon Impact's otherwise (`reference_from: impact`).
 
 ## Changes in version 0.14.0 (October 2026): A file chosen at run time: the CSV reader in an exported FMU
 
