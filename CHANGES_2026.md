@@ -22,7 +22,7 @@ tool-by-tool measurements are kept beside the library (see `Requirements.UsersGu
 | 0.12.1 | 2026-10-19 | Bug fix: `DelayedRising` stayed true after its input fell, when the fall coincided with the end of the duration |
 | 0.13.0 | 2026-10-20 | Three check blocks ported from the Modelica Buildings_Requirements library: `WithinBand`, `GreaterEqual`, `StableSignal` |
 | 0.13.1 | 2026-10-21 | Bug fix: the CSV reader stopped (every Boolean and Integer column held) at an event due a few ulps after another |
-| 0.13.2 | 2026-10-24 | OpenModelica builds every example; no block computes anything different |
+| 0.13.2 | 2026-10-24 | OpenModelica builds and simulates every example; no block computes anything different |
 | 0.14.0 | 2026-10-26 | A file chosen at run time: the CSV reader in an exported FMU |
 
 No release needs a model conversion. Each one declares `conversion(noneFromVersion=...)`
@@ -220,7 +220,7 @@ This release changes requirement semantics.
   `when {time >= pre(nextTimeEvent), initial()}` that 0.13.1 replaced in the reader; it now uses `when {fileEvent, initial()}`.
 - Measured on Modelon Impact (2026-10-26): the full suite passes 649/649 checks (91 cases, 100x rtol spread), the changed example 9/9 with zero deviation; the example's FMU (FMI 2.0 and 3.0, ME and CS) reads another file through `reader.runTimeFileName` in FMPy and PyFMI. Replacing the packaged file works with FMI 2.0 FMUs; Impact's FMI 3.0 FMUs keep the importer's resource path without copying it, so FMPy finds no packaged file there. OpenModelica and Dymola were not run for this release.
 
-## 0.13.2 — OpenModelica builds every example
+## 0.13.2 — OpenModelica builds and simulates every example
 
 - The 21 examples OpenModelica 1.27.1 could not build (the 14 that use a sliding-window block, the 7 that use an FFT
   check) build and simulate in it, with the new and the old frontend.

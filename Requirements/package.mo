@@ -48,7 +48,7 @@ The regression baselines and the tool-by-tool measurements are kept beside the l
 <tr><td><a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Version_0_13_1\">0.13.1</a></td><td>2026-10-21</td>
     <td>Bug fix: the CSV reader stopped (every Boolean and Integer column held) at an event due a few ulps after another</td></tr>
 <tr><td><a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Version_0_13_2\">0.13.2</a></td><td>2026-10-24</td>
-    <td>OpenModelica builds every example; no block computes anything different</td></tr>
+    <td>OpenModelica builds and simulates every example; no block computes anything different</td></tr>
 <tr><td><a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Version_0_14_0\">0.14.0</a></td><td>2026-10-26</td>
     <td>A file chosen at run time: the CSV reader in an exported FMU</td></tr>
 </table>
@@ -296,7 +296,7 @@ This release changes requirement semantics.
      so a model copied from the example cannot freeze its discrete columns.</li>
 </ul>
 
-<h4>0.13.2 &mdash; OpenModelica builds every example</h4>
+<h4>0.13.2 &mdash; OpenModelica builds and simulates every example</h4>
 <ul>
 <li> The 21 examples OpenModelica 1.27.1 could not build (the 14 that use a sliding-window block, the 7 that use an FFT
      check) build and simulate in it, with the new and the old frontend. Two code-generation limits of omc are worked
@@ -408,7 +408,7 @@ No model conversion is needed: <code>conversion(noneFromVersion=\"0.13.2\")</cod
 
     annotation (Documentation(info="<html>
 <p>
-<b>OpenModelica builds every example.</b> The 21 examples OpenModelica 1.27.1 could not build (the 14 that use a
+<b>OpenModelica builds and simulates every example.</b> The 21 examples OpenModelica 1.27.1 could not build (the 14 that use a
 sliding-window block, the 7 that use an FFT check) build and simulate in it, with the new and the old frontend. Two
 code-generation limits of omc are worked around without changing what any block computes:
 </p>
@@ -1356,6 +1356,57 @@ using temporal logic to formally define requirements
 and automatically test these requirements when a model
 is simulated.
 </p>
+<h4><a name=\"why-redesign\"></a>What the library does today</h4>
+<p>
+The Requirements library is a Modelica package for stating requirements formally and for judging a simulation against them. Its blocks implement a temporal logic over simulated signals: time locators select the periods in which a requirement applies, check blocks evaluate conditions in fixed or sliding windows, and a verdict type records whether a requirement was violated, satisfied or never decided. The structure descends from the Modelica_Requirements library presented in 2015, which in turn follows the FORM-L language developed at EDF, where a requirement has a where, a when, a what and a how well. FORM-L has been superceded by CRML, also developed by EDF, during the same research project in which the original Modelica_Requirements Library was developed. The current Library has been updated to the principles presented in the CRML language, but does not directly interface with it. Beyond conditions on transient signals, the library offers spectral checks (FFT), step-response metrics, requirements checking for steady-state design, eigenvalue checks over a linearization, and violation statistics for long runs, that is, how often, for how long and by how much a requirement was violated.
+</p>
+<p>
+Verdicts use four values inside the library (Violated, Undecided, Satisfied and Undefined, the last meaning not applicable), leaning on the formalism developed in CRML, and three wherever a person or another tool reads them (violated, untested, satisfied). Every check block also outputs a margin, the distance to its limit in units of the requirement's tolerance. The library can be used on its own, with the requirement blocks wired next to a plant in one model that prints its verdicts at the end of a simulation with <a href=\"modelica://Requirements.Verify.PrintViolations\"><code>Verify.PrintViolations</code></a>, or as the checking engine of a two-run workflow: the plant is simulated alone, its signals are stored in one <a href=\"https://github.com/modelica/ma-hs-csv\">MA-HS-CSV file</a>, and the check blocks read that file in a second run through <a href=\"modelica://Requirements.Sources.PartialSignalsFromFile\"><code>Sources.PartialSignalsFromFile</code></a>. In that workflow the library produces <a href=\"modelica://Requirements.Types.Property\"><code>Types.Property</code></a> and margin trajectories, and the reported verdicts are taken from them in Python by the Chaperone requirements-verification pipeline. The examples build and simulate in Dymola, OpenModelica and Modelon Impact.
+</p>
+<h4>Why a redesign of the Requirements Library?</h4>
+<p>
+In the original library (Modelica_Requirements up to version 0.7) a requirement was a hand-written Modelica model. Library blocks were wired next to the plant, the plant and its checks were simulated together as one model in one Modelica tool, and <a href=\"modelica://Requirements.Verify.PrintViolations\"><code>Verify.PrintViolations</code></a> printed the verdict at the end of the run. The verdict type had three values, and a requirement that was still undecided at the end was reported as untested. This design is compact and gives a short development loop, and its blocks and verdict words are what the redesign keeps. Practice with larger plants and several tools exposed nine limitations.
+</p>
+<p>
+Four of them concern the independence of the evidence. The when, edge and sample events of the checks change the solver's step sequence and can therefore change the trajectory being verified. The verdict depended on the tool: <code>terminal()</code> evaluates to false in Modelon Impact, a <code>terminate()</code> edge loses the last state, and verdicts were printed twice. Only a tool that compiles the library could take part, which excluded FMUs and SSP systems. Finally, OpenModelica 1.27.1 could not build the sliding-window and FFT examples.
+</p>
+<p>
+Three concern what a verdict says. Untested was invisible: Undecided was printed without a reason, and a requirement that no example exercised printed nothing. Without a margin, a requirement satisfied by a hair and one satisfied with ten tolerances of headroom printed the same word. Without sets of components, a requirement such as all bearings shall ... needed one block per bearing, and an absent instance looked like a violated one.
+</p>
+<p>
+The last two concern traceability and reach. The model was the requirement, so a reviewer who does not read Modelica could not confirm that it matched the intended statement. And whole families of requirements, such as steady-state envelopes, step-response metrics and eigenvalue bounds, cannot be decided inside a single transient run.
+</p>
+<p>
+The redesign inverts the concept and keeps the library. The requirement becomes a <b>sentence in a controlled natural language</b>, stored in a <a href=\"https://github.com/strictdoc-project/strictdoc\">strictdoc project</a> together with its rationale and review trail. Check models are generated from it by a <b>deterministic parser</b>, committed, and never edited by hand. The decisions are recorded as eleven design rules, of which the following carry most of the change.
+</p>
+<p>
+Simulation and checking are separated. The plant is simulated alone, without any requirement block in it, so that the object being verified is not altered by verifying it. Its named signals are stored in one file and the check model reads that file in a second run. The verdict is computed in Python from the stored <a href=\"modelica://Requirements.Types.Property\"><code>Property</code></a> and margin trajectories, which makes it independent of the Modelica tool and provides the time and the reason of a verdict without extra effort. Any Modelica, FMI or SSP tool can run the plant, because the file is the only interface. Verification inside Modelica remains as an optional layer on the same check model, for the fastest development loop, but it is never a reported verdict. The split has a cost: a threshold crossing is located on the interpolated stored signal, so the first-violation instant can move by up to one recording interval, and the recording interval is therefore a required field of every test case. On the requirements corpus run with OpenModelica and Modelon Impact, 75 pairs of requirement and test case gave no differing verdict between the coupled one-run model and the two-run pipeline; 45 of 48 violated pairs had an identical first-violation instant and the other three shifted by at most one interval.
+</p>
+<p>
+Requirements are <b>text first</b>, as is the most common industry practice. The controlled language uses an EARS skeleton (while, when, if-then, ubiquitous and complex patterns) over a typed glossary and a closed phrasebook. Every noun phrase must be a glossary signal with a type, a unit and a plant variable, and quantities carry units that are checked for dimensional consistency. The step from text to model is a deterministic parser and not a language model, so the same text yields the same model at any later time, offline and auditable, and a statement that does not parse is rejected instead of interpreted. The parser echoes each requirement as a canonical sentence and draws a timing diagram of its scope, trigger and obligation; the author's confirmation of both is the review step. Language models may help to write text that parses from less formal original requirements text, and to design test cases, but no language model output sits between a requirement and its verdict.
+</p>
+<p>
+The verdict semantics are stricter. Four values are used inside a check model because composition needs Undefined as the neutral element: a check outside its period drops out of a conjunction instead of holding it Undecided. Wherever a person or another tool reads a verdict there are three values, since a fourth token is what a dashboard may coerce to green. Untested is a first-class verdict that carries its reason (never applicable, applicable but never decided, signal not recorded, run failed, and similar) and the number of attempts, and a satisfied verdict with no attempts is refused. Every verdict is keyed by requirement and <b>component instance</b>, so a requirement over a set of components yields one verdict per instance and an aggregate, and an absent instance is no longer mistaken for a violated one. Margins are normalized by the requirement's tolerance; without a tolerance the number is shown but never ranked, because quantities in different units cannot be compared. Because the four-valued algebra is not a lattice, <a href=\"modelica://Requirements.Types.Property\"><code>Property</code></a> expressions are never simplified.
+</p>
+<p>
+Requirement families that a single transient run cannot decide are evaluated in Python on the same stored data: steady-state point clouds over parameter sweeps, step responses, eigenvalue and frequency-response properties of a linearization, and spectral checks. Where the library has a corresponding block, it serves as an independent cross-check. One requirement set is run against several test cases, and each test case states the verdict it expects, so that a run also tests the tests. A requirement that no test case exercises is listed as untested, with that reason.
+</p>
+<p>
+A related decision concerned CRML, the language of EDF that carries the extended temporal logic. Five options were weighed, from full adoption of its toolchain to declining it. The semantics, that is the four-valued tables and the decision events, were adopted and implemented in the library's own Modelica, with matching names so that later convergence stays cheap; export to and import from CRML are held open. The toolchain was not adopted because, at the time of the decision, its runtime had no published license, the language was not governed by a standards body, and the semantics are available in open literature and can be implemented independently.
+</p>
+<p>
+For users of the library the redesign is evolutionary. Requirements is a derivative of Modelica_Requirements 0.7.1 under the original BSD 3-Clause license, renamed on 2026-09-14, and the changes meant for upstream are kept on a separate branch. From 0.7.1 to the current version no release requires a model conversion, with one exception: code that reads a stored <a href=\"modelica://Requirements.Types.Property\"><code>Property</code></a> result must accept the value 4 (Undefined) from version 0.8.0 on. The release notes and the summary of 2026 in the User's Guide give the details of each step.
+</p>
+<h4>Tool support</h4>
+<p>
+Every example builds and simulates in <b>Dymola</b>, <b>OpenModelica</b> and <b>Modelon Impact</b>.
+</p>
+<table border=1 cellspacing=0 cellpadding=2>
+<tr><th>Tool</th><th>Examples</th></tr>
+<tr><td>Dymola 2026x</td><td>all</td></tr>
+<tr><td>OpenModelica 1.27.1</td><td>all, new and old frontend (since version <a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Version_0_13_2\">0.13.2</a>)</td></tr>
+<tr><td>Modelon Impact</td><td>all</td></tr>
+</table>
 <p>
 <b>Origin.</b> Requirements is Model Based Innovation LLC's derivative of
 <a href=\"https://github.com/modelica-3rdparty/Modelica_Requirements\">Modelica_Requirements</a>
@@ -1466,7 +1517,7 @@ The result of the requirement verification might then not be correct.
 </p>
 
 <p>
-<b>This package is not yet finalized. A redesign is planned. The redesigned library (with improved implementations
+<b>This package is not yet finalized. Continuous improvements are planned. The improved library (with improved implementations
 of models and new functionality) should be backwards compatible to this version, but
 it is not guaranteed. If non-backwards compatible changes are introduced, most likely
 automatic conversions will not be provided.</b>.
