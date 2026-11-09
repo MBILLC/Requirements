@@ -28,9 +28,24 @@ package Units "Type definitions of non-SI units and conversion functions, for th
     type Inductance_mH = Real (final quantity="Inductance", final unit="mH") "Inductance in millihenries";
     type Inductance_uH = Real (final quantity="Inductance", final unit="uH") "Inductance in microhenries";
     type MagneticFlux_mWb = Real (final quantity="MagneticFlux", final unit="mWb") "Magnetic flux in milliwebers";
+    type Resistance_kOhm = Real (final quantity="Resistance", final unit="kOhm") "Resistance in kilohms";
+    type Resistance_MOhm = Real (final quantity="Resistance", final unit="MOhm") "Resistance in megohms (insulation resistances)";
+    type Resistance_mOhm = Real (final quantity="Resistance", final unit="mOhm") "Resistance in milliohms (contact and shunt resistances)";
+    type Capacitance_uF = Real (final quantity="Capacitance", final unit="uF") "Capacitance in microfarads";
+    type Capacitance_nF = Real (final quantity="Capacitance", final unit="nF") "Capacitance in nanofarads";
+    type Capacitance_pF = Real (final quantity="Capacitance", final unit="pF") "Capacitance in picofarads";
+    type ApparentPower_kVA = Real (final quantity="Power", final unit="kV.A") "Apparent power in kilovolt-amperes";
+    type ReactivePower_kvar = Real (final quantity="Power", final unit="kvar") "Reactive power in kilovars";
+    type SpecificHeatCapacity_kJpkgK = Real (final quantity="SpecificHeatCapacity", final unit="kJ/(kg.K)") "Specific heat capacity in kilojoules per kilogram kelvin";
+    type Density_gpcm3 = Real (final quantity="Density", final unit="g/cm3") "Density in grams per cubic centimetre";
+    type DynamicViscosity_mPas = Real (final quantity="DynamicViscosity", final unit="mPa.s") "Dynamic viscosity in millipascal seconds (centipoise)";
+    type Area_cm2 = Real (final quantity="Area", final unit="cm2") "Area in square centimetres";
+    type Area_mm2 = Real (final quantity="Area", final unit="mm2") "Area in square millimetres";
+    type MagneticFluxDensity_mT = Real (final quantity="MagneticFluxDensity", final unit="mT") "Magnetic flux density in millitesla";
+    type PressureSlope_barps = Real (final quantity="PressureSlope", final unit="bar/s") "Pressure slope in bars per second";
 
     annotation (Documentation(info="<html>
-<p>Type definitions of non-SI units in the manner of <a href=\"modelica://Modelica.Units.NonSI\">Modelica.Units.NonSI</a>, for the units that package does not define and that requirements written in engineering practice use (feet and thousands of feet for altitudes, kg/min for air flows, kPa and mbar for cabin pressures, milliseconds, kilowatts), and the display units of the quantities the MSL's connectors carry (deg/s, l/min and m3/h, kJ/kg, g/kg, mH and uH, mWb). The corresponding conversion functions are in <a href=\"modelica://Requirements.Units.Conversions\">Conversions</a>. A quantity that <code>Modelica.Units.NonSI</code> already defines (degC, bar, rpm, km/h, min, h, ...) is not repeated here.</p>
+<p>Type definitions of non-SI units in the manner of <a href=\"modelica://Modelica.Units.NonSI\">Modelica.Units.NonSI</a>, for the units that package does not define and that requirements written in engineering practice use (feet and thousands of feet for altitudes, kg/min for air flows, kPa and mbar for cabin pressures, milliseconds, kilowatts), and the display units of the quantities the MSL's connectors carry (deg/s, l/min and m3/h, kJ/kg, g/kg, mH and uH, mWb) and of the quantities of its components (kOhm, MOhm and mOhm, uF, nF and pF, kV.A, kvar, kJ/(kg.K), g/cm3, mPa.s, cm2 and mm2, mT, bar/s). The corresponding conversion functions are in <a href=\"modelica://Requirements.Units.Conversions\">Conversions</a>. A quantity that <code>Modelica.Units.NonSI</code> already defines (degC, bar, rpm, km/h, min, h, ...) is not repeated here.</p>
 <p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
 </html>"));
   end NonSI;
@@ -451,6 +466,276 @@ package Units "Type definitions of non-SI units and conversion functions, for th
       Wb := (1/1000)*mWb;
       annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
     end from_mWb;
+
+    function to_kOhm "Convert from ohm to kilohm"
+      extends Modelica.Units.Icons.Conversion;
+      input Modelica.Units.SI.Resistance Ohm "Value in ohm";
+      output NonSI.Resistance_kOhm kOhm "Value in kilohm";
+    algorithm
+      kOhm := (1/1000)*Ohm;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end to_kOhm;
+
+    function from_kOhm "Convert from kilohm to ohm"
+      extends Modelica.Units.Icons.Conversion;
+      input NonSI.Resistance_kOhm kOhm "Value in kilohm";
+      output Modelica.Units.SI.Resistance Ohm "Value in ohm";
+    algorithm
+      Ohm := 1000*kOhm;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end from_kOhm;
+
+    function to_MOhm "Convert from ohm to megohm"
+      extends Modelica.Units.Icons.Conversion;
+      input Modelica.Units.SI.Resistance Ohm "Value in ohm";
+      output NonSI.Resistance_MOhm MOhm "Value in megohm";
+    algorithm
+      MOhm := (1/1000000)*Ohm;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end to_MOhm;
+
+    function from_MOhm "Convert from megohm to ohm"
+      extends Modelica.Units.Icons.Conversion;
+      input NonSI.Resistance_MOhm MOhm "Value in megohm";
+      output Modelica.Units.SI.Resistance Ohm "Value in ohm";
+    algorithm
+      Ohm := 1000000*MOhm;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end from_MOhm;
+
+    function to_mOhm "Convert from ohm to milliohm"
+      extends Modelica.Units.Icons.Conversion;
+      input Modelica.Units.SI.Resistance Ohm "Value in ohm";
+      output NonSI.Resistance_mOhm mOhm "Value in milliohm";
+    algorithm
+      mOhm := 1000*Ohm;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end to_mOhm;
+
+    function from_mOhm "Convert from milliohm to ohm"
+      extends Modelica.Units.Icons.Conversion;
+      input NonSI.Resistance_mOhm mOhm "Value in milliohm";
+      output Modelica.Units.SI.Resistance Ohm "Value in ohm";
+    algorithm
+      Ohm := (1/1000)*mOhm;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end from_mOhm;
+
+    function to_uF "Convert from farad to microfarad"
+      extends Modelica.Units.Icons.Conversion;
+      input Modelica.Units.SI.Capacitance F "Value in farad";
+      output NonSI.Capacitance_uF uF "Value in microfarad";
+    algorithm
+      uF := 1000000*F;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end to_uF;
+
+    function from_uF "Convert from microfarad to farad"
+      extends Modelica.Units.Icons.Conversion;
+      input NonSI.Capacitance_uF uF "Value in microfarad";
+      output Modelica.Units.SI.Capacitance F "Value in farad";
+    algorithm
+      F := (1/1000000)*uF;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end from_uF;
+
+    function to_nF "Convert from farad to nanofarad"
+      extends Modelica.Units.Icons.Conversion;
+      input Modelica.Units.SI.Capacitance F "Value in farad";
+      output NonSI.Capacitance_nF nF "Value in nanofarad";
+    algorithm
+      nF := 1000000000*F;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end to_nF;
+
+    function from_nF "Convert from nanofarad to farad"
+      extends Modelica.Units.Icons.Conversion;
+      input NonSI.Capacitance_nF nF "Value in nanofarad";
+      output Modelica.Units.SI.Capacitance F "Value in farad";
+    algorithm
+      F := (1/1000000000)*nF;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end from_nF;
+
+    function to_pF "Convert from farad to picofarad"
+      extends Modelica.Units.Icons.Conversion;
+      input Modelica.Units.SI.Capacitance F "Value in farad";
+      output NonSI.Capacitance_pF pF "Value in picofarad";
+    algorithm
+      pF := 1000000000000*F;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end to_pF;
+
+    function from_pF "Convert from picofarad to farad"
+      extends Modelica.Units.Icons.Conversion;
+      input NonSI.Capacitance_pF pF "Value in picofarad";
+      output Modelica.Units.SI.Capacitance F "Value in farad";
+    algorithm
+      F := (1/1000000000000)*pF;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end from_pF;
+
+    function to_kVA "Convert from volt-ampere to kilovolt-ampere"
+      extends Modelica.Units.Icons.Conversion;
+      input Modelica.Units.SI.ApparentPower VA "Value in volt-ampere";
+      output NonSI.ApparentPower_kVA kVA "Value in kilovolt-ampere";
+    algorithm
+      kVA := (1/1000)*VA;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end to_kVA;
+
+    function from_kVA "Convert from kilovolt-ampere to volt-ampere"
+      extends Modelica.Units.Icons.Conversion;
+      input NonSI.ApparentPower_kVA kVA "Value in kilovolt-ampere";
+      output Modelica.Units.SI.ApparentPower VA "Value in volt-ampere";
+    algorithm
+      VA := 1000*kVA;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end from_kVA;
+
+    function to_kvar "Convert from var to kilovar"
+      extends Modelica.Units.Icons.Conversion;
+      input Modelica.Units.SI.ReactivePower var "Value in var";
+      output NonSI.ReactivePower_kvar kvar "Value in kilovar";
+    algorithm
+      kvar := (1/1000)*var;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end to_kvar;
+
+    function from_kvar "Convert from kilovar to var"
+      extends Modelica.Units.Icons.Conversion;
+      input NonSI.ReactivePower_kvar kvar "Value in kilovar";
+      output Modelica.Units.SI.ReactivePower var "Value in var";
+    algorithm
+      var := 1000*kvar;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end from_kvar;
+
+    function to_kJpkgK "Convert from joule per kilogram kelvin to kilojoule per kilogram kelvin"
+      extends Modelica.Units.Icons.Conversion;
+      input Modelica.Units.SI.SpecificHeatCapacity J_kgK "Value in joule per kilogram kelvin";
+      output NonSI.SpecificHeatCapacity_kJpkgK kJ_kgK "Value in kilojoule per kilogram kelvin";
+    algorithm
+      kJ_kgK := (1/1000)*J_kgK;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end to_kJpkgK;
+
+    function from_kJpkgK "Convert from kilojoule per kilogram kelvin to joule per kilogram kelvin"
+      extends Modelica.Units.Icons.Conversion;
+      input NonSI.SpecificHeatCapacity_kJpkgK kJ_kgK "Value in kilojoule per kilogram kelvin";
+      output Modelica.Units.SI.SpecificHeatCapacity J_kgK "Value in joule per kilogram kelvin";
+    algorithm
+      J_kgK := 1000*kJ_kgK;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end from_kJpkgK;
+
+    function to_gpcm3 "Convert from kilogram per cubic metre to gram per cubic centimetre"
+      extends Modelica.Units.Icons.Conversion;
+      input Modelica.Units.SI.Density kg_m3 "Value in kilogram per cubic metre";
+      output NonSI.Density_gpcm3 g_cm3 "Value in gram per cubic centimetre";
+    algorithm
+      g_cm3 := (1/1000)*kg_m3;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end to_gpcm3;
+
+    function from_gpcm3 "Convert from gram per cubic centimetre to kilogram per cubic metre"
+      extends Modelica.Units.Icons.Conversion;
+      input NonSI.Density_gpcm3 g_cm3 "Value in gram per cubic centimetre";
+      output Modelica.Units.SI.Density kg_m3 "Value in kilogram per cubic metre";
+    algorithm
+      kg_m3 := 1000*g_cm3;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end from_gpcm3;
+
+    function to_mPas "Convert from pascal second to millipascal second"
+      extends Modelica.Units.Icons.Conversion;
+      input Modelica.Units.SI.DynamicViscosity Pas "Value in pascal second";
+      output NonSI.DynamicViscosity_mPas mPas "Value in millipascal second";
+    algorithm
+      mPas := 1000*Pas;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end to_mPas;
+
+    function from_mPas "Convert from millipascal second to pascal second"
+      extends Modelica.Units.Icons.Conversion;
+      input NonSI.DynamicViscosity_mPas mPas "Value in millipascal second";
+      output Modelica.Units.SI.DynamicViscosity Pas "Value in pascal second";
+    algorithm
+      Pas := (1/1000)*mPas;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end from_mPas;
+
+    function to_cm2 "Convert from square metre to square centimetre"
+      extends Modelica.Units.Icons.Conversion;
+      input Modelica.Units.SI.Area m2 "Value in square metre";
+      output NonSI.Area_cm2 cm2 "Value in square centimetre";
+    algorithm
+      cm2 := 10000*m2;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end to_cm2;
+
+    function from_cm2 "Convert from square centimetre to square metre"
+      extends Modelica.Units.Icons.Conversion;
+      input NonSI.Area_cm2 cm2 "Value in square centimetre";
+      output Modelica.Units.SI.Area m2 "Value in square metre";
+    algorithm
+      m2 := (1/10000)*cm2;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end from_cm2;
+
+    function to_mm2 "Convert from square metre to square millimetre"
+      extends Modelica.Units.Icons.Conversion;
+      input Modelica.Units.SI.Area m2 "Value in square metre";
+      output NonSI.Area_mm2 mm2 "Value in square millimetre";
+    algorithm
+      mm2 := 1000000*m2;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end to_mm2;
+
+    function from_mm2 "Convert from square millimetre to square metre"
+      extends Modelica.Units.Icons.Conversion;
+      input NonSI.Area_mm2 mm2 "Value in square millimetre";
+      output Modelica.Units.SI.Area m2 "Value in square metre";
+    algorithm
+      m2 := (1/1000000)*mm2;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end from_mm2;
+
+    function to_mT "Convert from tesla to millitesla"
+      extends Modelica.Units.Icons.Conversion;
+      input Modelica.Units.SI.MagneticFluxDensity T "Value in tesla";
+      output NonSI.MagneticFluxDensity_mT mT "Value in millitesla";
+    algorithm
+      mT := 1000*T;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end to_mT;
+
+    function from_mT "Convert from millitesla to tesla"
+      extends Modelica.Units.Icons.Conversion;
+      input NonSI.MagneticFluxDensity_mT mT "Value in millitesla";
+      output Modelica.Units.SI.MagneticFluxDensity T "Value in tesla";
+    algorithm
+      T := (1/1000)*mT;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end from_mT;
+
+    function to_barps "Convert from pascal per second to bar per second"
+      extends Modelica.Units.Icons.Conversion;
+      input Modelica.Units.SI.PressureSlope Pa_s "Value in pascal per second";
+      output NonSI.PressureSlope_barps bar_s "Value in bar per second";
+    algorithm
+      bar_s := (1/100000)*Pa_s;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end to_barps;
+
+    function from_barps "Convert from bar per second to pascal per second"
+      extends Modelica.Units.Icons.Conversion;
+      input NonSI.PressureSlope_barps bar_s "Value in bar per second";
+      output Modelica.Units.SI.PressureSlope Pa_s "Value in pascal per second";
+    algorithm
+      Pa_s := 100000*bar_s;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end from_barps;
 
     annotation (Documentation(info="<html>
 <p>Conversion functions in the manner of <a href=\"modelica://Modelica.Units.Conversions\">Modelica.Units.Conversions</a> for the non-SI units of <a href=\"modelica://Requirements.Units.NonSI\">NonSI</a>: <code>from_&lt;unit&gt;</code> converts a value written in the non-SI unit to the SI unit, <code>to_&lt;unit&gt;</code> the reverse; every function is inlined. A check model, hand-written or generated from a requirement statement, can write every quantity of the statement as <code>from_&lt;unit&gt;(&lt;value as written&gt;)</code>, so the model reads like the statement and the conversion is this library's, not the author's (or a generator's) arithmetic; a plant variable that is in a non-SI unit is converted the same way into the SI output the check reads, which keeps the original unit in its <code>displayUnit</code>. Units that <code>Modelica.Units.Conversions</code> already covers (degC, bar, rpm, km/h, min, h, ...) are taken from there.</p>

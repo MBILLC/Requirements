@@ -14,7 +14,7 @@ package ReleaseNotes "Release notes"
 
     annotation (Documentation(info="<html>
 <p>
-In 2026 the library went from version 0.7.0 (Feb. 2025) to <b>0.15.0</b> (2026-11-09) in fourteen
+In 2026 the library went from version 0.7.0 (Feb. 2025) to <b>0.16.0</b> (2026-11-09) in fifteen
 releases. This page summarizes them; the release note of each version has the details.
 The same summary is kept as Markdown in
 <a href=\"https://github.com/MBILLC/Requirements/blob/HEAD/CHANGES_2026.md\">CHANGES_2026.md</a>
@@ -53,6 +53,8 @@ The regression baselines and the tool-by-tool measurements are kept beside the l
     <td>A file chosen at run time: the CSV reader in an exported FMU</td></tr>
 <tr><td><a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Version_0_15_0\">0.15.0</a></td><td>2026-11-09</td>
     <td>Display units for the quantities of the MSL's connectors: deg/s, l/min, kJ/kg, g/kg, mH, mWb, ...</td></tr>
+<tr><td><a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Version_0_16_0\">0.16.0</a></td><td>2026-11-09</td>
+    <td>Display units for the quantities of the MSL's components: kOhm, uF, kV.A, kJ/(kg.K), g/cm3, mPa.s, mT, bar/s, ...</td></tr>
 </table>
 
 <p>
@@ -365,6 +367,38 @@ This release changes requirement semantics.
 </ul>
 </html>"));
   end Summary2026;
+
+  class Version_0_16_0 "Version 0.16.0 (Nov. 9, 2026)"
+  extends Modelica.Icons.ReleaseNotes;
+
+    annotation (Documentation(info="<html>
+<p>
+<b>Display units for the quantities of the MSL's components.</b>
+<a href=\"modelica://Requirements.Units\">Units</a> gains fifteen non-SI unit types and their conversion functions
+(<code>from_&lt;unit&gt;</code> and <code>to_&lt;unit&gt;</code>), for units an engineer writes a requirement in. The
+Modelica Standard Library defines none of them:
+</p>
+<ul>
+<li> Electrical: <code>kOhm</code>, <code>MOhm</code> and <code>mOhm</code> (resistance); <code>uF</code>, <code>nF</code>
+     and <code>pF</code> (capacitance); <code>kV.A</code> (apparent power); <code>kvar</code> (reactive power).</li>
+<li> Thermal and fluid properties: <code>kJ/(kg.K)</code> (specific heat capacity); <code>g/cm3</code> (density);
+     <code>mPa.s</code> (dynamic viscosity).</li>
+<li> Mechanical: <code>cm2</code> and <code>mm2</code> (area).</li>
+<li> Magnetic: <code>mT</code> (magnetic flux density).</li>
+<li> Rates: <code>bar/s</code> (a pressure slope, <code>Modelica.Units.SI.PressureSlope</code>, whose display unit it is).</li>
+</ul>
+<p>
+A charge in ampere hours needs no new function: <code>Modelica.Units.Conversions.from_Ah</code> converts it.
+<a href=\"modelica://Requirements.Examples.Elementary.Units.Conversions\">Examples.Elementary.Units.Conversions</a>
+asserts each factor and each round trip. The choice follows a survey of the units of the parameters and variables of
+the MSL's components (Chaperone, <code>Planning/MSL_PHRASEBOOK_SURVEY.md</code>, step 4). No existing class changed.
+</p>
+<p>
+No model conversion is needed: <code>conversion(noneFromVersion=\"0.15.0\")</code>.
+</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+  end Version_0_16_0;
 
   class Version_0_15_0 "Version 0.15.0 (Nov. 9, 2026)"
   extends Modelica.Icons.ReleaseNotes;
@@ -1488,10 +1522,10 @@ end UsersGuide;
 
   annotation (preferredView="info",
   uses(Modelica(version="4.1.0")),
-version="0.15.0",
+version="0.16.0",
 versionDate="2026-11-09",
 dateModified = "2026-11-09",
-conversion(noneFromVersion="0.7.1", noneFromVersion="0.8.0", noneFromVersion="0.9.0", noneFromVersion="0.9.1", noneFromVersion="0.10.0", noneFromVersion="0.11.0", noneFromVersion="0.11.1", noneFromVersion="0.12.0", noneFromVersion="0.12.1", noneFromVersion="0.13.0", noneFromVersion="0.13.1", noneFromVersion="0.13.2", noneFromVersion="0.14.0"),
+conversion(noneFromVersion="0.7.1", noneFromVersion="0.8.0", noneFromVersion="0.9.0", noneFromVersion="0.9.1", noneFromVersion="0.10.0", noneFromVersion="0.11.0", noneFromVersion="0.11.1", noneFromVersion="0.12.0", noneFromVersion="0.12.1", noneFromVersion="0.13.0", noneFromVersion="0.13.1", noneFromVersion="0.13.2", noneFromVersion="0.14.0", noneFromVersion="0.15.0"),
 revisionId="$Id:: package.mo 9390 2016-06-21 06:35:11Z #$",
 Documentation(info="<html>
 <p>
