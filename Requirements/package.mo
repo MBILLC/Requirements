@@ -14,7 +14,7 @@ package ReleaseNotes "Release notes"
 
     annotation (Documentation(info="<html>
 <p>
-In 2026 the library went from version 0.7.0 (Feb. 2025) to <b>0.14.0</b> (2026-10-26) in thirteen
+In 2026 the library went from version 0.7.0 (Feb. 2025) to <b>0.15.0</b> (2026-11-09) in fourteen
 releases. This page summarizes them; the release note of each version has the details.
 The same summary is kept as Markdown in
 <a href=\"https://github.com/MBILLC/Requirements/blob/HEAD/CHANGES_2026.md\">CHANGES_2026.md</a>
@@ -51,6 +51,8 @@ The regression baselines and the tool-by-tool measurements are kept beside the l
     <td>OpenModelica builds and simulates every example; no block computes anything different</td></tr>
 <tr><td><a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Version_0_14_0\">0.14.0</a></td><td>2026-10-26</td>
     <td>A file chosen at run time: the CSV reader in an exported FMU</td></tr>
+<tr><td><a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Version_0_15_0\">0.15.0</a></td><td>2026-11-09</td>
+    <td>Display units for the quantities of the MSL's connectors: deg/s, l/min, kJ/kg, g/kg, mH, mWb, ...</td></tr>
 </table>
 
 <p>
@@ -363,6 +365,37 @@ This release changes requirement semantics.
 </ul>
 </html>"));
   end Summary2026;
+
+  class Version_0_15_0 "Version 0.15.0 (Nov. 9, 2026)"
+  extends Modelica.Icons.ReleaseNotes;
+
+    annotation (Documentation(info="<html>
+<p>
+<b>Display units for the quantities of the MSL's connectors.</b>
+<a href=\"modelica://Requirements.Units\">Units</a> gains nine non-SI unit types and their conversion functions
+(<code>from_&lt;unit&gt;</code> and <code>to_&lt;unit&gt;</code>), for units an engineer writes a requirement in. The
+Modelica Standard Library defines none of them:
+</p>
+<ul>
+<li> <code>deg/s</code> and <code>deg/s2</code>: angular velocity and acceleration in degrees.</li>
+<li> <code>l/min</code> and <code>m3/h</code>: volume flow rates.</li>
+<li> <code>kJ/kg</code>: specific enthalpy.</li>
+<li> <code>g/kg</code>: mass fraction (humidity ratios). It converts to
+     <code>Modelica.Media.Interfaces.Types.MassFraction</code> (kg/kg), the type Modelica.Fluid's ports carry.</li>
+<li> <code>mH</code> and <code>uH</code>: inductance.</li>
+<li> <code>mWb</code>: magnetic flux.</li>
+</ul>
+<p>
+<a href=\"modelica://Requirements.Examples.Elementary.Units.Conversions\">Examples.Elementary.Units.Conversions</a>
+asserts each factor and each round trip. The choice follows a survey of the units the MSL's connectors carry
+(Chaperone, <code>Planning/MSL_PHRASEBOOK_SURVEY.md</code>). No existing class changed.
+</p>
+<p>
+No model conversion is needed: <code>conversion(noneFromVersion=\"0.14.0\")</code>.
+</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+  end Version_0_15_0;
 
   class Version_0_14_0 "Version 0.14.0 (Oct. 26, 2026)"
   extends Modelica.Icons.ReleaseNotes;
@@ -1455,10 +1488,10 @@ end UsersGuide;
 
   annotation (preferredView="info",
   uses(Modelica(version="4.1.0")),
-version="0.14.0",
-versionDate="2026-10-26",
-dateModified = "2026-10-26",
-conversion(noneFromVersion="0.7.1", noneFromVersion="0.8.0", noneFromVersion="0.9.0", noneFromVersion="0.9.1", noneFromVersion="0.10.0", noneFromVersion="0.11.0", noneFromVersion="0.11.1", noneFromVersion="0.12.0", noneFromVersion="0.12.1", noneFromVersion="0.13.0", noneFromVersion="0.13.1", noneFromVersion="0.13.2"),
+version="0.15.0",
+versionDate="2026-11-09",
+dateModified = "2026-11-09",
+conversion(noneFromVersion="0.7.1", noneFromVersion="0.8.0", noneFromVersion="0.9.0", noneFromVersion="0.9.1", noneFromVersion="0.10.0", noneFromVersion="0.11.0", noneFromVersion="0.11.1", noneFromVersion="0.12.0", noneFromVersion="0.12.1", noneFromVersion="0.13.0", noneFromVersion="0.13.1", noneFromVersion="0.13.2", noneFromVersion="0.14.0"),
 revisionId="$Id:: package.mo 9390 2016-06-21 06:35:11Z #$",
 Documentation(info="<html>
 <p>

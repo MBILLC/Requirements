@@ -3452,6 +3452,15 @@ when the pack is switched off while the flight phase is still 2 (until 250 s).
       assert(abs(C.from_mbar(1013.25) - 101325) < eps*101325, "from_mbar");
       assert(abs(C.from_kW(2.5) - 2500) < eps*2500, "from_kW");
       assert(abs(C.from_kJ(3.6) - 3600) < eps*3600, "from_kJ");
+      assert(abs(C.from_degps(180) - Modelica.Constants.pi) < eps*abs(Modelica.Constants.pi), "from_degps");
+      assert(abs(C.from_degps2(90) - Modelica.Constants.pi/2) < eps*abs(Modelica.Constants.pi/2), "from_degps2");
+      assert(abs(C.from_lpmin(60) - 0.001) < eps*abs(0.001), "from_lpmin");
+      assert(abs(C.from_m3ph(36) - 0.01) < eps*abs(0.01), "from_m3ph");
+      assert(abs(C.from_kJpkg(2676) - 2676000) < eps*abs(2676000), "from_kJpkg");
+      assert(abs(C.from_gpkg(8) - 0.008) < eps*abs(0.008), "from_gpkg");
+      assert(abs(C.from_mH(2.5) - 0.0025) < eps*abs(0.0025), "from_mH");
+      assert(abs(C.from_uH(470) - 0.00047) < eps*abs(0.00047), "from_uH");
+      assert(abs(C.from_mWb(12) - 0.012) < eps*abs(0.012), "from_mWb");
       // round trips
       assert(abs(C.to_ms(C.from_ms(7)) - 7) < eps*7, "ms round trip");
       assert(abs(C.to_mm(C.from_mm(7)) - 7) < eps*7, "mm round trip");
@@ -3467,6 +3476,15 @@ when the pack is switched off while the flight phase is still 2 (until 250 s).
       assert(abs(C.to_mbar(C.from_mbar(7)) - 7) < eps*7, "mbar round trip");
       assert(abs(C.to_kW(C.from_kW(7)) - 7) < eps*7, "kW round trip");
       assert(abs(C.to_kJ(C.from_kJ(7)) - 7) < eps*7, "kJ round trip");
+      assert(abs(C.to_degps(C.from_degps(7)) - 7) < eps*7, "deg/s round trip");
+      assert(abs(C.to_degps2(C.from_degps2(7)) - 7) < eps*7, "deg/s2 round trip");
+      assert(abs(C.to_lpmin(C.from_lpmin(7)) - 7) < eps*7, "l/min round trip");
+      assert(abs(C.to_m3ph(C.from_m3ph(7)) - 7) < eps*7, "m3/h round trip");
+      assert(abs(C.to_kJpkg(C.from_kJpkg(7)) - 7) < eps*7, "kJ/kg round trip");
+      assert(abs(C.to_gpkg(C.from_gpkg(7)) - 7) < eps*7, "g/kg round trip");
+      assert(abs(C.to_mH(C.from_mH(7)) - 7) < eps*7, "mH round trip");
+      assert(abs(C.to_uH(C.from_uH(7)) - 7) < eps*7, "uH round trip");
+      assert(abs(C.to_mWb(C.from_mWb(7)) - 7) < eps*7, "mWb round trip");
       annotation (experiment(StopTime=1), Documentation(info="<html>
 <p>Asserts every factor of <a href=\"modelica://Requirements.Units.Conversions\">Requirements.Units.Conversions</a> (the international foot is 0.3048 m exactly, 1 kft = 304.8 m, 1 kg/min = 1/60 kg/s, ...) and every round trip; a model that translates and runs is the test. The two variables show how a check model writes a quantity stated in a non-SI unit: <code>from_kft(4.65)</code>, not 1417.32.</p>
 <p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
