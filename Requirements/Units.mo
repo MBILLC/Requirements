@@ -19,9 +19,18 @@ package Units "Type definitions of non-SI units and conversion functions, for th
     type Pressure_mbar = Real (final quantity="Pressure", final unit="mbar") "Pressure in millibars";
     type Power_kW = Real (final quantity="Power", final unit="kW") "Power in kilowatts";
     type Energy_kJ = Real (final quantity="Energy", final unit="kJ") "Energy in kilojoules";
+    type AngularVelocity_degps = Real (final quantity="AngularVelocity", final unit="deg/s") "Angular velocity in degrees per second";
+    type AngularAcceleration_degps2 = Real (final quantity="AngularAcceleration", final unit="deg/s2") "Angular acceleration in degrees per second squared";
+    type VolumeFlowRate_lpmin = Real (final quantity="VolumeFlowRate", final unit="l/min") "Volume flow rate in litres per minute (pumps, coolant loops)";
+    type VolumeFlowRate_m3ph = Real (final quantity="VolumeFlowRate", final unit="m3/h") "Volume flow rate in cubic metres per hour (pumps, HVAC)";
+    type SpecificEnergy_kJpkg = Real (final quantity="SpecificEnergy", final unit="kJ/kg") "Specific energy (a specific enthalpy) in kilojoules per kilogram";
+    type MassFraction_gpkg = Real (final quantity="MassFraction", final unit="g/kg") "Mass fraction in grams per kilogram (humidity ratios)";
+    type Inductance_mH = Real (final quantity="Inductance", final unit="mH") "Inductance in millihenries";
+    type Inductance_uH = Real (final quantity="Inductance", final unit="uH") "Inductance in microhenries";
+    type MagneticFlux_mWb = Real (final quantity="MagneticFlux", final unit="mWb") "Magnetic flux in milliwebers";
 
     annotation (Documentation(info="<html>
-<p>Type definitions of non-SI units in the manner of <a href=\"modelica://Modelica.Units.NonSI\">Modelica.Units.NonSI</a>, for the units that package does not define and that requirements written in engineering practice use (feet and thousands of feet for altitudes, kg/min for air flows, kPa and mbar for cabin pressures, milliseconds, kilowatts). The corresponding conversion functions are in <a href=\"modelica://Requirements.Units.Conversions\">Conversions</a>. A quantity that <code>Modelica.Units.NonSI</code> already defines (degC, bar, rpm, km/h, min, h, ...) is not repeated here.</p>
+<p>Type definitions of non-SI units in the manner of <a href=\"modelica://Modelica.Units.NonSI\">Modelica.Units.NonSI</a>, for the units that package does not define and that requirements written in engineering practice use (feet and thousands of feet for altitudes, kg/min for air flows, kPa and mbar for cabin pressures, milliseconds, kilowatts), and the display units of the quantities the MSL's connectors carry (deg/s, l/min and m3/h, kJ/kg, g/kg, mH and uH, mWb). The corresponding conversion functions are in <a href=\"modelica://Requirements.Units.Conversions\">Conversions</a>. A quantity that <code>Modelica.Units.NonSI</code> already defines (degC, bar, rpm, km/h, min, h, ...) is not repeated here.</p>
 <p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
 </html>"));
   end NonSI;
@@ -280,6 +289,168 @@ package Units "Type definitions of non-SI units and conversion functions, for th
       J := kJ*1000;
       annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
     end from_kJ;
+
+    function to_degps "Convert from radian per second to degree per second"
+      extends Modelica.Units.Icons.Conversion;
+      input Modelica.Units.SI.AngularVelocity radps "Value in radian per second";
+      output NonSI.AngularVelocity_degps degps "Value in degree per second";
+    algorithm
+      degps := (180/Modelica.Constants.pi)*radps;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end to_degps;
+
+    function from_degps "Convert from degree per second to radian per second"
+      extends Modelica.Units.Icons.Conversion;
+      input NonSI.AngularVelocity_degps degps "Value in degree per second";
+      output Modelica.Units.SI.AngularVelocity radps "Value in radian per second";
+    algorithm
+      radps := (Modelica.Constants.pi/180)*degps;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end from_degps;
+
+    function to_degps2 "Convert from radian per second squared to degree per second squared"
+      extends Modelica.Units.Icons.Conversion;
+      input Modelica.Units.SI.AngularAcceleration radps2 "Value in radian per second squared";
+      output NonSI.AngularAcceleration_degps2 degps2 "Value in degree per second squared";
+    algorithm
+      degps2 := (180/Modelica.Constants.pi)*radps2;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end to_degps2;
+
+    function from_degps2 "Convert from degree per second squared to radian per second squared"
+      extends Modelica.Units.Icons.Conversion;
+      input NonSI.AngularAcceleration_degps2 degps2 "Value in degree per second squared";
+      output Modelica.Units.SI.AngularAcceleration radps2 "Value in radian per second squared";
+    algorithm
+      radps2 := (Modelica.Constants.pi/180)*degps2;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end from_degps2;
+
+    function to_lpmin "Convert from cubic metre per second to litre per minute"
+      extends Modelica.Units.Icons.Conversion;
+      input Modelica.Units.SI.VolumeFlowRate m3ps "Value in cubic metre per second";
+      output NonSI.VolumeFlowRate_lpmin lpmin "Value in litre per minute";
+    algorithm
+      lpmin := 60000*m3ps;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end to_lpmin;
+
+    function from_lpmin "Convert from litre per minute to cubic metre per second"
+      extends Modelica.Units.Icons.Conversion;
+      input NonSI.VolumeFlowRate_lpmin lpmin "Value in litre per minute";
+      output Modelica.Units.SI.VolumeFlowRate m3ps "Value in cubic metre per second";
+    algorithm
+      m3ps := (1/60000)*lpmin;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end from_lpmin;
+
+    function to_m3ph "Convert from cubic metre per second to cubic metre per hour"
+      extends Modelica.Units.Icons.Conversion;
+      input Modelica.Units.SI.VolumeFlowRate m3ps "Value in cubic metre per second";
+      output NonSI.VolumeFlowRate_m3ph m3ph "Value in cubic metre per hour";
+    algorithm
+      m3ph := 3600*m3ps;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end to_m3ph;
+
+    function from_m3ph "Convert from cubic metre per hour to cubic metre per second"
+      extends Modelica.Units.Icons.Conversion;
+      input NonSI.VolumeFlowRate_m3ph m3ph "Value in cubic metre per hour";
+      output Modelica.Units.SI.VolumeFlowRate m3ps "Value in cubic metre per second";
+    algorithm
+      m3ps := (1/3600)*m3ph;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end from_m3ph;
+
+    function to_kJpkg "Convert from joule per kilogram to kilojoule per kilogram"
+      extends Modelica.Units.Icons.Conversion;
+      input Modelica.Units.SI.SpecificEnergy Jpkg "Value in joule per kilogram";
+      output NonSI.SpecificEnergy_kJpkg kJpkg "Value in kilojoule per kilogram";
+    algorithm
+      kJpkg := (1/1000)*Jpkg;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end to_kJpkg;
+
+    function from_kJpkg "Convert from kilojoule per kilogram to joule per kilogram"
+      extends Modelica.Units.Icons.Conversion;
+      input NonSI.SpecificEnergy_kJpkg kJpkg "Value in kilojoule per kilogram";
+      output Modelica.Units.SI.SpecificEnergy Jpkg "Value in joule per kilogram";
+    algorithm
+      Jpkg := 1000*kJpkg;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end from_kJpkg;
+
+    function to_gpkg "Convert from kilogram per kilogram to gram per kilogram"
+      extends Modelica.Units.Icons.Conversion;
+      input Modelica.Media.Interfaces.Types.MassFraction kgpkg "Value in kilogram per kilogram";
+      output NonSI.MassFraction_gpkg gpkg "Value in gram per kilogram";
+    algorithm
+      gpkg := 1000*kgpkg;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end to_gpkg;
+
+    function from_gpkg "Convert from gram per kilogram to kilogram per kilogram"
+      extends Modelica.Units.Icons.Conversion;
+      input NonSI.MassFraction_gpkg gpkg "Value in gram per kilogram";
+      output Modelica.Media.Interfaces.Types.MassFraction kgpkg "Value in kilogram per kilogram";
+    algorithm
+      kgpkg := (1/1000)*gpkg;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end from_gpkg;
+
+    function to_mH "Convert from henry to millihenry"
+      extends Modelica.Units.Icons.Conversion;
+      input Modelica.Units.SI.Inductance H "Value in henry";
+      output NonSI.Inductance_mH mH "Value in millihenry";
+    algorithm
+      mH := 1000*H;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end to_mH;
+
+    function from_mH "Convert from millihenry to henry"
+      extends Modelica.Units.Icons.Conversion;
+      input NonSI.Inductance_mH mH "Value in millihenry";
+      output Modelica.Units.SI.Inductance H "Value in henry";
+    algorithm
+      H := (1/1000)*mH;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end from_mH;
+
+    function to_uH "Convert from henry to microhenry"
+      extends Modelica.Units.Icons.Conversion;
+      input Modelica.Units.SI.Inductance H "Value in henry";
+      output NonSI.Inductance_uH uH "Value in microhenry";
+    algorithm
+      uH := 1000000*H;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end to_uH;
+
+    function from_uH "Convert from microhenry to henry"
+      extends Modelica.Units.Icons.Conversion;
+      input NonSI.Inductance_uH uH "Value in microhenry";
+      output Modelica.Units.SI.Inductance H "Value in henry";
+    algorithm
+      H := (1/1000000)*uH;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end from_uH;
+
+    function to_mWb "Convert from weber to milliweber"
+      extends Modelica.Units.Icons.Conversion;
+      input Modelica.Units.SI.MagneticFlux Wb "Value in weber";
+      output NonSI.MagneticFlux_mWb mWb "Value in milliweber";
+    algorithm
+      mWb := 1000*Wb;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end to_mWb;
+
+    function from_mWb "Convert from milliweber to weber"
+      extends Modelica.Units.Icons.Conversion;
+      input NonSI.MagneticFlux_mWb mWb "Value in milliweber";
+      output Modelica.Units.SI.MagneticFlux Wb "Value in weber";
+    algorithm
+      Wb := (1/1000)*mWb;
+      annotation (Inline=true, Documentation(info="<html><p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p></html>"));
+    end from_mWb;
 
     annotation (Documentation(info="<html>
 <p>Conversion functions in the manner of <a href=\"modelica://Modelica.Units.Conversions\">Modelica.Units.Conversions</a> for the non-SI units of <a href=\"modelica://Requirements.Units.NonSI\">NonSI</a>: <code>from_&lt;unit&gt;</code> converts a value written in the non-SI unit to the SI unit, <code>to_&lt;unit&gt;</code> the reverse; every function is inlined. A check model, hand-written or generated from a requirement statement, can write every quantity of the statement as <code>from_&lt;unit&gt;(&lt;value as written&gt;)</code>, so the model reads like the statement and the conversion is this library's, not the author's (or a generator's) arithmetic; a plant variable that is in a non-SI unit is converted the same way into the SI output the check reads, which keeps the original unit in its <code>displayUnit</code>. Units that <code>Modelica.Units.Conversions</code> already covers (degC, bar, rpm, km/h, min, h, ...) are taken from there.</p>
