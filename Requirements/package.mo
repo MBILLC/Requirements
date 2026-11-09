@@ -14,7 +14,7 @@ package ReleaseNotes "Release notes"
 
     annotation (Documentation(info="<html>
 <p>
-In 2026 the library went from version 0.7.0 (Feb. 2025) to <b>0.16.0</b> (2026-11-09) in fifteen
+In 2026 the library went from version 0.7.0 (Feb. 2025) to <b>0.17.0</b> (2026-11-09) in sixteen
 releases. This page summarizes them; the release note of each version has the details.
 The same summary is kept as Markdown in
 <a href=\"https://github.com/MBILLC/Requirements/blob/HEAD/CHANGES_2026.md\">CHANGES_2026.md</a>
@@ -55,6 +55,8 @@ The regression baselines and the tool-by-tool measurements are kept beside the l
     <td>Display units for the quantities of the MSL's connectors: deg/s, l/min, kJ/kg, g/kg, mH, mWb, ...</td></tr>
 <tr><td><a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Version_0_16_0\">0.16.0</a></td><td>2026-11-09</td>
     <td>Display units for the quantities of the MSL's components: kOhm, uF, kV.A, kJ/(kg.K), g/cm3, mPa.s, mT, bar/s, ...</td></tr>
+<tr><td><a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Version_0_17_0\">0.17.0</a></td><td>2026-11-09</td>
+    <td>Phasors: transformations between the polar and the rectangular form, and the wrapped phase difference</td></tr>
 </table>
 
 <p>
@@ -367,6 +369,35 @@ This release changes requirement semantics.
 </ul>
 </html>"));
   end Summary2026;
+
+  class Version_0_17_0 "Version 0.17.0 (Nov. 9, 2026)"
+  extends Modelica.Icons.ReleaseNotes;
+
+    annotation (Documentation(info="<html>
+<p>
+<b>Phasors.</b> The new package <a href=\"modelica://Requirements.Units.Phasors\">Units.Phasors</a> transforms a phasor
+between its two coordinate systems, in both directions, so that a requirement can name a phasor's magnitude, phase angle,
+real part or imaginary part whichever form the model carries it in:
+</p>
+<ul>
+<li> rectangular to polar: <code>magnitude(re, im)</code> and <code>phaseAngle(re, im)</code>, in (-pi, pi];</li>
+<li> polar to rectangular: <code>realPart(r, phi)</code> and <code>imaginaryPart(r, phi)</code>;</li>
+<li> <code>wrapAngle(phi)</code>, to (-pi, pi], and <code>phaseDifference(phi1, phi2)</code>, the phase angle of one
+     phasor relative to another, wrapped.</li>
+</ul>
+<p>
+The magnitude is the one the model carries: the MSL's quasi-static phasors are RMS phasors.
+<a href=\"modelica://Requirements.Examples.Elementary.Units.Phasors\">Examples.Elementary.Units.Phasors</a> asserts every
+function, its agreement with <code>Modelica.ComplexMath.abs</code> and <code>arg</code>, and the round trip. The functions
+follow Chaperone's phasor signals (Chaperone, <code>Planning/MSL_PHRASEBOOK_SURVEY.md</code>, step 5). No existing class
+changed.
+</p>
+<p>
+No model conversion is needed: <code>conversion(noneFromVersion=\"0.16.0\")</code>.
+</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+  end Version_0_17_0;
 
   class Version_0_16_0 "Version 0.16.0 (Nov. 9, 2026)"
   extends Modelica.Icons.ReleaseNotes;
@@ -1522,10 +1553,10 @@ end UsersGuide;
 
   annotation (preferredView="info",
   uses(Modelica(version="4.1.0")),
-version="0.16.0",
+version="0.17.0",
 versionDate="2026-11-09",
 dateModified = "2026-11-09",
-conversion(noneFromVersion="0.7.1", noneFromVersion="0.8.0", noneFromVersion="0.9.0", noneFromVersion="0.9.1", noneFromVersion="0.10.0", noneFromVersion="0.11.0", noneFromVersion="0.11.1", noneFromVersion="0.12.0", noneFromVersion="0.12.1", noneFromVersion="0.13.0", noneFromVersion="0.13.1", noneFromVersion="0.13.2", noneFromVersion="0.14.0", noneFromVersion="0.15.0"),
+conversion(noneFromVersion="0.7.1", noneFromVersion="0.8.0", noneFromVersion="0.9.0", noneFromVersion="0.9.1", noneFromVersion="0.10.0", noneFromVersion="0.11.0", noneFromVersion="0.11.1", noneFromVersion="0.12.0", noneFromVersion="0.12.1", noneFromVersion="0.13.0", noneFromVersion="0.13.1", noneFromVersion="0.13.2", noneFromVersion="0.14.0", noneFromVersion="0.15.0", noneFromVersion="0.16.0"),
 revisionId="$Id:: package.mo 9390 2016-06-21 06:35:11Z #$",
 Documentation(info="<html>
 <p>

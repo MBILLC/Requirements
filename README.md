@@ -63,6 +63,10 @@ Every example builds and simulates in **Dymola**, **OpenModelica** and **Modelon
 
 The regression baselines of all three tools are kept in [ModCheck](https://github.com/MBILLC/ModCheck), `ModCheck/Resources/RequirementsLibrary/`, my own, currently private regression testing tool. Every example has a reference in each tool's list: the tool's own result where it was stored, Modelon Impact's otherwise (`reference_from: impact`).
 
+## Changes in version 0.17.0 (November 2026): Phasors
+
+The new package `Units.Phasors` transforms a phasor between its polar and rectangular forms, in both directions: `magnitude(re, im)` and `phaseAngle(re, im)`, `realPart(r, phi)` and `imaginaryPart(r, phi)`. It also has `wrapAngle(phi)`, to (-pi, pi], and `phaseDifference(phi1, phi2)`, one phasor's phase angle relative to another's. A requirement can then name a phasor's magnitude, phase angle, real or imaginary part whichever form the model carries it in. `Examples.Elementary.Units.Phasors` asserts every function. No existing class changed, and no model conversion is needed. Full account: `UsersGuide.ReleaseNotes.Version_0_17_0`.
+
 ## Changes in version 0.16.0 (November 2026): Display units for the quantities of the MSL's components
 
 `Units` gains fifteen non-SI unit types and their `from_`/`to_` conversion functions, for units an engineer writes a requirement in and the MSL does not define: `kOhm`, `MOhm` and `mOhm`; `uF`, `nF` and `pF`; `kV.A` and `kvar`; `kJ/(kg.K)`; `g/cm3`; `mPa.s`; `cm2` and `mm2`; `mT`; and `bar/s`. A charge in `A.h` converts through the MSL's own `from_Ah`. `Examples.Elementary.Units.Conversions` asserts each factor and round trip. The choice comes from Chaperone's survey of the units of the parameters and variables of the MSL's components. No existing class changed, and no model conversion is needed. Full account: `UsersGuide.ReleaseNotes.Version_0_16_0`.
