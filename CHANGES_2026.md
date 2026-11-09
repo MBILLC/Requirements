@@ -2,7 +2,7 @@
 
 This file summarizes what changed in the Modelica **Requirements** library
 (package folder [`Requirements/`](Requirements/)) during 2026. The library went from
-**0.7.0** (Feb. 2025) to **0.14.0** (2026-10-26) in thirteen releases.
+**0.7.0** (Feb. 2025) to **0.16.0** (2026-11-09) in fifteen releases.
 
 The full release notes are in the library itself, under
 `Requirements.UsersGuide.ReleaseNotes`. The same summary is in the library documentation,
@@ -24,6 +24,8 @@ tool-by-tool measurements are kept beside the library (see `Requirements.UsersGu
 | 0.13.1 | 2026-10-21 | Bug fix: the CSV reader stopped (every Boolean and Integer column held) at an event due a few ulps after another |
 | 0.13.2 | 2026-10-24 | OpenModelica builds and simulates every example; no block computes anything different |
 | 0.14.0 | 2026-10-26 | A file chosen at run time: the CSV reader in an exported FMU |
+| 0.15.0 | 2026-11-09 | Display units for the quantities of the MSL's connectors: `deg/s`, `l/min`, `kJ/kg`, `g/kg`, `mH`, `mWb`, ... |
+| 0.16.0 | 2026-11-09 | Display units for the quantities of the MSL's components: `kOhm`, `uF`, `kV.A`, `kJ/(kg.K)`, `g/cm3`, `mPa.s`, `mT`, `bar/s`, ... |
 
 No release needs a model conversion. Each one declares `conversion(noneFromVersion=...)`
 for the version before it. One exception: from 0.8.0 on, code that reads a stored
@@ -205,6 +207,25 @@ This release changes requirement semantics.
     tools.
 - The repository [MBILLC/Requirements](https://github.com/MBILLC/Requirements) is public;
   the User's Guide and the Contact page link to it.
+
+## 0.16.0 — Display units for the quantities of the MSL's components
+
+- `Units` gains fifteen non-SI unit types and their `from_`/`to_` conversion functions:
+  - electrical: `kOhm`, `MOhm`, `mOhm`; `uF`, `nF`, `pF`; `kV.A`; `kvar`;
+  - thermal and fluid properties: `kJ/(kg.K)`, `g/cm3`, `mPa.s`;
+  - mechanical: `cm2`, `mm2`;
+  - magnetic: `mT`;
+  - rates: `bar/s`, the display unit of `SI.PressureSlope`.
+- A charge in `A.h` converts through the MSL's own `from_Ah`.
+- `Examples.Elementary.Units.Conversions` asserts each factor and round trip.
+- The choice follows Chaperone's survey of the units of the MSL's component parameters and variables. No existing class changed; `conversion(noneFromVersion="0.15.0")`.
+
+## 0.15.0 — Display units for the quantities of the MSL's connectors
+
+- `Units` gains nine non-SI unit types and their `from_`/`to_` conversion functions: `deg/s` and `deg/s2`, `l/min` and `m3/h`, `kJ/kg`, `g/kg`, `mH` and `uH`, `mWb`.
+- `g/kg` converts to `Modelica.Media.Interfaces.Types.MassFraction` (kg/kg), the type Modelica.Fluid's ports carry.
+- `Examples.Elementary.Units.Conversions` asserts each factor and round trip. OpenModelica 1.27.1 simulates it; the Chaperone corpus passes on Modelon Impact with this release.
+- No existing class changed; `conversion(noneFromVersion="0.14.0")`.
 
 ## 0.14.0 — A file chosen at run time: the CSV reader in an exported FMU
 

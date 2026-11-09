@@ -3461,6 +3461,21 @@ when the pack is switched off while the flight phase is still 2 (until 250 s).
       assert(abs(C.from_mH(2.5) - 0.0025) < eps*abs(0.0025), "from_mH");
       assert(abs(C.from_uH(470) - 0.00047) < eps*abs(0.00047), "from_uH");
       assert(abs(C.from_mWb(12) - 0.012) < eps*abs(0.012), "from_mWb");
+      assert(abs(C.from_kOhm(4.7) - 4700) < eps*abs(4700), "from_kOhm");
+      assert(abs(C.from_MOhm(2) - 2000000.0) < eps*abs(2000000.0), "from_MOhm");
+      assert(abs(C.from_mOhm(50) - 0.05) < eps*abs(0.05), "from_mOhm");
+      assert(abs(C.from_uF(470) - 0.00047) < eps*abs(0.00047), "from_uF");
+      assert(abs(C.from_nF(100) - 1e-07) < eps*abs(1e-07), "from_nF");
+      assert(abs(C.from_pF(22) - 2.2e-11) < eps*abs(2.2e-11), "from_pF");
+      assert(abs(C.from_kVA(5) - 5000) < eps*abs(5000), "from_kVA");
+      assert(abs(C.from_kvar(0.8) - 800) < eps*abs(800), "from_kvar");
+      assert(abs(C.from_kJpkgK(4.18) - 4180) < eps*abs(4180), "from_kJpkgK");
+      assert(abs(C.from_gpcm3(0.85) - 850) < eps*abs(850), "from_gpcm3");
+      assert(abs(C.from_mPas(50) - 0.05) < eps*abs(0.05), "from_mPas");
+      assert(abs(C.from_cm2(4) - 0.0004) < eps*abs(0.0004), "from_cm2");
+      assert(abs(C.from_mm2(400) - 0.0004) < eps*abs(0.0004), "from_mm2");
+      assert(abs(C.from_mT(800) - 0.8) < eps*abs(0.8), "from_mT");
+      assert(abs(C.from_barps(0.2) - 20000) < eps*abs(20000), "from_barps");
       // round trips
       assert(abs(C.to_ms(C.from_ms(7)) - 7) < eps*7, "ms round trip");
       assert(abs(C.to_mm(C.from_mm(7)) - 7) < eps*7, "mm round trip");
@@ -3485,6 +3500,21 @@ when the pack is switched off while the flight phase is still 2 (until 250 s).
       assert(abs(C.to_mH(C.from_mH(7)) - 7) < eps*7, "mH round trip");
       assert(abs(C.to_uH(C.from_uH(7)) - 7) < eps*7, "uH round trip");
       assert(abs(C.to_mWb(C.from_mWb(7)) - 7) < eps*7, "mWb round trip");
+      assert(abs(C.to_kOhm(C.from_kOhm(7)) - 7) < eps*7, "kOhm round trip");
+      assert(abs(C.to_MOhm(C.from_MOhm(7)) - 7) < eps*7, "MOhm round trip");
+      assert(abs(C.to_mOhm(C.from_mOhm(7)) - 7) < eps*7, "mOhm round trip");
+      assert(abs(C.to_uF(C.from_uF(7)) - 7) < eps*7, "uF round trip");
+      assert(abs(C.to_nF(C.from_nF(7)) - 7) < eps*7, "nF round trip");
+      assert(abs(C.to_pF(C.from_pF(7)) - 7) < eps*7, "pF round trip");
+      assert(abs(C.to_kVA(C.from_kVA(7)) - 7) < eps*7, "kVA round trip");
+      assert(abs(C.to_kvar(C.from_kvar(7)) - 7) < eps*7, "kvar round trip");
+      assert(abs(C.to_kJpkgK(C.from_kJpkgK(7)) - 7) < eps*7, "kJpkgK round trip");
+      assert(abs(C.to_gpcm3(C.from_gpcm3(7)) - 7) < eps*7, "gpcm3 round trip");
+      assert(abs(C.to_mPas(C.from_mPas(7)) - 7) < eps*7, "mPas round trip");
+      assert(abs(C.to_cm2(C.from_cm2(7)) - 7) < eps*7, "cm2 round trip");
+      assert(abs(C.to_mm2(C.from_mm2(7)) - 7) < eps*7, "mm2 round trip");
+      assert(abs(C.to_mT(C.from_mT(7)) - 7) < eps*7, "mT round trip");
+      assert(abs(C.to_barps(C.from_barps(7)) - 7) < eps*7, "barps round trip");
       annotation (experiment(StopTime=1), Documentation(info="<html>
 <p>Asserts every factor of <a href=\"modelica://Requirements.Units.Conversions\">Requirements.Units.Conversions</a> (the international foot is 0.3048 m exactly, 1 kft = 304.8 m, 1 kg/min = 1/60 kg/s, ...) and every round trip; a model that translates and runs is the test. The two variables show how a check model writes a quantity stated in a non-SI unit: <code>from_kft(4.65)</code>, not 1417.32.</p>
 <p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>

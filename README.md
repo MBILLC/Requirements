@@ -63,6 +63,10 @@ Every example builds and simulates in **Dymola**, **OpenModelica** and **Modelon
 
 The regression baselines of all three tools are kept in [ModCheck](https://github.com/MBILLC/ModCheck), `ModCheck/Resources/RequirementsLibrary/`, my own, currently private regression testing tool. Every example has a reference in each tool's list: the tool's own result where it was stored, Modelon Impact's otherwise (`reference_from: impact`).
 
+## Changes in version 0.16.0 (November 2026): Display units for the quantities of the MSL's components
+
+`Units` gains fifteen non-SI unit types and their `from_`/`to_` conversion functions, for units an engineer writes a requirement in and the MSL does not define: `kOhm`, `MOhm` and `mOhm`; `uF`, `nF` and `pF`; `kV.A` and `kvar`; `kJ/(kg.K)`; `g/cm3`; `mPa.s`; `cm2` and `mm2`; `mT`; and `bar/s`. A charge in `A.h` converts through the MSL's own `from_Ah`. `Examples.Elementary.Units.Conversions` asserts each factor and round trip. The choice comes from Chaperone's survey of the units of the parameters and variables of the MSL's components. No existing class changed, and no model conversion is needed. Full account: `UsersGuide.ReleaseNotes.Version_0_16_0`.
+
 ## Changes in version 0.15.0 (November 2026): Display units for the quantities of the MSL's connectors
 
 `Units` gains nine non-SI unit types and their `from_`/`to_` conversion functions, for units an engineer writes a requirement in and the MSL does not define: `deg/s` and `deg/s2`, `l/min` and `m3/h`, `kJ/kg`, `g/kg` (converted to `Modelica.Media.Interfaces.Types.MassFraction`, the kg/kg of Modelica.Fluid's ports), `mH` and `uH`, and `mWb`. `Examples.Elementary.Units.Conversions` asserts each factor and round trip. The choice comes from Chaperone's survey of the units the MSL's connectors carry. No existing class changed, and no model conversion is needed. Full account: `UsersGuide.ReleaseNotes.Version_0_15_0`.
