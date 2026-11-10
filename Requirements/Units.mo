@@ -743,6 +743,99 @@ package Units "Type definitions of non-SI units and conversion functions, for th
 </html>"));
   end Conversions;
 
+  package Phasors "Transformations between the polar and the rectangular form of a phasor"
+    extends Modelica.Icons.Package;
+
+    function magnitude "Magnitude of a phasor from its real and imaginary parts"
+      extends Modelica.Icons.Function;
+      input Real re "Real part";
+      input Real im "Imaginary part";
+      output Real r "Magnitude, in the unit of the parts";
+    algorithm
+      r := sqrt(re^2 + im^2);
+      annotation (Inline=true, Documentation(info="<html>
+<p>Rectangular to polar: the magnitude <code>sqrt(re^2 + im^2)</code>, in the unit of the parts. For a <code>Complex</code> it equals <a href=\"modelica://Modelica.ComplexMath.abs\">Modelica.ComplexMath.abs</a>.</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+    end magnitude;
+
+    function phaseAngle "Phase angle of a phasor from its real and imaginary parts, in (-pi, pi]"
+      extends Modelica.Icons.Function;
+      input Real re "Real part";
+      input Real im "Imaginary part";
+      output Modelica.Units.SI.Angle phi "Phase angle, in (-pi, pi]";
+    algorithm
+      phi := Modelica.Math.atan2(im, re);
+      annotation (Inline=true, Documentation(info="<html>
+<p>Rectangular to polar: the phase angle <code>atan2(im, re)</code>, in (-pi, pi]. A phasor of zero magnitude has phase angle 0. For a <code>Complex</code> it equals <a href=\"modelica://Modelica.ComplexMath.arg\">Modelica.ComplexMath.arg</a>.</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+    end phaseAngle;
+
+    function realPart "Real part of a phasor from its magnitude and phase angle"
+      extends Modelica.Icons.Function;
+      input Real r "Magnitude";
+      input Modelica.Units.SI.Angle phi "Phase angle";
+      output Real re "Real part, in the unit of the magnitude";
+    algorithm
+      re := r*cos(phi);
+      annotation (Inline=true, Documentation(info="<html>
+<p>Polar to rectangular: the real part <code>r*cos(phi)</code>, in the unit of the magnitude.</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+    end realPart;
+
+    function imaginaryPart "Imaginary part of a phasor from its magnitude and phase angle"
+      extends Modelica.Icons.Function;
+      input Real r "Magnitude";
+      input Modelica.Units.SI.Angle phi "Phase angle";
+      output Real im "Imaginary part, in the unit of the magnitude";
+    algorithm
+      im := r*sin(phi);
+      annotation (Inline=true, Documentation(info="<html>
+<p>Polar to rectangular: the imaginary part <code>r*sin(phi)</code>, in the unit of the magnitude.</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+    end imaginaryPart;
+
+    function wrapAngle "Angle wrapped to (-pi, pi]"
+      extends Modelica.Icons.Function;
+      input Modelica.Units.SI.Angle phi "Angle";
+      output Modelica.Units.SI.Angle phiWrapped "The same direction, in (-pi, pi]";
+    algorithm
+      phiWrapped := phi - 2*Modelica.Constants.pi*ceil((phi - Modelica.Constants.pi)/(2*Modelica.Constants.pi));
+      annotation (Inline=true, Documentation(info="<html>
+<p>The angle of the same direction in (-pi, pi]: pi stays pi, -pi becomes pi, 3*pi/2 becomes -pi/2. A phase angle of a model given in polar form is wrapped by it, so every phase angle a requirement reads is in the same range as <a href=\"modelica://Requirements.Units.Phasors.phaseAngle\">phaseAngle</a>'s.</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+    end wrapAngle;
+
+    function phaseDifference "Phase angle of one phasor relative to another, wrapped to (-pi, pi]"
+      extends Modelica.Icons.Function;
+      input Modelica.Units.SI.Angle phi1 "Phase angle of the phasor";
+      input Modelica.Units.SI.Angle phi2 "Phase angle of the reference phasor";
+      output Modelica.Units.SI.Angle dphi "phi1 - phi2, wrapped to (-pi, pi]";
+    algorithm
+      dphi := wrapAngle(phi1 - phi2);
+      annotation (Inline=true, Documentation(info="<html>
+<p>The phase angle of a phasor relative to a reference phasor, <code>phi1 - phi2</code> wrapped to (-pi, pi]: positive when the phasor leads the reference. The angle of a current relative to its voltage is the negative of the power-factor angle of an inductive load.</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+    end phaseDifference;
+
+    annotation (Documentation(info="<html>
+<p>A phasor (a quasi-static voltage or current, as in <a href=\"modelica://Modelica.Electrical.QuasiStatic\">Modelica.Electrical.QuasiStatic</a>) is
+written in one of two coordinate systems: rectangular (real and imaginary part, as a <code>Complex</code> holds it) or polar
+(magnitude and phase angle, as power-system libraries often carry it). A requirement may name either form, whichever form
+the model has. These functions transform between the two, in both directions, and give a phase angle relative to another
+phasor; every phase angle they return is in (-pi, pi]. The magnitude is the one the model carries: the MSL's quasi-static
+phasors are RMS phasors, so their magnitude is an RMS value. A check model, hand-written or generated, writes
+<code>magnitude(v.re, v.im)</code>, not the formula. <a href=\"modelica://Requirements.Examples.Elementary.Units.Phasors\">Examples.Elementary.Units.Phasors</a>
+asserts every function.</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+  end Phasors;
+
   annotation (Documentation(info="<html>
 <p>Non-SI unit types and their conversions to and from SI, complementing <a href=\"modelica://Modelica.Units\">Modelica.Units</a>: a requirement is written in the units its domain uses (an altitude in kft, an air flow in kg/min, a cabin pressure in mbar), a model computes in SI, and the conversion between the two must be one function with one factor, in the library, never a number typed into a generated model. <a href=\"modelica://Requirements.Examples.Elementary.Units.Conversions\">Examples.Elementary.Units.Conversions</a> asserts every factor.</p>
 <p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>

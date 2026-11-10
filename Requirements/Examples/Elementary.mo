@@ -3520,6 +3520,42 @@ when the pack is switched off while the flight phase is still 2 (until 250 s).
 <p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
 </html>"));
     end Conversions;
+
+    model Phasors "Every transformation of Requirements.Units.Phasors asserted against its closed form, and its round trip"
+      extends Modelica.Icons.Example;
+      import P = Requirements.Units.Phasors;
+      import Modelica.Constants.pi;
+      constant Real eps = 1e-12 "Absolute tolerance of the assertions";
+      parameter Complex c = Complex(-3, 4) "A phasor in the second quadrant";
+      Real r = P.magnitude(c.re, c.im) "Its magnitude, 5";
+      Modelica.Units.SI.Angle phi = P.phaseAngle(c.re, c.im) "Its phase angle";
+    equation
+      assert(abs(P.magnitude(3, 4) - 5) < eps, "magnitude");
+      assert(abs(P.phaseAngle(0, 1) - pi/2) < eps, "phaseAngle, +j");
+      assert(abs(P.phaseAngle(-1, 0) - pi) < eps, "phaseAngle, -1 is pi");
+      assert(abs(P.phaseAngle(0, -1) + pi/2) < eps, "phaseAngle, -j");
+      assert(abs(P.phaseAngle(0, 0)) < eps, "phaseAngle, zero phasor");
+      assert(abs(P.realPart(2, pi/3) - 1) < eps, "realPart");
+      assert(abs(P.imaginaryPart(2, pi/6) - 1) < eps, "imaginaryPart");
+      assert(abs(r - Modelica.ComplexMath.abs(c)) < eps, "magnitude = ComplexMath.abs");
+      assert(abs(phi - Modelica.ComplexMath.arg(c)) < eps, "phaseAngle = ComplexMath.arg");
+      assert(abs(P.realPart(r, phi) - c.re) < eps, "real part round trip");
+      assert(abs(P.imaginaryPart(r, phi) - c.im) < eps, "imaginary part round trip");
+      assert(abs(P.wrapAngle(pi) - pi) < eps, "wrapAngle, pi stays");
+      assert(abs(P.wrapAngle(-pi) - pi) < eps, "wrapAngle, -pi is pi");
+      assert(abs(P.wrapAngle(3*pi/2) + pi/2) < eps, "wrapAngle, 3 pi/2");
+      assert(abs(P.wrapAngle(-7*pi/3) + pi/3) < eps, "wrapAngle, -7 pi/3");
+      assert(abs(P.phaseDifference(Modelica.Units.Conversions.from_deg(170), Modelica.Units.Conversions.from_deg(-170))
+        - Modelica.Units.Conversions.from_deg(-20)) < eps, "phaseDifference across pi");
+      assert(abs(P.phaseDifference(0.5, 0.2) - 0.3) < eps, "phaseDifference");
+      annotation (experiment(StopTime=1), Documentation(info="<html>
+<p>Asserts every function of <a href=\"modelica://Requirements.Units.Phasors\">Requirements.Units.Phasors</a>: the
+transformations in both directions, their agreement with <code>Modelica.ComplexMath.abs</code> and <code>arg</code>, the round
+trip polar to rectangular and back, and the wrap to (-pi, pi], including across pi (170 deg relative to -170 deg is -20 deg);
+a model that translates and runs is the test.</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+    end Phasors;
   end Units;
 
   package Margin "Library of examples asserting the margin outputs of the check blocks against closed-form values"

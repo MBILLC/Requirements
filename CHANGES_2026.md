@@ -2,7 +2,7 @@
 
 This file summarizes what changed in the Modelica **Requirements** library
 (package folder [`Requirements/`](Requirements/)) during 2026. The library went from
-**0.7.0** (Feb. 2025) to **0.16.0** (2026-11-09) in fifteen releases.
+**0.7.0** (Feb. 2025) to **0.17.0** (2026-11-09) in sixteen releases.
 
 The full release notes are in the library itself, under
 `Requirements.UsersGuide.ReleaseNotes`. The same summary is in the library documentation,
@@ -26,6 +26,7 @@ tool-by-tool measurements are kept beside the library (see `Requirements.UsersGu
 | 0.14.0 | 2026-10-26 | A file chosen at run time: the CSV reader in an exported FMU |
 | 0.15.0 | 2026-11-09 | Display units for the quantities of the MSL's connectors: `deg/s`, `l/min`, `kJ/kg`, `g/kg`, `mH`, `mWb`, ... |
 | 0.16.0 | 2026-11-09 | Display units for the quantities of the MSL's components: `kOhm`, `uF`, `kV.A`, `kJ/(kg.K)`, `g/cm3`, `mPa.s`, `mT`, `bar/s`, ... |
+| 0.17.0 | 2026-11-09 | Phasors: transformations between the polar and the rectangular form, and the wrapped phase difference |
 
 No release needs a model conversion. Each one declares `conversion(noneFromVersion=...)`
 for the version before it. One exception: from 0.8.0 on, code that reads a stored
@@ -207,6 +208,16 @@ This release changes requirement semantics.
     tools.
 - The repository [MBILLC/Requirements](https://github.com/MBILLC/Requirements) is public;
   the User's Guide and the Contact page link to it.
+
+## 0.17.0 — Phasors
+
+- The new package `Units.Phasors` transforms a phasor between its two coordinate systems, in both directions:
+  - rectangular to polar: `magnitude(re, im)`, `phaseAngle(re, im)` in (-pi, pi];
+  - polar to rectangular: `realPart(r, phi)`, `imaginaryPart(r, phi)`;
+  - `wrapAngle(phi)` to (-pi, pi], and `phaseDifference(phi1, phi2)`, the wrapped phase angle of one phasor relative to another.
+- The magnitude is the one the model carries; the MSL's quasi-static phasors are RMS phasors.
+- `Examples.Elementary.Units.Phasors` asserts every function, its agreement with `Modelica.ComplexMath`, and the round trip.
+- The functions serve Chaperone's phasor signals. No existing class changed; `conversion(noneFromVersion="0.16.0")`.
 
 ## 0.16.0 — Display units for the quantities of the MSL's components
 
