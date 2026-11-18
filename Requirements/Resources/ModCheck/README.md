@@ -38,6 +38,14 @@ verdict from these signals, or from the tool's log. *Violated / untested / satis
 a margin, from requirements written as text, is Chaperone (`MBILLC/Chaperone`), which uses
 ModCheck as its runner.
 
+## The references for other tools
+
+The npz references here are ModCheck's format. `../Testing/` exports them, on demand and
+without ModCheck, for csv-compare (the MSL's `ReferenceResults` layout) and OpenModelica's
+LibraryTesting, under the library's license: `python3 ../Testing/export_references.py`.
+Its `README.md` explains the files and what a pass there means. The export goes to the
+git-ignored `../Testing/Export/`.
+
 ## Modelon Impact
 
 **Every example builds on OpenModelica, and every tool has a reference (measured 2026-10-23).** The library's
