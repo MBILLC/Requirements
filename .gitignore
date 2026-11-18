@@ -1,1 +1,4 @@
 Requirements/Resources/C-Sources/test/build/
+
+# The reference export (Resources/Testing/export_references.py): produced on demand, not kept
+Requirements/Resources/Testing/Export/
