@@ -1,0 +1,55 @@
+{
+ "experiment": {
+  "base": {
+   "analysis": {
+    "parameters": [
+     {
+      "name": "start_time",
+      "value": 0.0
+     },
+     {
+      "name": "final_time",
+      "value": 6.0
+     },
+     {
+      "name": "interval",
+      "value": 0
+     }
+    ],
+    "simulationLogLevel": "WARNING",
+    "simulationOptions": {
+     "dynamic_diagnostics": false,
+     "filter": "['time', '*.y', '*.margin', '*.value']",
+     "ncp": 6000,
+     "solver": "Radau5ODE"
+    },
+    "solverOptions": {
+     "rtol": 1e-08
+    },
+    "type": "dynamic"
+   },
+   "expansion": {
+    "algorithm": "FULLFACTORIAL"
+   },
+   "model": {
+    "modelica": {
+     "className": "Requirements.Examples.Elementary.StepResponse.SecondOrder",
+     "compilerLogLevel": "warning",
+     "compilerOptions": {
+      "generate_html_diagnostics": false,
+      "include_protected_variables": false
+     },
+     "fmiTarget": "me",
+     "fmiVersion": "2.0",
+     "platform": "auto",
+     "runtimeOptions": {}
+    }
+   },
+   "modifiers": {
+    "variables": []
+   }
+  },
+  "extensions": [],
+  "version": 3
+ }
+}
