@@ -215,7 +215,7 @@ This release changes requirement semantics.
 - `StableSignal` approximates du/dt with a first-order filter of time constant `Td`. Its default is now **0.1 s**; it was 1 s, the fixed value of the block's original.
 - Why: a filter as long as the window smears every move faster than `Td`, and the check reads the net change rather than the travel. On a level with an inverse response over a 1 s window the block read 0.053 m/s for a travel of 0.109 m/s per second (Chaperone, 2026-11-19): a pass where the signal violated the limit.
 - The block's documentation has a new section, *Choosing Td*: at most a tenth of the fastest movement to be counted and a hundredth of the window; the gain `1/sqrt(1 + (w Td)^2)` on a sine; why not smaller than needed (a state the solver resolves, noise passed through).
-- Results change for a model that uses `StableSignal` without setting `Td`: within 0.14 % for `Examples.Elementary.ChecksInFixedWindow.StableSignal`, whose verdicts do not move. To keep the old results, set `Td = 1`. `conversion(noneFromVersion="0.17.0")`.
+- Results change for a model that uses `StableSignal` without setting `Td`, and a long run of a slow signal becomes more sensitive to the solver's tolerance. To keep the old results, set `Td = 1`. `Examples.Elementary.ChecksInFixedWindow.StableSignal` does, as the rule gives for its windows of minutes (with the new default its final average moved by 0.26 % at 100 times the rtol, 0.01 % with `Td = 1`): its results and references are unchanged. `conversion(noneFromVersion="0.17.0")`.
 
 ## 0.17.0 — Phasors
 

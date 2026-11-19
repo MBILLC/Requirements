@@ -2437,7 +2437,10 @@ the filter lets through, not the signal's own rate of change.
      and at most a hundredth of <b>window</b>. A window of minutes on a building's temperatures is met by the default;
      a window of a second on a mechanical or a level loop needs Td = window/100 or less.</li>
 <li> <b>Not smaller than needed:</b> the filter is a state with time constant Td, which the solver has to resolve;
-     a very small Td on a long run of a slow signal costs steps for nothing. Fast noise on u (a measured signal, a
+     a small Td on a long run of a slow signal costs steps and accuracy for nothing. Measured on
+     <a href=\"modelica://Requirements.Examples.Elementary.ChecksInFixedWindow.StableSignal\">Examples.Elementary.ChecksInFixedWindow.StableSignal</a>
+     (a 120 s sine, a 360 s window, an hour): at 100 times the rtol the final rateAverage moves by 0.26 % with Td = 0.1 s
+     and by 0.01 % with Td = 1 s, which the rule gives there and the example sets. Fast noise on u (a measured signal, a
      chattering controller) passes a small Td and counts in |du/dt|: there a Td above the noise's time scale is the
      point, and the requirement's limit has to allow for it.</li>
 </ul>

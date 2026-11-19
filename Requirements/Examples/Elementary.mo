@@ -1232,13 +1232,13 @@ and contributors; see <a href=\"modelica://Requirements.UsersGuide.BuildingsLice
         annotation (Placement(transformation(extent={{-100,10},{-80,30}})));
       Modelica.Blocks.Sources.BooleanPulse booPul1(width=50, period=1200) "Active in the first half of every 1200 s"
         annotation (Placement(transformation(extent={{-100,-70},{-80,-50}})));
-      Requirements.ChecksInFixedWindow.StableSignal staSigOn(window=120) "Slow sine, always active: satisfied"
+      Requirements.ChecksInFixedWindow.StableSignal staSigOn(window=120, Td=1) "Slow sine, always active: satisfied"
         annotation (Placement(transformation(extent={{-40,80},{0,100}})));
-      Requirements.ChecksInFixedWindow.StableSignal staSigPul(window=120) "Slow sine, sometimes active: satisfied"
+      Requirements.ChecksInFixedWindow.StableSignal staSigPul(window=120, Td=1) "Slow sine, sometimes active: satisfied"
         annotation (Placement(transformation(extent={{-40,40},{0,60}})));
-      Requirements.ChecksInFixedWindow.StableSignal staSigOn1 "Fast sine, always active: violated"
+      Requirements.ChecksInFixedWindow.StableSignal staSigOn1(Td=1) "Fast sine, always active: violated"
         annotation (Placement(transformation(extent={{-40,-10},{0,10}})));
-      Requirements.ChecksInFixedWindow.StableSignal staSigPul1 "Fast sine, sometimes active: violated"
+      Requirements.ChecksInFixedWindow.StableSignal staSigPul1(Td=1) "Fast sine, sometimes active: violated"
         annotation (Placement(transformation(extent={{-40,-50},{0,-30}})));
       Requirements.Verify.Requirement reqStaSigOn(method=Requirements.Types.WorstMarginMethod.Ratchet, text="Slow sine is stable", computeStatistics=true, useMargin=true)
         annotation (Placement(transformation(extent={{30,80},{90,100}})));
@@ -1283,6 +1283,13 @@ Check block <a href=\"modelica://Requirements.ChecksInFixedWindow.StableSignal\"
      360 s window, always active and active in the first half of every 1200 s. Its average speed is
      (2/&pi;)&middot;0.5&middot;2&pi;/120 s = 0.0167 s<sup>-1</sup>: violated once the first window is complete.</li>
 </ul>
+<p>
+Every check sets <code>Td = 1 s</code>, the derivative filter's time constant (the default is 0.1 s since version 0.18.0):
+the rule of the block's <em>Choosing Td</em> -- at most a hundredth of the window and a tenth of the fastest movement --
+gives about 1 s for windows of 120 s and 360 s and sines of 120 s and 1200 s. A smaller Td measures nothing more here
+and costs accuracy over the hour: at 100 times the rtol, the fast sine's final average moves by 0.26 % with Td = 0.1 s
+and by 0.01 % with Td = 1 s (Modelon Impact, 2026-11-19).
+</p>
 <p>
 This is the validation model <code>Buildings_Requirements.Validation.StableContinuousSignal</code> of
 <a href=\"https://github.com/lbl-srg/modelica-buildings-requirements\">modelica-buildings-requirements</a>

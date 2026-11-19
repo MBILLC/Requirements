@@ -387,9 +387,11 @@ and a hundredth of the window, the gain on a sine, and why not smaller than need
 </p>
 <p>
 Results change for a model that uses StableSignal without setting <code>Td</code>, by the filter's gain
-<code>1/sqrt(1 + (&omega; Td)&sup2;)</code> on its movements: within 0.14 % for
-<a href=\"modelica://Requirements.Examples.Elementary.ChecksInFixedWindow.StableSignal\">Examples.Elementary.ChecksInFixedWindow.StableSignal</a>,
-whose verdicts do not move. To keep the old results, set <code>Td = 1</code>.
+<code>1/sqrt(1 + (&omega; Td)&sup2;)</code> on its movements, and a long run of a slow signal becomes more sensitive to the
+solver's tolerance. To keep the old results, set <code>Td = 1</code>.
+<a href=\"modelica://Requirements.Examples.Elementary.ChecksInFixedWindow.StableSignal\">Examples.Elementary.ChecksInFixedWindow.StableSignal</a>
+does so, as the rule gives for its windows of minutes: with the new default its final average moved by 0.26 % at 100 times
+the rtol (0.01 % with Td = 1 s; Modelon Impact, 2026-11-19), so its results and references are unchanged.
 </p>
 <p>
 No model conversion is needed: <code>conversion(noneFromVersion=\"0.17.0\")</code>.
