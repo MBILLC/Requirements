@@ -14,7 +14,7 @@ package ReleaseNotes "Release notes"
 
     annotation (Documentation(info="<html>
 <p>
-In 2026 the library went from version 0.7.0 (Feb. 2025) to <b>0.17.0</b> (2026-11-09) in sixteen
+In 2026 the library went from version 0.7.0 (Feb. 2025) to <b>0.18.0</b> (2026-11-19) in seventeen
 releases. This page summarizes them; the release note of each version has the details.
 The same summary is kept as Markdown in
 <a href=\"https://github.com/MBILLC/Requirements/blob/HEAD/CHANGES_2026.md\">CHANGES_2026.md</a>
@@ -57,6 +57,8 @@ The regression baselines and the tool-by-tool measurements are kept beside the l
     <td>Display units for the quantities of the MSL's components: kOhm, uF, kV.A, kJ/(kg.K), g/cm3, mPa.s, mT, bar/s, ...</td></tr>
 <tr><td><a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Version_0_17_0\">0.17.0</a></td><td>2026-11-09</td>
     <td>Phasors: transformations between the polar and the rectangular form, and the wrapped phase difference</td></tr>
+<tr><td><a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Version_0_18_0\">0.18.0</a></td><td>2026-11-19</td>
+    <td><code>StableSignal</code>: the derivative filter's default <code>Td</code> 0.1 s (was 1 s), and how to choose it</td></tr>
 </table>
 
 <p>
@@ -369,6 +371,32 @@ This release changes requirement semantics.
 </ul>
 </html>"));
   end Summary2026;
+
+  class Version_0_18_0 "Version 0.18.0 (Nov. 19, 2026)"
+  extends Modelica.Icons.ReleaseNotes;
+
+    annotation (Documentation(info="<html>
+<p>
+<b>StableSignal's derivative filter.</b> <a href=\"modelica://Requirements.ChecksInFixedWindow.StableSignal\">StableSignal</a>
+approximates du/dt with a first-order filter of time constant <code>Td</code>. Its default is now <b>0.1 s</b>; it was 1 s,
+the fixed value of the block's original. A filter as long as the window smears every move faster than Td, and the check
+then reads the net change rather than the travel: on a level with an inverse response over a 1 s window the block read
+0.053 m/s for a travel of 0.109 m/s per second (Chaperone, 2026-11-19), a pass where the signal violated the limit.
+The block's documentation has a new section, <em>Choosing Td</em>: Td at most a tenth of the fastest movement to be counted
+and a hundredth of the window, the gain on a sine, and why not smaller than needed.
+</p>
+<p>
+Results change for a model that uses StableSignal without setting <code>Td</code>, by the filter's gain
+<code>1/sqrt(1 + (&omega; Td)&sup2;)</code> on its movements: within 0.14 % for
+<a href=\"modelica://Requirements.Examples.Elementary.ChecksInFixedWindow.StableSignal\">Examples.Elementary.ChecksInFixedWindow.StableSignal</a>,
+whose verdicts do not move. To keep the old results, set <code>Td = 1</code>.
+</p>
+<p>
+No model conversion is needed: <code>conversion(noneFromVersion=\"0.17.0\")</code>.
+</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+  end Version_0_18_0;
 
   class Version_0_17_0 "Version 0.17.0 (Nov. 9, 2026)"
   extends Modelica.Icons.ReleaseNotes;
@@ -1554,10 +1582,10 @@ end UsersGuide;
 
   annotation (preferredView="info",
   uses(Modelica(version="4.1.0")),
-version="0.17.0",
-versionDate="2026-11-09",
-dateModified = "2026-11-09",
-conversion(noneFromVersion="0.7.1", noneFromVersion="0.8.0", noneFromVersion="0.9.0", noneFromVersion="0.9.1", noneFromVersion="0.10.0", noneFromVersion="0.11.0", noneFromVersion="0.11.1", noneFromVersion="0.12.0", noneFromVersion="0.12.1", noneFromVersion="0.13.0", noneFromVersion="0.13.1", noneFromVersion="0.13.2", noneFromVersion="0.14.0", noneFromVersion="0.15.0", noneFromVersion="0.16.0"),
+version="0.18.0",
+versionDate="2026-11-19",
+dateModified = "2026-11-19",
+conversion(noneFromVersion="0.7.1", noneFromVersion="0.8.0", noneFromVersion="0.9.0", noneFromVersion="0.9.1", noneFromVersion="0.10.0", noneFromVersion="0.11.0", noneFromVersion="0.11.1", noneFromVersion="0.12.0", noneFromVersion="0.12.1", noneFromVersion="0.13.0", noneFromVersion="0.13.1", noneFromVersion="0.13.2", noneFromVersion="0.14.0", noneFromVersion="0.15.0", noneFromVersion="0.16.0", noneFromVersion="0.17.0"),
 revisionId="$Id:: package.mo 9390 2016-06-21 06:35:11Z #$",
 Documentation(info="<html>
 <p>

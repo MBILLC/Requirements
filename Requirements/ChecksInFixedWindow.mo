@@ -2317,8 +2317,8 @@ see <a href=\"modelica://Requirements.UsersGuide.BuildingsLicense\">UsersGuide.B
       "Hysteresis: once unstable, u counts as stable again only at or below upperLimit - h (0: none, and the sign of the margin is the verdict)";
     parameter Modelica.Units.SI.Time delayTime(min=0) = 0
       "Time after each rising edge of condition before the averaging starts (to skip a start-up transient)";
-    parameter Modelica.Units.SI.Time Td(min=Modelica.Constants.eps) = 1
-      "Time constant of the filter that approximates du/dt"
+    parameter Modelica.Units.SI.Time Td(min=Modelica.Constants.eps) = 0.1
+      "Time constant of the filter that approximates du/dt: at most a tenth of the fastest movement of u to be counted and a hundredth of window (see Choosing Td)"
       annotation(Dialog(tab="Advanced"));
     Modelica.Blocks.Interfaces.RealInput u "Monitored quantity"
       annotation (Placement(transformation(extent={{-240,40},{-200,80}})));
@@ -2405,7 +2405,7 @@ the limit and can adjust upperLimit.
 
 <h4>Implementation</h4>
 <p>
-du/dt is approximated with a first-order filter (time constant <b>Td</b>, default 1 s). Its absolute value is
+du/dt is approximated with a first-order filter (time constant <b>Td</b>, default 0.1 s; see Choosing Td). Its absolute value is
 integrated from the start of each phase, and the moving average is the difference of that integral over the last
 window, <code>(I(t) - I(t - window))/window</code>. This avoids the state events that a test on changes of direction
 would generate. The filter is started in steady state and always sees u: the original held its input at 0 while the
@@ -2417,6 +2417,34 @@ edge, and the average read 290 K / window for a few seconds: a violation that ne
 derivative spike at every start is not cancelled exactly by its delayed copy) the average drifts by tens of percent
 with the solver's step sequence. The difference of the integral has no such drift. Parameter <b>h</b> adds a hysteresis: once unstable, u counts as stable again only at
 or below upperLimit - h, which avoids chattering verdicts at the limit.
+</p>
+
+<h4>Choosing Td</h4>
+<p>
+The filter is <code>s/(1 + Td s)</code>: it follows u only on time scales well above Td, and the check measures what
+the filter lets through, not the signal's own rate of change.
+</p>
+<ul>
+<li> <b>A sine</b> of angular frequency &omega; reaches |du/dt| with the gain <code>1/sqrt(1 + (&omega; Td)&sup2;)</code>, so
+     rateAverage reads low by that factor: 0.1 % at &omega; Td = 0.045, 29 % at &omega; Td = 1.</li>
+<li> <b>A move faster than Td is smeared</b>, and back-and-forth movements within about Td partly cancel before the
+     absolute value is taken: the average reads closer to the net change than to the travel. Measured (Chaperone,
+     2026-11-19): a level with an inverse response, (1 - 0.1 s&middot;s)/(1 + 0.2 s&middot;s)&sup2; after a 0.1 m step, dips
+     by 7.5 mm within 67 ms and then rises; over a 1 s window its travel is 0.109 m. With Td = 1 s the block read
+     rateAverage = 0.053 m/s; with Td = 0.01 s, 0.1087 m/s. A requirement checked with a filter as long as its window
+     passed where the signal violated it.</li>
+<li> <b>The rule:</b> Td at most a tenth of the fastest time constant of the movements the requirement means to count,
+     and at most a hundredth of <b>window</b>. A window of minutes on a building's temperatures is met by the default;
+     a window of a second on a mechanical or a level loop needs Td = window/100 or less.</li>
+<li> <b>Not smaller than needed:</b> the filter is a state with time constant Td, which the solver has to resolve;
+     a very small Td on a long run of a slow signal costs steps for nothing. Fast noise on u (a measured signal, a
+     chattering controller) passes a small Td and counts in |du/dt|: there a Td above the noise's time scale is the
+     point, and the requirement's limit has to allow for it.</li>
+</ul>
+<p>
+The default is 0.1 s since version 0.18.0. It was 1 s before, the original's fixed value, which is negligible for the
+windows of minutes it was written for and wrong for windows of a few seconds. A model that relied on the old default
+and wants its old results sets <code>Td = 1</code>.
 </p>
 
 <h4>Margin</h4>
@@ -2444,7 +2472,8 @@ original are <b>window</b> and <b>upperLimit</b> here, the activation input and 
 <b>delayTime</b>. Changes besides those listed in
 <a href=\"modelica://Requirements.ChecksInFixedWindow.WithinBand\">WithinBand</a>: the hysteresis is a parameter
 <b>h</b> with default 0 (the original fixed it to upperLimit/20) so that the margin's sign is the verdict, and
-the derivative filter's time constant is a parameter <b>Td</b> (fixed to 1 s in the original), the moving
+the derivative filter's time constant is a parameter <b>Td</b> (fixed to 1 s in the original; default 1 s up to
+version 0.17.0, 0.1 s from 0.18.0, see Choosing Td), the moving
 average is the difference of an integral instead of <code>SignalAnalysis.MovingAverage</code>, and the derivative filter
 always sees u instead of 0 while inactive (see Implementation for both).
 Copyright (c) 1998-2024 Modelica Association, International Building Performance Simulation Association (IBPSA),
