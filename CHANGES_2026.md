@@ -2,7 +2,7 @@
 
 This file summarizes what changed in the Modelica **Requirements** library
 (package folder [`Requirements/`](Requirements/)) during 2026. The library went from
-**0.7.0** (Feb. 2025) to **0.17.0** (2026-11-09) in sixteen releases.
+**0.7.0** (Feb. 2025) to **0.18.0** (2026-11-19) in seventeen releases.
 
 The full release notes are in the library itself, under
 `Requirements.UsersGuide.ReleaseNotes`. The same summary is in the library documentation,
@@ -27,6 +27,7 @@ tool-by-tool measurements are kept beside the library (see `Requirements.UsersGu
 | 0.15.0 | 2026-11-09 | Display units for the quantities of the MSL's connectors: `deg/s`, `l/min`, `kJ/kg`, `g/kg`, `mH`, `mWb`, ... |
 | 0.16.0 | 2026-11-09 | Display units for the quantities of the MSL's components: `kOhm`, `uF`, `kV.A`, `kJ/(kg.K)`, `g/cm3`, `mPa.s`, `mT`, `bar/s`, ... |
 | 0.17.0 | 2026-11-09 | Phasors: transformations between the polar and the rectangular form, and the wrapped phase difference |
+| 0.18.0 | 2026-11-19 | `StableSignal`: the derivative filter's default `Td` 0.1 s (was 1 s), and how to choose it |
 
 No release needs a model conversion. Each one declares `conversion(noneFromVersion=...)`
 for the version before it. One exception: from 0.8.0 on, code that reads a stored
@@ -208,6 +209,13 @@ This release changes requirement semantics.
     tools.
 - The repository [MBILLC/Requirements](https://github.com/MBILLC/Requirements) is public;
   the User's Guide and the Contact page link to it.
+
+## 0.18.0 — StableSignal's derivative filter
+
+- `StableSignal` approximates du/dt with a first-order filter of time constant `Td`. Its default is now **0.1 s**; it was 1 s, the fixed value of the block's original.
+- Why: a filter as long as the window smears every move faster than `Td`, and the check reads the net change rather than the travel. On a level with an inverse response over a 1 s window the block read 0.053 m/s for a travel of 0.109 m/s per second (Chaperone, 2026-11-19): a pass where the signal violated the limit.
+- The block's documentation has a new section, *Choosing Td*: at most a tenth of the fastest movement to be counted and a hundredth of the window; the gain `1/sqrt(1 + (w Td)^2)` on a sine; why not smaller than needed (a state the solver resolves, noise passed through).
+- Results change for a model that uses `StableSignal` without setting `Td`, and a long run of a slow signal becomes more sensitive to the solver's tolerance. To keep the old results, set `Td = 1`. `Examples.Elementary.ChecksInFixedWindow.StableSignal` does, as the rule gives for its windows of minutes (with the new default its final average moved by 0.26 % at 100 times the rtol, 0.01 % with `Td = 1`): its results and references are unchanged. `conversion(noneFromVersion="0.17.0")`.
 
 ## 0.17.0 — Phasors
 
