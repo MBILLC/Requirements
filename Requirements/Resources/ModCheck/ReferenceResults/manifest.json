@@ -13,74 +13,25 @@
       "toBoolean.y",
       "withinDomain1.y"
     ],
+    "bytes": 6521,
     "metrics": {
-      "solver": "CVode",
-      "linear_multistep_method": "BDF",
-      "nonlinear_solver": "Newton",
-      "linear_solver_type": "DENSE",
-      "atol": 1e-06,
-      "rtol": 1e-06,
-      "cpu_time": 0.05663807199744042,
-      "steps": 505,
-      "rhs_evaluations": 521,
-      "jacobian_evaluations": 11,
-      "error_test_failures": 0,
-      "convergence_failures": 0,
+      "cpu_time": 0.014,
+      "steps": 13,
+      "function_evaluations": 22,
+      "jacobian_evaluations": 3,
       "state_events": 3,
-      "kind": "dynamic"
+      "time_events": 0,
+      "result_points": 507,
+      "kind": "dynamic",
+      "solver": "Cvode",
+      "rtol": 1e-06,
+      "wall_time": 7.471728000004077,
+      "samples": 507,
+      "dymola_version": "Dymola Version 2027x, 2026-10-28",
+      "msl_version": "4.1.0",
+      "spread_applied": true
     },
-    "descriptor": "impact workspace 'omcfixes-check'",
-    "units": {},
-    "display_units": {},
-    "format": "npz",
-    "bytes": 6935,
-    "record": {
-      "schema": 1,
-      "record_id": "b8830d1392abfd137b559b11f41d0f2ddb953f499cc54bb57b3ffd066903edb3",
-      "executable": {
-        "fmi_version": "2.0",
-        "generation_date": "2026-10-23T23:35:57",
-        "generation_tool": "Optimica Compiler Toolkit",
-        "guid": "f3675e1821932bb0c30f984e5b625ff1",
-        "impact_fmu_id": "_raftrequirements_limitedcabinaltituderateofchange_20261023_233554_ac366c7",
-        "model_description_sha256": "6996a12a85adb0555adf2c1b31016ba19304d7dc9b7b2d835579ecb08a7949b8"
-      },
-      "experiment": {
-        "case_entry_sha256": "efee7bc81248c31e46d7336458ce8a63a0fbca01058b2879faecdb3f828c40c0",
-        "descriptor": "impact workspace 'omcfixes-check'",
-        "engine": "impact",
-        "impact_case_id": "case_1",
-        "impact_experiment_id": "_raftrequirements_limitedcabinaltituderateofchange_20261023_233554_f41a59e",
-        "released": true,
-        "rtol_factor": 1.0,
-        "workspace": "omcfixes-check",
-        "definition_sha256": "3c7b466441890e65e434d8ff4c7ab7c2c2e53b0b440a2b933b83c24a0d594515"
-      },
-      "model": {
-        "class": "Requirements.Examples.AircraftRequirements.LimitedCabinAltitudeRateOfChange",
-        "libraries": [
-          {
-            "local": false,
-            "name": "Requirements"
-          }
-        ]
-      },
-      "result": {
-        "bytes": 6935,
-        "file": "MR_Examples_AircraftRequirements_LimitedCabinAltitudeRateOfChange.npz",
-        "format": "npz",
-        "sha256": "a9c906fc30d3ffd19cee4df2dcdd20d7df848de4607060317047c46d5b498644"
-      },
-      "run": {
-        "utc": "2026-10-23T23:35:59+00:00",
-        "modcheck": {
-          "api": 1,
-          "commit": "fa6b07f68fb0afcaedb4d690a67008a696dc69c1",
-          "dirty": true
-        }
-      }
-    },
-    "reference_from": "impact"
+    "descriptor": "dymola 2027x, 2026-10-28, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_AircraftRequirements_LimitedControlFrequency",
@@ -350,75 +301,25 @@
       "onTable.y",
       "time"
     ],
+    "bytes": 8877,
     "metrics": {
-      "solver": "CVode",
-      "linear_multistep_method": "BDF",
-      "nonlinear_solver": "Newton",
-      "linear_solver_type": "DENSE",
-      "atol": 1e-06,
+      "cpu_time": 0.058,
+      "steps": 134,
+      "function_evaluations": 245,
+      "jacobian_evaluations": 37,
+      "state_events": 14,
+      "time_events": 24,
+      "result_points": 572,
+      "kind": "dynamic",
+      "solver": "Cvode",
       "rtol": 1e-06,
-      "cpu_time": 0.0737082650011871,
-      "steps": 560,
-      "rhs_evaluations": 712,
-      "jacobian_evaluations": 39,
-      "time_events": 19,
-      "error_test_failures": 0,
-      "convergence_failures": 0,
-      "state_events": 19,
-      "kind": "dynamic"
+      "wall_time": 5.922176899999613,
+      "samples": 572,
+      "dymola_version": "Dymola Version 2027x, 2026-10-28",
+      "msl_version": "4.1.0",
+      "spread_applied": true
     },
-    "descriptor": "impact workspace 'omcfixes-check'",
-    "units": {},
-    "display_units": {},
-    "format": "npz",
-    "bytes": 8891,
-    "record": {
-      "schema": 1,
-      "record_id": "0576ad481df4e4376cb6c5229d281228967b0babe6855b0e1f1cd6fa70ee63ed",
-      "executable": {
-        "fmi_version": "2.0",
-        "generation_date": "2026-10-23T23:36:03",
-        "generation_tool": "Optimica Compiler Toolkit",
-        "guid": "874a433c67f7e3073feea6069791e633",
-        "impact_fmu_id": "_les_backuppowersupply_mainpowersupplyrequirements_20261023_233559_d633656",
-        "model_description_sha256": "c56f21a502792dd1979c5ac29a86e85a68c381b9ab220f9e8c71b80052d54f53"
-      },
-      "experiment": {
-        "case_entry_sha256": "4fdf6667cd07c784bcb31a46cd1b4b80ffc669e91022530d1c07d6321aa7eddf",
-        "descriptor": "impact workspace 'omcfixes-check'",
-        "engine": "impact",
-        "impact_case_id": "case_1",
-        "impact_experiment_id": "_les_backuppowersupply_mainpowersupplyrequirements_20261023_233559_a4338dc",
-        "released": true,
-        "rtol_factor": 1.0,
-        "workspace": "omcfixes-check",
-        "definition_sha256": "d879b4e20bc455d1db2845ca2dcd6f68ee22732b4b365148881c0725e47ec144"
-      },
-      "model": {
-        "class": "Requirements.Examples.BackupPowerSupply.MainPowerSupplyRequirements",
-        "libraries": [
-          {
-            "local": false,
-            "name": "Requirements"
-          }
-        ]
-      },
-      "result": {
-        "bytes": 8891,
-        "file": "MR_Examples_BackupPowerSupply_MainPowerSupplyRequirements.npz",
-        "format": "npz",
-        "sha256": "ff0c1c3cfe4bb4ccc798f16f58a51bfbc3e456ed847edaeecf423f4d82ece4cb"
-      },
-      "run": {
-        "utc": "2026-10-23T23:36:06+00:00",
-        "modcheck": {
-          "api": 1,
-          "commit": "fa6b07f68fb0afcaedb4d690a67008a696dc69c1",
-          "dirty": true
-        }
-      }
-    },
-    "reference_from": "impact"
+    "descriptor": "dymola 2027x, 2026-10-28, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInFixedWindow_BandDuration",
@@ -572,88 +473,25 @@
       "sin.y",
       "time"
     ],
+    "bytes": 20380,
     "metrics": {
-      "solver": "CVode",
-      "linear_multistep_method": "BDF",
-      "nonlinear_solver": "Newton",
-      "linear_solver_type": "DENSE",
-      "atol": 1e-06,
-      "rtol": 1e-06,
-      "cpu_time": 0.0721537490026094,
-      "steps": 764,
-      "rhs_evaluations": 990,
-      "jacobian_evaluations": 26,
+      "cpu_time": 0.057,
+      "steps": 588,
+      "function_evaluations": 835,
+      "jacobian_evaluations": 18,
+      "state_events": 6,
       "time_events": 8,
-      "error_test_failures": 23,
-      "convergence_failures": 0,
-      "state_events": 10,
-      "kind": "dynamic"
+      "result_points": 525,
+      "kind": "dynamic",
+      "solver": "Cvode",
+      "rtol": 1e-06,
+      "wall_time": 6.065111500007333,
+      "samples": 525,
+      "dymola_version": "Dymola Version 2027x, 2026-10-28",
+      "msl_version": "4.1.0",
+      "spread_applied": true
     },
-    "descriptor": "impact workspace 'omcfixes-check'",
-    "units": {
-      "greAct3.margin": "1",
-      "reqGreAct3.margin": "1",
-      "reqGreAct3.statistics.margin": "1",
-      "greAct.margin": "1",
-      "reqGreAct.margin": "1",
-      "reqGreAct.statistics.margin": "1",
-      "greAct1.margin": "1",
-      "reqGreAct1.margin": "1",
-      "reqGreAct1.statistics.margin": "1",
-      "greAct2.margin": "1",
-      "reqGreAct2.margin": "1",
-      "reqGreAct2.statistics.margin": "1"
-    },
-    "display_units": {},
-    "format": "npz",
-    "bytes": 20571,
-    "record": {
-      "schema": 1,
-      "record_id": "3c3784194af3b67fbed19c64be1ad3f33168defcfaa37a6d412b5e4f59092bc8",
-      "executable": {
-        "fmi_version": "2.0",
-        "generation_date": "2026-10-23T23:38:48",
-        "generation_tool": "Optimica Compiler Toolkit",
-        "guid": "2a943db4828467b26d9cce4019951c16",
-        "impact_fmu_id": "_mples_elementary_checksinfixedwindow_greaterequal_20261023_233844_cba3730",
-        "model_description_sha256": "5f6085799bfe973c586b92cafa4d179f5a72f5e7dc0c514e60211ef2c81ec093"
-      },
-      "experiment": {
-        "case_entry_sha256": "7ef9483a377caf473ef960d76f4f24c49a97fab3fdf2d8c11c310d017af42f04",
-        "descriptor": "impact workspace 'omcfixes-check'",
-        "engine": "impact",
-        "impact_case_id": "case_1",
-        "impact_experiment_id": "_mples_elementary_checksinfixedwindow_greaterequal_20261023_233844_21bedcd",
-        "released": true,
-        "rtol_factor": 1.0,
-        "workspace": "omcfixes-check",
-        "definition_sha256": "d08e190192147c9f4dffe4885be6ef7f9819f90af51d9dd507afa649cc087aa8"
-      },
-      "model": {
-        "class": "Requirements.Examples.Elementary.ChecksInFixedWindow.GreaterEqual",
-        "libraries": [
-          {
-            "local": false,
-            "name": "Requirements"
-          }
-        ]
-      },
-      "result": {
-        "bytes": 20571,
-        "file": "MR_Examples_Elementary_ChecksInFixedWindow_GreaterEqual.npz",
-        "format": "npz",
-        "sha256": "410128fcdbfaa6ea7d1a8cb8f411f7507049ddba62561e60d8ef2bff4467a076"
-      },
-      "run": {
-        "utc": "2026-10-23T23:38:49+00:00",
-        "modcheck": {
-          "api": 1,
-          "commit": "fa6b07f68fb0afcaedb4d690a67008a696dc69c1",
-          "dirty": true
-        }
-      }
-    },
-    "reference_from": "impact"
+    "descriptor": "dymola 2027x, 2026-10-28, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInFixedWindow_MaxDuration",
@@ -859,79 +697,25 @@
       "staSigPul1.y",
       "time"
     ],
+    "bytes": 24479,
     "metrics": {
-      "solver": "CVode",
-      "linear_multistep_method": "BDF",
-      "nonlinear_solver": "Newton",
-      "linear_solver_type": "DENSE",
-      "atol": 1e-06,
-      "rtol": 1e-06,
-      "cpu_time": 0.13804237300064415,
-      "steps": 2746,
-      "rhs_evaluations": 4087,
+      "cpu_time": 0.069,
+      "steps": 2781,
+      "function_evaluations": 4169,
       "jacobian_evaluations": 61,
+      "state_events": 0,
       "time_events": 21,
-      "error_test_failures": 268,
-      "convergence_failures": 0,
-      "kind": "dynamic"
+      "result_points": 742,
+      "kind": "dynamic",
+      "solver": "Cvode",
+      "rtol": 1e-06,
+      "wall_time": 5.977948599989759,
+      "samples": 742,
+      "dymola_version": "Dymola Version 2027x, 2026-10-28",
+      "msl_version": "4.1.0",
+      "spread_applied": true
     },
-    "descriptor": "impact workspace 'omcfixes-check'",
-    "units": {
-      "staSigOn.margin": "1",
-      "staSigPul.margin": "1",
-      "staSigOn1.margin": "1",
-      "staSigPul1.margin": "1"
-    },
-    "display_units": {},
-    "format": "npz",
-    "bytes": 27169,
-    "record": {
-      "schema": 1,
-      "record_id": "762958799f0383f27b283394d0a2fd2f90752da2b99bd6e4e4301ced2955fad0",
-      "executable": {
-        "fmi_version": "2.0",
-        "generation_date": "2026-10-23T23:38:54",
-        "generation_tool": "Optimica Compiler Toolkit",
-        "guid": "66f550a4cea350753d1f4cd1640f3f45",
-        "impact_fmu_id": "_mples_elementary_checksinfixedwindow_stablesignal_20261023_233850_1feac5c",
-        "model_description_sha256": "9422453faa75b9494e3b8b1f54c0986e353055c3a56c78c678078d58d2f96da0"
-      },
-      "experiment": {
-        "case_entry_sha256": "59e8f0458b97d628adac3adf7fb95f3ec92cf79159e0d168d3cafcfdd508305f",
-        "descriptor": "impact workspace 'omcfixes-check'",
-        "engine": "impact",
-        "impact_case_id": "case_1",
-        "impact_experiment_id": "_mples_elementary_checksinfixedwindow_stablesignal_20261023_233850_ea5d35d",
-        "released": true,
-        "rtol_factor": 1.0,
-        "workspace": "omcfixes-check",
-        "definition_sha256": "6efabedec3f7f5b646a26f9bebb0d374e8664bbde7b8866b275a0840c5d5c184"
-      },
-      "model": {
-        "class": "Requirements.Examples.Elementary.ChecksInFixedWindow.StableSignal",
-        "libraries": [
-          {
-            "local": false,
-            "name": "Requirements"
-          }
-        ]
-      },
-      "result": {
-        "bytes": 27169,
-        "file": "MR_Examples_Elementary_ChecksInFixedWindow_StableSignal.npz",
-        "format": "npz",
-        "sha256": "bcdfac7a64453fb47c55617615f294a97819d80a4d206c9340967ffdd19acc05"
-      },
-      "run": {
-        "utc": "2026-10-23T23:38:56+00:00",
-        "modcheck": {
-          "api": 1,
-          "commit": "fa6b07f68fb0afcaedb4d690a67008a696dc69c1",
-          "dirty": true
-        }
-      }
-    },
-    "reference_from": "impact"
+    "descriptor": "dymola 2027x, 2026-10-28, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInFixedWindow_WhenChanging",
@@ -1075,94 +859,25 @@
       "zer1.y",
       "zer2.y"
     ],
+    "bytes": 22075,
     "metrics": {
-      "solver": "CVode",
-      "linear_multistep_method": "BDF",
-      "nonlinear_solver": "Newton",
-      "linear_solver_type": "DENSE",
-      "atol": 1e-06,
-      "rtol": 1e-06,
-      "cpu_time": 0.07944842200231506,
-      "steps": 791,
-      "rhs_evaluations": 1089,
-      "jacobian_evaluations": 27,
+      "cpu_time": 0.085,
+      "steps": 605,
+      "function_evaluations": 889,
+      "jacobian_evaluations": 18,
+      "state_events": 11,
       "time_events": 8,
-      "error_test_failures": 32,
-      "convergence_failures": 0,
-      "state_events": 17,
-      "kind": "dynamic"
+      "result_points": 535,
+      "kind": "dynamic",
+      "solver": "Cvode",
+      "rtol": 1e-06,
+      "wall_time": 5.987440800003242,
+      "samples": 535,
+      "dymola_version": "Dymola Version 2027x, 2026-10-28",
+      "msl_version": "4.1.0",
+      "spread_applied": true
     },
-    "descriptor": "impact workspace 'omcfixes-check'",
-    "units": {
-      "con1.margin": "1",
-      "reqCon1.margin": "1",
-      "reqCon1.statistics.margin": "1",
-      "con2.margin": "1",
-      "reqCon2.margin": "1",
-      "reqCon2.statistics.margin": "1",
-      "con3.margin": "1",
-      "reqCon3.margin": "1",
-      "reqCon3.statistics.margin": "1",
-      "reqWitBan.margin": "1",
-      "reqWitBan.statistics.margin": "1",
-      "witBan.margin": "1",
-      "reqWitBan1.margin": "1",
-      "reqWitBan1.statistics.margin": "1",
-      "witBan1.margin": "1",
-      "reqWitBan2.margin": "1",
-      "reqWitBan2.statistics.margin": "1",
-      "witBan2.margin": "1"
-    },
-    "display_units": {},
-    "format": "npz",
-    "bytes": 22333,
-    "record": {
-      "schema": 1,
-      "record_id": "8609f0b49ca90fb1295aa49f7b37297458e85d7763e86e1238da698fa8fc99db",
-      "executable": {
-        "fmi_version": "2.0",
-        "generation_date": "2026-10-23T23:38:41",
-        "generation_tool": "Optimica Compiler Toolkit",
-        "guid": "5e8f7183018930cc72e38dbc829bc955",
-        "impact_fmu_id": "_xamples_elementary_checksinfixedwindow_withinband_20261023_233837_43bb383",
-        "model_description_sha256": "9b9b0d592a0dc405dfba35820354372aad60926783d0e429ccacaab7d9362d19"
-      },
-      "experiment": {
-        "case_entry_sha256": "b0686a792b1347551d0dd0762fa6a0a4686ce9b7be26a88453c567657aa6d556",
-        "descriptor": "impact workspace 'omcfixes-check'",
-        "engine": "impact",
-        "impact_case_id": "case_1",
-        "impact_experiment_id": "_xamples_elementary_checksinfixedwindow_withinband_20261023_233837_3263754",
-        "released": true,
-        "rtol_factor": 1.0,
-        "workspace": "omcfixes-check",
-        "definition_sha256": "757639c9901be26dc47886d26dbeb074ed2f7f2a1ced95747e33b8967017b181"
-      },
-      "model": {
-        "class": "Requirements.Examples.Elementary.ChecksInFixedWindow.WithinBand",
-        "libraries": [
-          {
-            "local": false,
-            "name": "Requirements"
-          }
-        ]
-      },
-      "result": {
-        "bytes": 22333,
-        "file": "MR_Examples_Elementary_ChecksInFixedWindow_WithinBand.npz",
-        "format": "npz",
-        "sha256": "7fd0484c389576d68afbd1f6dfb5eb5689bad4e9877e866f8137d6872b3fee2d"
-      },
-      "run": {
-        "utc": "2026-10-23T23:38:44+00:00",
-        "modcheck": {
-          "api": 1,
-          "commit": "fa6b07f68fb0afcaedb4d690a67008a696dc69c1",
-          "dirty": true
-        }
-      }
-    },
-    "reference_from": "impact"
+    "descriptor": "dymola 2027x, 2026-10-28, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInFixedWindow_WithinDomain",
@@ -1207,74 +922,25 @@
       "sine5.y",
       "time"
     ],
+    "bytes": 26239,
     "metrics": {
-      "solver": "CVode",
-      "linear_multistep_method": "BDF",
-      "nonlinear_solver": "Newton",
-      "linear_solver_type": "DENSE",
-      "atol": 1e-06,
-      "rtol": 1e-06,
-      "cpu_time": 0.2635975890007103,
-      "steps": 1156,
-      "rhs_evaluations": 3156,
-      "jacobian_evaluations": 501,
+      "cpu_time": 0.022,
+      "steps": 6,
+      "function_evaluations": 9,
+      "jacobian_evaluations": 1,
+      "state_events": 0,
       "time_events": 499,
-      "error_test_failures": 0,
-      "convergence_failures": 0,
-      "kind": "dynamic"
+      "result_points": 1416,
+      "kind": "dynamic",
+      "solver": "Cvode",
+      "rtol": 1e-06,
+      "wall_time": 5.827711399993859,
+      "samples": 1416,
+      "dymola_version": "Dymola Version 2027x, 2026-10-28",
+      "msl_version": "4.1.0",
+      "spread_applied": true
     },
-    "descriptor": "impact workspace 'omcfixes-check'",
-    "units": {},
-    "display_units": {},
-    "format": "npz",
-    "bytes": 26276,
-    "record": {
-      "schema": 1,
-      "record_id": "0d7878504966296a20463a553cd3d85cc526508e45d09dec6dd81706ee891f5b",
-      "executable": {
-        "fmi_version": "2.0",
-        "generation_date": "2026-10-23T23:36:22",
-        "generation_tool": "Optimica Compiler Toolkit",
-        "guid": "e26d2ecedff2e7354161bb0c444d0686",
-        "impact_fmu_id": "_sinfixedwindow_withfft_maxtotalhamonicdistortion1_20261023_233618_01a1056",
-        "model_description_sha256": "3ba86f095479abfc99da01824f526bec91a47aa9de8643d79383e329b415a9b8"
-      },
-      "experiment": {
-        "case_entry_sha256": "0750e056c41c63ad729862d94eee3e8447d3740e390496db0c51cf552505151c",
-        "descriptor": "impact workspace 'omcfixes-check'",
-        "engine": "impact",
-        "impact_case_id": "case_1",
-        "impact_experiment_id": "_sinfixedwindow_withfft_maxtotalhamonicdistortion1_20261023_233618_5fd3e3f",
-        "released": true,
-        "rtol_factor": 1.0,
-        "workspace": "omcfixes-check",
-        "definition_sha256": "b9b508740159d9f108cd74e0adb15791bd73f311b5ce78b3da0ea05f0ab37a19"
-      },
-      "model": {
-        "class": "Requirements.Examples.Elementary.ChecksInFixedWindow_withFFT.MaxTotalHamonicDistortion1",
-        "libraries": [
-          {
-            "local": false,
-            "name": "Requirements"
-          }
-        ]
-      },
-      "result": {
-        "bytes": 26276,
-        "file": "MR_Examples_Elementary_ChecksInFixedWindow_withFFT_MaxTotalHamonicDistortion1.npz",
-        "format": "npz",
-        "sha256": "befedb3d3e8e40fa3cccdbe0de7d29dbc1cdfbbc213da50f23410c74c0dea606"
-      },
-      "run": {
-        "utc": "2026-10-23T23:36:25+00:00",
-        "modcheck": {
-          "api": 1,
-          "commit": "fa6b07f68fb0afcaedb4d690a67008a696dc69c1",
-          "dirty": true
-        }
-      }
-    },
-    "reference_from": "impact"
+    "descriptor": "dymola 2027x, 2026-10-28, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInFixedWindow_withFFT_MaxTotalHamonicDistortion2",
@@ -1292,74 +958,25 @@
       "sine5.y",
       "time"
     ],
+    "bytes": 38730,
     "metrics": {
-      "solver": "CVode",
-      "linear_multistep_method": "BDF",
-      "nonlinear_solver": "Newton",
-      "linear_solver_type": "DENSE",
-      "atol": 1e-06,
-      "rtol": 1e-06,
-      "cpu_time": 0.47335589100111974,
-      "steps": 2190,
-      "rhs_evaluations": 6198,
-      "jacobian_evaluations": 1004,
+      "cpu_time": 0.042,
+      "steps": 31,
+      "function_evaluations": 52,
+      "jacobian_evaluations": 7,
+      "state_events": 0,
       "time_events": 1001,
-      "error_test_failures": 0,
-      "convergence_failures": 0,
-      "kind": "dynamic"
+      "result_points": 2441,
+      "kind": "dynamic",
+      "solver": "Cvode",
+      "rtol": 1e-06,
+      "wall_time": 5.90502859998378,
+      "samples": 2441,
+      "dymola_version": "Dymola Version 2027x, 2026-10-28",
+      "msl_version": "4.1.0",
+      "spread_applied": true
     },
-    "descriptor": "impact workspace 'omcfixes-check'",
-    "units": {},
-    "display_units": {},
-    "format": "npz",
-    "bytes": 38822,
-    "record": {
-      "schema": 1,
-      "record_id": "35d502b70dd3524ea04215e71a96195b0d2b0729de5752898c2c9591b3755304",
-      "executable": {
-        "fmi_version": "2.0",
-        "generation_date": "2026-10-23T23:36:29",
-        "generation_tool": "Optimica Compiler Toolkit",
-        "guid": "d24bcb71b55d81d3135a1f278a4df938",
-        "impact_fmu_id": "_sinfixedwindow_withfft_maxtotalhamonicdistortion2_20261023_233625_129e34e",
-        "model_description_sha256": "7415e0dbdc694347a59fb995b7cfb9233672060b280ffafc6407797c2d5c75da"
-      },
-      "experiment": {
-        "case_entry_sha256": "049b95a3d1f12b3d7a2347b3157c71fc83bc466932e10da9d40aa70958c8d0b1",
-        "descriptor": "impact workspace 'omcfixes-check'",
-        "engine": "impact",
-        "impact_case_id": "case_1",
-        "impact_experiment_id": "_sinfixedwindow_withfft_maxtotalhamonicdistortion2_20261023_233625_557c495",
-        "released": true,
-        "rtol_factor": 1.0,
-        "workspace": "omcfixes-check",
-        "definition_sha256": "7e54f34c8589722a0996166c0e93e0d434523c631c991241af45fc06ce616dfd"
-      },
-      "model": {
-        "class": "Requirements.Examples.Elementary.ChecksInFixedWindow_withFFT.MaxTotalHamonicDistortion2",
-        "libraries": [
-          {
-            "local": false,
-            "name": "Requirements"
-          }
-        ]
-      },
-      "result": {
-        "bytes": 38822,
-        "file": "MR_Examples_Elementary_ChecksInFixedWindow_withFFT_MaxTotalHamonicDistortion2.npz",
-        "format": "npz",
-        "sha256": "8f0d6354c19ea851a16bf4aa9f0fdc1da0da1ca74fecfabafdb4367305fd2276"
-      },
-      "run": {
-        "utc": "2026-10-23T23:36:32+00:00",
-        "modcheck": {
-          "api": 1,
-          "commit": "fa6b07f68fb0afcaedb4d690a67008a696dc69c1",
-          "dirty": true
-        }
-      }
-    },
-    "reference_from": "impact"
+    "descriptor": "dymola 2027x, 2026-10-28, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInFixedWindow_withFFT_WithinAbsoluteDomain1",
@@ -1407,74 +1024,25 @@
       "sine5.y",
       "time"
     ],
+    "bytes": 21957,
     "metrics": {
-      "solver": "CVode",
-      "linear_multistep_method": "BDF",
-      "nonlinear_solver": "Newton",
-      "linear_solver_type": "DENSE",
-      "atol": 1e-06,
-      "rtol": 1e-06,
-      "cpu_time": 0.2774579300021287,
-      "steps": 1403,
-      "rhs_evaluations": 3811,
-      "jacobian_evaluations": 604,
+      "cpu_time": 0.019,
+      "steps": 32,
+      "function_evaluations": 53,
+      "jacobian_evaluations": 7,
+      "state_events": 0,
       "time_events": 601,
-      "error_test_failures": 0,
-      "convergence_failures": 0,
-      "kind": "dynamic"
+      "result_points": 1691,
+      "kind": "dynamic",
+      "solver": "Cvode",
+      "rtol": 1e-06,
+      "wall_time": 5.843525500007672,
+      "samples": 1691,
+      "dymola_version": "Dymola Version 2027x, 2026-10-28",
+      "msl_version": "4.1.0",
+      "spread_applied": true
     },
-    "descriptor": "impact workspace 'omcfixes-check'",
-    "units": {},
-    "display_units": {},
-    "format": "npz",
-    "bytes": 21984,
-    "record": {
-      "schema": 1,
-      "record_id": "781533a24c94fbc2d9de0cd136b8ccb3602a23b4e5116e4c7571462c389e408f",
-      "executable": {
-        "fmi_version": "2.0",
-        "generation_date": "2026-10-23T23:36:10",
-        "generation_tool": "Optimica Compiler Toolkit",
-        "guid": "c7cd9cecaf7e2c6654a144dfe76529b7",
-        "impact_fmu_id": "_checksinfixedwindow_withfft_withinabsolutedomain2_20261023_233606_58ece73",
-        "model_description_sha256": "9d2c2e95735c3715cdf1ac1b9aadedf50c8158458d704e911e1fed2b4adf40fd"
-      },
-      "experiment": {
-        "case_entry_sha256": "129e9850ad2b7b28ceb1782916742d7199fbd969166f67dcbd643d28553a92d6",
-        "descriptor": "impact workspace 'omcfixes-check'",
-        "engine": "impact",
-        "impact_case_id": "case_1",
-        "impact_experiment_id": "_checksinfixedwindow_withfft_withinabsolutedomain2_20261023_233606_1340865",
-        "released": true,
-        "rtol_factor": 1.0,
-        "workspace": "omcfixes-check",
-        "definition_sha256": "753bc6d2255fe8e856ef479ed2efb4e996e0a05bbe235bd2b2bc7abfbb846ae0"
-      },
-      "model": {
-        "class": "Requirements.Examples.Elementary.ChecksInFixedWindow_withFFT.WithinAbsoluteDomain2",
-        "libraries": [
-          {
-            "local": false,
-            "name": "Requirements"
-          }
-        ]
-      },
-      "result": {
-        "bytes": 21984,
-        "file": "MR_Examples_Elementary_ChecksInFixedWindow_withFFT_WithinAbsoluteDomain2.npz",
-        "format": "npz",
-        "sha256": "115ddf751744c33734689aa154e67c006935fb5e24bc4fa7967e9eed7c2b753e"
-      },
-      "run": {
-        "utc": "2026-10-23T23:36:12+00:00",
-        "modcheck": {
-          "api": 1,
-          "commit": "fa6b07f68fb0afcaedb4d690a67008a696dc69c1",
-          "dirty": true
-        }
-      }
-    },
-    "reference_from": "impact"
+    "descriptor": "dymola 2027x, 2026-10-28, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInFixedWindow_withFFT_WithinRelativeDomain1",
@@ -1522,74 +1090,25 @@
       "sine5.y",
       "time"
     ],
+    "bytes": 22069,
     "metrics": {
-      "solver": "CVode",
-      "linear_multistep_method": "BDF",
-      "nonlinear_solver": "Newton",
-      "linear_solver_type": "DENSE",
-      "atol": 1e-06,
-      "rtol": 1e-06,
-      "cpu_time": 0.25712852199649205,
-      "steps": 1403,
-      "rhs_evaluations": 3811,
-      "jacobian_evaluations": 604,
+      "cpu_time": 0.02,
+      "steps": 32,
+      "function_evaluations": 53,
+      "jacobian_evaluations": 7,
+      "state_events": 0,
       "time_events": 601,
-      "error_test_failures": 0,
-      "convergence_failures": 0,
-      "kind": "dynamic"
+      "result_points": 1691,
+      "kind": "dynamic",
+      "solver": "Cvode",
+      "rtol": 1e-06,
+      "wall_time": 5.8641234999813605,
+      "samples": 1691,
+      "dymola_version": "Dymola Version 2027x, 2026-10-28",
+      "msl_version": "4.1.0",
+      "spread_applied": true
     },
-    "descriptor": "impact workspace 'omcfixes-check'",
-    "units": {},
-    "display_units": {},
-    "format": "npz",
-    "bytes": 22096,
-    "record": {
-      "schema": 1,
-      "record_id": "273c484c648a52a82eb0c55b33ae86346efa238e64afe9ec856a3d4d6378f7f7",
-      "executable": {
-        "fmi_version": "2.0",
-        "generation_date": "2026-10-23T23:36:16",
-        "generation_tool": "Optimica Compiler Toolkit",
-        "guid": "28722e6769214419fa05d6f50c8d0fb5",
-        "impact_fmu_id": "_checksinfixedwindow_withfft_withinrelativedomain2_20261023_233612_455460f",
-        "model_description_sha256": "54fa0cb3cd72db5f0966cf3d04de97741f67f318656809ea57b581bc550cfbca"
-      },
-      "experiment": {
-        "case_entry_sha256": "2d0b7631cb012a175ea58fa6e05bc1a946ff92beb21c2a2a4c098ab2f2142c44",
-        "descriptor": "impact workspace 'omcfixes-check'",
-        "engine": "impact",
-        "impact_case_id": "case_1",
-        "impact_experiment_id": "_checksinfixedwindow_withfft_withinrelativedomain2_20261023_233612_f88de5b",
-        "released": true,
-        "rtol_factor": 1.0,
-        "workspace": "omcfixes-check",
-        "definition_sha256": "faf07296dfcfccf03b6742239f44f4548c9a7c5ec41ee7b15d79dcffd949d06b"
-      },
-      "model": {
-        "class": "Requirements.Examples.Elementary.ChecksInFixedWindow_withFFT.WithinRelativeDomain2",
-        "libraries": [
-          {
-            "local": false,
-            "name": "Requirements"
-          }
-        ]
-      },
-      "result": {
-        "bytes": 22096,
-        "file": "MR_Examples_Elementary_ChecksInFixedWindow_withFFT_WithinRelativeDomain2.npz",
-        "format": "npz",
-        "sha256": "4fb4c4e51452d9c806de0e30307649300506dee7c7ee188517cddb5c0ea27add"
-      },
-      "run": {
-        "utc": "2026-10-23T23:36:18+00:00",
-        "modcheck": {
-          "api": 1,
-          "commit": "fa6b07f68fb0afcaedb4d690a67008a696dc69c1",
-          "dirty": true
-        }
-      }
-    },
-    "reference_from": "impact"
+    "descriptor": "dymola 2027x, 2026-10-28, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ChecksInSlidingWindow_BandAccumulatedDuration",
@@ -2445,81 +1964,25 @@
       "withinBand1.margin",
       "withinBand1.y"
     ],
+    "bytes": 31020,
     "metrics": {
-      "solver": "CVode",
-      "linear_multistep_method": "BDF",
-      "nonlinear_solver": "Newton",
-      "linear_solver_type": "DENSE",
-      "atol": 1e-06,
+      "cpu_time": 0.011,
+      "steps": 485,
+      "function_evaluations": 703,
+      "jacobian_evaluations": 16,
+      "state_events": 8,
+      "time_events": 2000,
+      "result_points": 4017,
+      "kind": "dynamic",
+      "solver": "Cvode",
       "rtol": 1e-06,
-      "cpu_time": 0.534700108000834,
-      "steps": 7854,
-      "rhs_evaluations": 17692,
-      "jacobian_evaluations": 2008,
-      "time_events": 1996,
-      "error_test_failures": 34,
-      "convergence_failures": 0,
-      "state_events": 12,
-      "kind": "dynamic"
+      "wall_time": 5.688240400020732,
+      "samples": 4017,
+      "dymola_version": "Dymola Version 2027x, 2026-10-28",
+      "msl_version": "4.1.0",
+      "spread_applied": true
     },
-    "descriptor": "impact workspace 'omcfixes-check'",
-    "units": {
-      "greaterEqual1.margin": "1",
-      "statistics.margin": "1",
-      "withinBand1.margin": "1",
-      "statistics.totalDuration": "s",
-      "statistics.worstMargin": "1"
-    },
-    "display_units": {},
-    "format": "npz",
-    "bytes": 31078,
-    "record": {
-      "schema": 1,
-      "record_id": "54e618654db29ab220c08392ad5928ce2447118d71991960e92bebeabf69a2e8",
-      "executable": {
-        "fmi_version": "2.0",
-        "generation_date": "2026-10-23T23:38:58",
-        "generation_tool": "Optimica Compiler Toolkit",
-        "guid": "e7e016d4b17049e00f6df6c3c1ddd8e5",
-        "impact_fmu_id": "requirements_examples_elementary_margin_gated_20261023_233856_a3b3a5a",
-        "model_description_sha256": "85d29baa7564e0033d3f814daa37e224552db5d0a324e3b2c949a091a76ab610"
-      },
-      "experiment": {
-        "case_entry_sha256": "3b3e5d448aa229a7f604b4ac2b5f6d624fce37a954da3e9ec1300614f160417a",
-        "descriptor": "impact workspace 'omcfixes-check'",
-        "engine": "impact",
-        "impact_case_id": "case_1",
-        "impact_experiment_id": "requirements_examples_elementary_margin_gated_20261023_233856_c63447b",
-        "released": true,
-        "rtol_factor": 1.0,
-        "workspace": "omcfixes-check",
-        "definition_sha256": "5ce36427d867fa652aae58a581d5e41b21884e704b908f5cb481f0f3d4dcdee7"
-      },
-      "model": {
-        "class": "Requirements.Examples.Elementary.Margin.Gated",
-        "libraries": [
-          {
-            "local": false,
-            "name": "Requirements"
-          }
-        ]
-      },
-      "result": {
-        "bytes": 31078,
-        "file": "MR_Examples_Elementary_Margin_Gated.npz",
-        "format": "npz",
-        "sha256": "bd2feb1810e5bf98c9936779a00790683785751f5d214f3d37c2dc83855c5d87"
-      },
-      "run": {
-        "utc": "2026-10-23T23:39:00+00:00",
-        "modcheck": {
-          "api": 1,
-          "commit": "fa6b07f68fb0afcaedb4d690a67008a696dc69c1",
-          "dirty": true
-        }
-      }
-    },
-    "reference_from": "impact"
+    "descriptor": "dymola 2027x, 2026-10-28, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_Margin_Rising",
@@ -2635,79 +2098,25 @@
       "time",
       "u.y"
     ],
+    "bytes": 47963,
     "metrics": {
-      "solver": "CVode",
-      "linear_multistep_method": "BDF",
-      "nonlinear_solver": "Newton",
-      "linear_solver_type": "DENSE",
-      "atol": 1e-06,
-      "rtol": 1e-06,
-      "cpu_time": 0.4477007989989943,
-      "steps": 8927,
-      "rhs_evaluations": 18724,
-      "jacobian_evaluations": 1502,
-      "time_events": 1500,
-      "error_test_failures": 860,
-      "convergence_failures": 0,
+      "cpu_time": 0.007,
+      "steps": 656,
+      "function_evaluations": 1399,
+      "jacobian_evaluations": 213,
       "state_events": 2,
-      "kind": "dynamic"
+      "time_events": 1500,
+      "result_points": 1508,
+      "kind": "dynamic",
+      "solver": "DASSL",
+      "rtol": 1e-06,
+      "wall_time": 3.1191177000000607,
+      "samples": 1508,
+      "dymola_version": "Dymola Version 2027x, 2026-10-28",
+      "msl_version": "4.1.0",
+      "spread_applied": true
     },
-    "descriptor": "impact workspace 'omcfixes-check'",
-    "units": {
-      "stable1.margin": "1",
-      "stable2.margin": "1",
-      "stable3.margin": "1"
-    },
-    "display_units": {},
-    "format": "npz",
-    "bytes": 46106,
-    "record": {
-      "schema": 1,
-      "record_id": "3ce5ea8ccdc876b17e2b8d1746e0b558b5a0277e6e2e11bf466fdedbec80c707",
-      "executable": {
-        "fmi_version": "2.0",
-        "generation_date": "2026-10-23T23:39:03",
-        "generation_tool": "Optimica Compiler Toolkit",
-        "guid": "db5b583f511bb050bbd2445c61163f81",
-        "impact_fmu_id": "_uirements_examples_elementary_margin_stablesignal_20261023_233901_dd5eaa5",
-        "model_description_sha256": "d479c3c95cee216b756fa6aa8116ccb85b0ca8f9e5ad476cb8d118783471f6f1"
-      },
-      "experiment": {
-        "case_entry_sha256": "a391cb5192efa934f3086b011883446bf541c396a68e749005da352b8cc7e5a3",
-        "descriptor": "impact workspace 'omcfixes-check'",
-        "engine": "impact",
-        "impact_case_id": "case_1",
-        "impact_experiment_id": "_uirements_examples_elementary_margin_stablesignal_20261023_233900_8980d70",
-        "released": true,
-        "rtol_factor": 1.0,
-        "workspace": "omcfixes-check",
-        "definition_sha256": "f246788d20d23cd8419df5838571c865a8a87639361395d17fbb8e1a702c81a8"
-      },
-      "model": {
-        "class": "Requirements.Examples.Elementary.Margin.StableSignal",
-        "libraries": [
-          {
-            "local": false,
-            "name": "Requirements"
-          }
-        ]
-      },
-      "result": {
-        "bytes": 46106,
-        "file": "MR_Examples_Elementary_Margin_StableSignal.npz",
-        "format": "npz",
-        "sha256": "d700c9990ebc7e0fd8909706583b1efe4d128c0fa798e7dfd8a764394f6fc449"
-      },
-      "run": {
-        "utc": "2026-10-23T23:39:05+00:00",
-        "modcheck": {
-          "api": 1,
-          "commit": "fa6b07f68fb0afcaedb4d690a67008a696dc69c1",
-          "dirty": true
-        }
-      }
-    },
-    "reference_from": "impact"
+    "descriptor": "dymola 2027x, 2026-10-28, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_Margin_WithinDomain",
@@ -2966,74 +2375,25 @@
       "time",
       "whenRising1.y"
     ],
+    "bytes": 4358,
     "metrics": {
-      "solver": "CVode",
-      "linear_multistep_method": "BDF",
-      "nonlinear_solver": "Newton",
-      "linear_solver_type": "DENSE",
-      "atol": 1e-06,
-      "rtol": 1e-06,
-      "cpu_time": 0.07194046099903062,
-      "steps": 519,
-      "rhs_evaluations": 559,
-      "jacobian_evaluations": 14,
-      "error_test_failures": 0,
-      "convergence_failures": 0,
+      "cpu_time": 0.002,
+      "steps": 44,
+      "function_evaluations": 74,
+      "jacobian_evaluations": 10,
       "state_events": 9,
-      "kind": "dynamic"
+      "time_events": 0,
+      "result_points": 519,
+      "kind": "dynamic",
+      "solver": "Cvode",
+      "rtol": 1e-06,
+      "wall_time": 5.366510299994843,
+      "samples": 519,
+      "dymola_version": "Dymola Version 2027x, 2026-10-28",
+      "msl_version": "4.1.0",
+      "spread_applied": true
     },
-    "descriptor": "impact workspace 'omcfixes-check'",
-    "units": {},
-    "display_units": {},
-    "format": "npz",
-    "bytes": 4329,
-    "record": {
-      "schema": 1,
-      "record_id": "08b30420f57bf03c18a0d3ec1d2fd1ea97d2bf31548c8374c4b9f19385d3e5f2",
-      "executable": {
-        "fmi_version": "2.0",
-        "generation_date": "2026-10-23T23:36:34",
-        "generation_tool": "Optimica Compiler Toolkit",
-        "guid": "bb32c90b690bf405cc3a6056581018e",
-        "impact_fmu_id": "_ments_examples_elementary_sources_signalsfromfile_20261023_233632_a341a44",
-        "model_description_sha256": "e985f78ab23006bf7f7166379e83a3be959ac4f1e35879f4fa44d4528f945a19"
-      },
-      "experiment": {
-        "case_entry_sha256": "28af3f2814244963a5830f75583bf3f0743856856dd0c201b6d6e7a0dda33098",
-        "descriptor": "impact workspace 'omcfixes-check'",
-        "engine": "impact",
-        "impact_case_id": "case_1",
-        "impact_experiment_id": "_ments_examples_elementary_sources_signalsfromfile_20261023_233632_01684ce",
-        "released": true,
-        "rtol_factor": 1.0,
-        "workspace": "omcfixes-check",
-        "definition_sha256": "ccfe0e1c99d9e971ebdd94a93d94de317f7c6c37038d32684b21762a42f3612a"
-      },
-      "model": {
-        "class": "Requirements.Examples.Elementary.Sources.SignalsFromFile",
-        "libraries": [
-          {
-            "local": false,
-            "name": "Requirements"
-          }
-        ]
-      },
-      "result": {
-        "bytes": 4329,
-        "file": "MR_Examples_Elementary_Sources_SignalsFromFile.npz",
-        "format": "npz",
-        "sha256": "4f7f2c9befe82f7d49c94d86e5c8a8ec8847990f7b7a86070a96be9e8848f8f7"
-      },
-      "run": {
-        "utc": "2026-10-23T23:36:36+00:00",
-        "modcheck": {
-          "api": 1,
-          "commit": "fa6b07f68fb0afcaedb4d690a67008a696dc69c1",
-          "dirty": true
-        }
-      }
-    },
-    "reference_from": "impact"
+    "descriptor": "dymola 2027x, 2026-10-28, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_StepResponse_Disturbance",
@@ -3111,79 +2471,25 @@
       "sys.y",
       "time"
     ],
+    "bytes": 207160,
     "metrics": {
-      "solver": "Radau5(explicit)",
+      "cpu_time": 0.281,
+      "steps": 324,
+      "function_evaluations": 611,
+      "jacobian_evaluations": 45,
+      "state_events": 0,
+      "time_events": 6004,
+      "result_points": 17004,
+      "kind": "dynamic",
+      "solver": "DASSL",
       "rtol": 1e-08,
-      "cpu_time": 3.8647292310051853,
-      "steps": 6006,
-      "rhs_evaluations": 39036,
-      "jacobian_evaluations": 6006,
-      "time_events": 6005,
-      "error_test_failures": 0,
-      "kind": "dynamic"
+      "wall_time": 3.6446040000009816,
+      "samples": 17004,
+      "dymola_version": "Dymola Version 2027x, 2026-10-28",
+      "msl_version": "4.1.0",
+      "spread_applied": true
     },
-    "descriptor": "impact workspace 'omcfixes-check'",
-    "units": {
-      "overshoot20.margin": "1",
-      "overshoot10.margin": "1",
-      "rise.margin": "1",
-      "delay.margin": "1",
-      "settle.margin": "1",
-      "settle1.margin": "1",
-      "damping.margin": "1",
-      "decay.margin": "1",
-      "error.margin": "1"
-    },
-    "display_units": {},
-    "format": "npz",
-    "bytes": 207580,
-    "record": {
-      "schema": 1,
-      "record_id": "b577008e59014fabec105128c7c14bf0a7e10852277b1be1424740a36255f94e",
-      "executable": {
-        "fmi_version": "2.0",
-        "generation_date": "2026-10-23T23:37:06",
-        "generation_tool": "Optimica Compiler Toolkit",
-        "guid": "751f4238031ca91c26ee6bab97add27",
-        "impact_fmu_id": "_ents_examples_elementary_stepresponse_secondorder_20261023_233653_fcd50e1",
-        "model_description_sha256": "09cf3866cf092564beded7e049715ffe28fd6f40594155637532be6b58616c10"
-      },
-      "experiment": {
-        "case_entry_sha256": "da8b91711b0c38a9b3cdb781dcba7ecaba8dccf5d237833a6216f2c14500f955",
-        "descriptor": "impact workspace 'omcfixes-check'",
-        "engine": "impact",
-        "impact_case_id": "case_1",
-        "impact_experiment_id": "_ents_examples_elementary_stepresponse_secondorder_20261023_233653_e5065e1",
-        "released": true,
-        "rtol_factor": 1.0,
-        "workspace": "omcfixes-check",
-        "definition_sha256": "9a9fb5415cd6a58ace02ad91cf39acdf4d1f9b194e38cc5ed981ee9b146097ad"
-      },
-      "model": {
-        "class": "Requirements.Examples.Elementary.StepResponse.SecondOrder",
-        "libraries": [
-          {
-            "local": false,
-            "name": "Requirements"
-          }
-        ]
-      },
-      "result": {
-        "bytes": 207580,
-        "file": "MR_Examples_Elementary_StepResponse_SecondOrder.npz",
-        "format": "npz",
-        "sha256": "e62c57ff81dd67a7ba3a32146d2f2fa5cd179bb0b53b3cff55f2ca0cc168f431"
-      },
-      "run": {
-        "utc": "2026-10-23T23:37:14+00:00",
-        "modcheck": {
-          "api": 1,
-          "commit": "fa6b07f68fb0afcaedb4d690a67008a696dc69c1",
-          "dirty": true
-        }
-      }
-    },
-    "reference_from": "impact"
+    "descriptor": "dymola 2027x, 2026-10-28, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_TimeLocators_After",
@@ -3427,101 +2733,25 @@
       "q",
       "time"
     ],
+    "bytes": 48233,
     "metrics": {
-      "solver": "CVode",
-      "linear_multistep_method": "BDF",
-      "nonlinear_solver": "Newton",
-      "linear_solver_type": "DENSE",
-      "atol": 1e-06,
-      "rtol": 1e-06,
-      "cpu_time": 0.11687196500133723,
-      "steps": 1018,
-      "rhs_evaluations": 1090,
-      "jacobian_evaluations": 29,
-      "time_events": 11,
-      "error_test_failures": 0,
-      "convergence_failures": 0,
+      "cpu_time": 0.003,
+      "steps": 58,
+      "function_evaluations": 106,
+      "jacobian_evaluations": 16,
       "state_events": 6,
-      "kind": "dynamic"
+      "time_events": 11,
+      "result_points": 1022,
+      "kind": "dynamic",
+      "solver": "Cvode",
+      "rtol": 1e-06,
+      "wall_time": 7.261047300009523,
+      "samples": 1022,
+      "dymola_version": "Dymola Version 2027x, 2026-10-28",
+      "msl_version": "4.1.0",
+      "spread_applied": true
     },
-    "descriptor": "impact workspace 'omcfixes-check'",
-    "units": {
-      "plain.totalDuration": "s",
-      "plain.violatedFraction": "1",
-      "plain.longestDuration": "s",
-      "plain.tLongestStart": "s",
-      "plain.currentDuration": "s",
-      "merged.totalDuration": "s",
-      "merged.violatedFraction": "1",
-      "merged.longestDuration": "s",
-      "merged.tLongestStart": "s",
-      "merged.currentDuration": "s",
-      "mergedMin.totalDuration": "s",
-      "mergedMin.violatedFraction": "1",
-      "mergedMin.longestDuration": "s",
-      "mergedMin.tLongestStart": "s",
-      "mergedMin.currentDuration": "s",
-      "minOnly.totalDuration": "s",
-      "minOnly.violatedFraction": "1",
-      "minOnly.longestDuration": "s",
-      "minOnly.tLongestStart": "s",
-      "minOnly.currentDuration": "s",
-      "partly.totalDuration": "s",
-      "partly.violatedFraction": "1",
-      "partly.longestDuration": "s",
-      "partly.tLongestStart": "s",
-      "partly.currentDuration": "s"
-    },
-    "display_units": {},
-    "format": "npz",
-    "bytes": 48084,
-    "record": {
-      "schema": 1,
-      "record_id": "5d5b4d9ccba6d30eabcb6d870034ff64e345555c645ba9ff0f7c19ae575a8464",
-      "executable": {
-        "fmi_version": "2.0",
-        "generation_date": "2026-10-23T23:38:24",
-        "generation_tool": "Optimica Compiler Toolkit",
-        "guid": "9c2def4cbb589028042baceb2ff7eb04",
-        "impact_fmu_id": "__examples_elementary_violationstatistics_episodes_20261023_233821_900c636",
-        "model_description_sha256": "eaf05b9e0711d16ea586dca7db006bd74e399c36ae76fc7023d9b10347038065"
-      },
-      "experiment": {
-        "case_entry_sha256": "e9777cb9b5dbf6a8e082b1978e8264e7cf8fa3f80e2ef9af9896bbf0dd6260d2",
-        "descriptor": "impact workspace 'omcfixes-check'",
-        "engine": "impact",
-        "impact_case_id": "case_1",
-        "impact_experiment_id": "__examples_elementary_violationstatistics_episodes_20261023_233821_a4bc712",
-        "released": true,
-        "rtol_factor": 1.0,
-        "workspace": "omcfixes-check",
-        "definition_sha256": "6d4457926586dc51be69ae25845026be0134c959a0efa6a571cc17d7f9a39ec9"
-      },
-      "model": {
-        "class": "Requirements.Examples.Elementary.ViolationStatistics.Episodes",
-        "libraries": [
-          {
-            "local": false,
-            "name": "Requirements"
-          }
-        ]
-      },
-      "result": {
-        "bytes": 48084,
-        "file": "MR_Examples_Elementary_ViolationStatistics_Episodes.npz",
-        "format": "npz",
-        "sha256": "24b2da09a9af23a84ff27c9ee11291961e6a66d711b44c96d89a624396209f4f"
-      },
-      "run": {
-        "utc": "2026-10-23T23:38:27+00:00",
-        "modcheck": {
-          "api": 1,
-          "commit": "fa6b07f68fb0afcaedb4d690a67008a696dc69c1",
-          "dirty": true
-        }
-      }
-    },
-    "reference_from": "impact"
+    "descriptor": "dymola 2027x, 2026-10-28, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ViolationStatistics_Gating",
@@ -3541,85 +2771,25 @@
       "ratchet.worstMargin",
       "time"
     ],
+    "bytes": 5002,
     "metrics": {
-      "solver": "CVode",
-      "linear_multistep_method": "BDF",
-      "nonlinear_solver": "Newton",
-      "linear_solver_type": "DENSE",
-      "atol": 1e-06,
-      "rtol": 1e-06,
-      "cpu_time": 0.05355289200088009,
-      "steps": 568,
-      "rhs_evaluations": 638,
-      "jacobian_evaluations": 13,
-      "time_events": 6,
-      "error_test_failures": 3,
-      "convergence_failures": 0,
+      "cpu_time": 0.003,
+      "steps": 111,
+      "function_evaluations": 162,
+      "jacobian_evaluations": 6,
       "state_events": 3,
-      "kind": "dynamic"
+      "time_events": 6,
+      "result_points": 513,
+      "kind": "dynamic",
+      "solver": "Cvode",
+      "rtol": 1e-06,
+      "wall_time": 6.100764300004812,
+      "samples": 513,
+      "dymola_version": "Dymola Version 2027x, 2026-10-28",
+      "msl_version": "4.1.0",
+      "spread_applied": true
     },
-    "descriptor": "impact workspace 'omcfixes-check'",
-    "units": {
-      "minDuration.margin": "1",
-      "continuous.totalDuration": "s",
-      "continuous.worstMargin": "1",
-      "continuous.continuousWorst.tWorst": "s",
-      "continuous.tWorst": "s",
-      "ratchet.totalDuration": "s",
-      "ratchet.worstMargin": "1",
-      "ratchet.ratchetWorst.tWorst": "s",
-      "ratchet.tWorst": "s"
-    },
-    "display_units": {},
-    "format": "npz",
-    "bytes": 4975,
-    "record": {
-      "schema": 1,
-      "record_id": "e9e488c77e43767a9436e1f651c9aea118ff03731584689c4be9f37df5ad9539",
-      "executable": {
-        "fmi_version": "2.0",
-        "generation_date": "2026-10-23T23:38:30",
-        "generation_tool": "Optimica Compiler Toolkit",
-        "guid": "aa52e0f07ef3b471a02cb5396cded4ef",
-        "impact_fmu_id": "_ts_examples_elementary_violationstatistics_gating_20261023_233827_99007d9",
-        "model_description_sha256": "7b88840448f6f2953f81874350541075aa500647360d9b79fbb6ce38a9f25573"
-      },
-      "experiment": {
-        "case_entry_sha256": "78ab29cede336c565570c7463421d38b35ff5ac23df6215ce573ece9b19a662d",
-        "descriptor": "impact workspace 'omcfixes-check'",
-        "engine": "impact",
-        "impact_case_id": "case_1",
-        "impact_experiment_id": "_ts_examples_elementary_violationstatistics_gating_20261023_233827_4c99979",
-        "released": true,
-        "rtol_factor": 1.0,
-        "workspace": "omcfixes-check",
-        "definition_sha256": "8ec9da2e1445606e4420984f9346e86b751b7f88f68e5227e9c12b86c230363e"
-      },
-      "model": {
-        "class": "Requirements.Examples.Elementary.ViolationStatistics.Gating",
-        "libraries": [
-          {
-            "local": false,
-            "name": "Requirements"
-          }
-        ]
-      },
-      "result": {
-        "bytes": 4975,
-        "file": "MR_Examples_Elementary_ViolationStatistics_Gating.npz",
-        "format": "npz",
-        "sha256": "22d8915ac02dc9595f241d9622218aae3255b4159258fb55bae0304672b73a00"
-      },
-      "run": {
-        "utc": "2026-10-23T23:38:32+00:00",
-        "modcheck": {
-          "api": 1,
-          "commit": "fa6b07f68fb0afcaedb4d690a67008a696dc69c1",
-          "dirty": true
-        }
-      }
-    },
-    "reference_from": "impact"
+    "descriptor": "dymola 2027x, 2026-10-28, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ViolationStatistics_RequirementLog",
@@ -3638,82 +2808,25 @@
       "during2.y",
       "time"
     ],
+    "bytes": 3394,
     "metrics": {
-      "solver": "CVode",
-      "linear_multistep_method": "BDF",
-      "nonlinear_solver": "Newton",
-      "linear_solver_type": "DENSE",
-      "atol": 1e-06,
+      "cpu_time": 0.036,
+      "steps": 575,
+      "function_evaluations": 837,
+      "jacobian_evaluations": 16,
+      "state_events": 16,
+      "time_events": 0,
+      "result_points": 68,
+      "kind": "dynamic",
+      "solver": "Cvode",
       "rtol": 1e-06,
-      "cpu_time": 0.01586550300271483,
-      "steps": 606,
-      "rhs_evaluations": 937,
-      "jacobian_evaluations": 25,
-      "error_test_failures": 37,
-      "convergence_failures": 0,
-      "state_events": 23,
-      "kind": "dynamic"
+      "wall_time": 5.975357199989958,
+      "samples": 68,
+      "dymola_version": "Dymola Version 2027x, 2026-10-28",
+      "msl_version": "4.1.0",
+      "spread_applied": true
     },
-    "descriptor": "impact workspace 'omcfixes-check'",
-    "units": {
-      "above.statistics.worstMargin": "1",
-      "during1.margin": "1",
-      "below.statistics.totalDuration": "s",
-      "below.statistics.longestDuration": "s",
-      "below.statistics.worstMargin": "1",
-      "above.statistics.totalDuration": "s",
-      "above.statistics.longestDuration": "s"
-    },
-    "display_units": {},
-    "format": "npz",
-    "bytes": 3533,
-    "record": {
-      "schema": 1,
-      "record_id": "efbd4ab6d222e17a3b278a3f992f8287bbe6eda8485a878998c3e989fe9a3185",
-      "executable": {
-        "fmi_version": "2.0",
-        "generation_date": "2026-10-23T23:38:35",
-        "generation_tool": "Optimica Compiler Toolkit",
-        "guid": "d3991745582bf87a982245c6729e04ab",
-        "impact_fmu_id": "_les_elementary_violationstatistics_requirementlog_20261023_233832_0f6aca4",
-        "model_description_sha256": "5cd34170e070621f88e2858406490d6bfa845ab91abde63dffe6605b60fa4c40"
-      },
-      "experiment": {
-        "case_entry_sha256": "4ab75d12152a38cf01abd69809add0409fac4f3174b6763cb3110f334292a40c",
-        "descriptor": "impact workspace 'omcfixes-check'",
-        "engine": "impact",
-        "impact_case_id": "case_1",
-        "impact_experiment_id": "_les_elementary_violationstatistics_requirementlog_20261023_233832_e66c9f5",
-        "released": true,
-        "rtol_factor": 1.0,
-        "workspace": "omcfixes-check",
-        "definition_sha256": "0c9d2c2099c0d0582d58f2cc43b1eaebf8d9c75edfba5c8a865b37e353e3c274"
-      },
-      "model": {
-        "class": "Requirements.Examples.Elementary.ViolationStatistics.RequirementLog",
-        "libraries": [
-          {
-            "local": false,
-            "name": "Requirements"
-          }
-        ]
-      },
-      "result": {
-        "bytes": 3533,
-        "file": "MR_Examples_Elementary_ViolationStatistics_RequirementLog.npz",
-        "format": "npz",
-        "sha256": "ffb47b78cbef5799553d7e1222c2407449897e4e2e68ed39e058785218cb203c"
-      },
-      "run": {
-        "utc": "2026-10-23T23:38:37+00:00",
-        "modcheck": {
-          "api": 1,
-          "commit": "fa6b07f68fb0afcaedb4d690a67008a696dc69c1",
-          "dirty": true
-        }
-      }
-    },
-    "reference_from": "impact"
+    "descriptor": "dymola 2027x, 2026-10-28, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_Elementary_ViolationStatistics_Sine",
@@ -3741,93 +2854,25 @@
       "ratchet.worstMargin",
       "time"
     ],
+    "bytes": 92375,
     "metrics": {
-      "solver": "CVode",
-      "linear_multistep_method": "BDF",
-      "nonlinear_solver": "Newton",
-      "linear_solver_type": "DENSE",
-      "atol": 1e-06,
-      "rtol": 1e-06,
-      "cpu_time": 0.3601798070012592,
-      "steps": 4907,
-      "rhs_evaluations": 12965,
-      "jacobian_evaluations": 1023,
+      "cpu_time": 0.017,
+      "steps": 595,
+      "function_evaluations": 871,
+      "jacobian_evaluations": 17,
+      "state_events": 1011,
       "time_events": 1,
-      "error_test_failures": 945,
-      "convergence_failures": 0,
-      "state_events": 1018,
-      "kind": "dynamic"
+      "result_points": 2060,
+      "kind": "dynamic",
+      "solver": "Cvode",
+      "rtol": 1e-06,
+      "wall_time": 5.749971100012772,
+      "samples": 2060,
+      "dymola_version": "Dymola Version 2027x, 2026-10-28",
+      "msl_version": "4.1.0",
+      "spread_applied": true
     },
-    "descriptor": "impact workspace 'omcfixes-check'",
-    "units": {
-      "during1.margin": "1",
-      "continuous.totalDuration": "s",
-      "continuous.violatedFraction": "1",
-      "continuous.longestDuration": "s",
-      "continuous.worstMargin": "1",
-      "continuous.currentDuration": "s",
-      "continuous.episodeWorstMargin": "1",
-      "continuous.continuousWorst.tEpisodeWorst": "s",
-      "continuous.tEpisodeWorst": "s",
-      "ratchet.totalDuration": "s",
-      "ratchet.violatedFraction": "1",
-      "ratchet.longestDuration": "s",
-      "ratchet.worstMargin": "1",
-      "ratchet.currentDuration": "s",
-      "ratchet.episodeWorstMargin": "1",
-      "ratchet.ratchetWorst.tEpisodeWorst": "s",
-      "ratchet.tEpisodeWorst": "s"
-    },
-    "display_units": {},
-    "format": "npz",
-    "bytes": 92253,
-    "record": {
-      "schema": 1,
-      "record_id": "d6517e69a6fdf09173a902ee6f57054afd3c22d068d2f8425d46eee433d0d4e4",
-      "executable": {
-        "fmi_version": "2.0",
-        "generation_date": "2026-10-23T23:37:34",
-        "generation_tool": "Optimica Compiler Toolkit",
-        "guid": "66d87b11a9b68a0fd6a0d6e4c877bcf3",
-        "impact_fmu_id": "_ents_examples_elementary_violationstatistics_sine_20261023_233731_e431792",
-        "model_description_sha256": "a9b97a4f75e55fe553108e0af5cdcdc01383a2e64761c632706b72c93b65622f"
-      },
-      "experiment": {
-        "case_entry_sha256": "7f2852ffd89f714cba44bfb576031c46bef002b87ab97e5e9288af79bdf0d00d",
-        "descriptor": "impact workspace 'omcfixes-check'",
-        "engine": "impact",
-        "impact_case_id": "case_1",
-        "impact_experiment_id": "_ents_examples_elementary_violationstatistics_sine_20261023_233731_8551dd1",
-        "released": true,
-        "rtol_factor": 1.0,
-        "workspace": "omcfixes-check",
-        "definition_sha256": "8facd2cea83848713dfd9258a1c2d64b8ba2984432c660b2f7fc43810360f861"
-      },
-      "model": {
-        "class": "Requirements.Examples.Elementary.ViolationStatistics.Sine",
-        "libraries": [
-          {
-            "local": false,
-            "name": "Requirements"
-          }
-        ]
-      },
-      "result": {
-        "bytes": 92253,
-        "file": "MR_Examples_Elementary_ViolationStatistics_Sine.npz",
-        "format": "npz",
-        "sha256": "7131cd576eec1d09baa62cf70bad52de0beeab5ed91b6424dfcc358d15bad22d"
-      },
-      "run": {
-        "utc": "2026-10-23T23:37:36+00:00",
-        "modcheck": {
-          "api": 1,
-          "commit": "fa6b07f68fb0afcaedb4d690a67008a696dc69c1",
-          "dirty": true
-        }
-      }
-    },
-    "reference_from": "impact"
+    "descriptor": "dymola 2027x, 2026-10-28, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_MotorsWithLosses_CheckMotorWithLosses",
@@ -3844,75 +2889,25 @@
       "checkRequirements.dcmotorRequirements[2].speed.y",
       "time"
     ],
+    "bytes": 5176,
     "metrics": {
-      "solver": "CVode",
-      "linear_multistep_method": "BDF",
-      "nonlinear_solver": "Newton",
-      "linear_solver_type": "DENSE",
-      "atol": 1e-06,
-      "rtol": 1e-06,
-      "cpu_time": 0.06047713299631141,
-      "steps": 620,
-      "rhs_evaluations": 715,
-      "jacobian_evaluations": 15,
-      "time_events": 2,
-      "error_test_failures": 10,
-      "convergence_failures": 0,
+      "cpu_time": 0.032,
+      "steps": 315,
+      "function_evaluations": 421,
+      "jacobian_evaluations": 11,
       "state_events": 5,
-      "kind": "dynamic"
+      "time_events": 2,
+      "result_points": 513,
+      "kind": "dynamic",
+      "solver": "Cvode",
+      "rtol": 1e-06,
+      "wall_time": 8.802217700023903,
+      "samples": 513,
+      "dymola_version": "Dymola Version 2027x, 2026-10-28",
+      "msl_version": "4.1.0",
+      "spread_applied": true
     },
-    "descriptor": "impact workspace 'omcfixes-check'",
-    "units": {},
-    "display_units": {},
-    "format": "npz",
-    "bytes": 5179,
-    "record": {
-      "schema": 1,
-      "record_id": "3bef348a930e543a1522bf8e94155aad7f7abcc47a393d678000c30aa2fb7b1e",
-      "executable": {
-        "fmi_version": "2.0",
-        "generation_date": "2026-10-23T23:36:40",
-        "generation_tool": "Optimica Compiler Toolkit",
-        "guid": "996f46dbfb54e0a331ac26d2bd2b989a",
-        "impact_fmu_id": "_ts_examples_motorswithlosses_checkmotorwithlosses_20261023_233636_168dcb0",
-        "model_description_sha256": "d8888692704343073cb2ba8982176a04e3da956fe665845a335962d50afc6298"
-      },
-      "experiment": {
-        "case_entry_sha256": "303bdef5f0fff01ffcce972fd15585711bcb7b5273ee49d7807678ea36e65a2f",
-        "descriptor": "impact workspace 'omcfixes-check'",
-        "engine": "impact",
-        "impact_case_id": "case_1",
-        "impact_experiment_id": "_ts_examples_motorswithlosses_checkmotorwithlosses_20261023_233636_ad7b964",
-        "released": true,
-        "rtol_factor": 1.0,
-        "workspace": "omcfixes-check",
-        "definition_sha256": "175b4042be6112187762ed1a55f0e8cbe2a27a207dc44b03f9bf7f2eee6264e1"
-      },
-      "model": {
-        "class": "Requirements.Examples.MotorsWithLosses.CheckMotorWithLosses",
-        "libraries": [
-          {
-            "local": false,
-            "name": "Requirements"
-          }
-        ]
-      },
-      "result": {
-        "bytes": 5179,
-        "file": "MR_Examples_MotorsWithLosses_CheckMotorWithLosses.npz",
-        "format": "npz",
-        "sha256": "fedfd633cff3b96f4fe22e0580a7dbeb9af4aaad72c68b8ef9d5d9bbd5e3b364"
-      },
-      "run": {
-        "utc": "2026-10-23T23:36:42+00:00",
-        "modcheck": {
-          "api": 1,
-          "commit": "fa6b07f68fb0afcaedb4d690a67008a696dc69c1",
-          "dirty": true
-        }
-      }
-    },
-    "reference_from": "impact"
+    "descriptor": "dymola 2027x, 2026-10-28, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_SimplePumpingSystem_CheckPumpingSystem",
@@ -3932,74 +2927,25 @@
       "time",
       "valveOpening.y"
     ],
+    "bytes": 70362,
     "metrics": {
-      "solver": "CVode",
-      "linear_multistep_method": "BDF",
-      "nonlinear_solver": "Newton",
-      "linear_solver_type": "DENSE",
-      "rtol": 1e-06,
-      "cpu_time": 0.4655414200024097,
-      "steps": 1700,
-      "rhs_evaluations": 2539,
-      "jacobian_evaluations": 96,
+      "cpu_time": 0.514,
+      "steps": 1427,
+      "function_evaluations": 2266,
+      "jacobian_evaluations": 86,
+      "state_events": 30,
       "time_events": 6,
-      "error_test_failures": 81,
-      "convergence_failures": 12,
-      "state_events": 36,
-      "kind": "dynamic"
+      "result_points": 5072,
+      "kind": "dynamic",
+      "solver": "Cvode",
+      "rtol": 1e-06,
+      "wall_time": 9.338245899998583,
+      "samples": 5072,
+      "dymola_version": "Dymola Version 2027x, 2026-10-28",
+      "msl_version": "4.1.0",
+      "spread_applied": true
     },
-    "descriptor": "impact workspace 'omcfixes-check'",
-    "units": {},
-    "display_units": {},
-    "format": "npz",
-    "bytes": 9803,
-    "record": {
-      "schema": 1,
-      "record_id": "2b3e9197a08508b16557b40ae0bf71037e8c7aed6b784b68164db8cf8ddd3eba",
-      "executable": {
-        "fmi_version": "2.0",
-        "generation_date": "2026-10-23T23:36:50",
-        "generation_tool": "Optimica Compiler Toolkit",
-        "guid": "d177917d9c981b2fd54add73eccf04bd",
-        "impact_fmu_id": "_s_examples_simplepumpingsystem_checkpumpingsystem_20261023_233642_fde86b3",
-        "model_description_sha256": "bc12f842e58ed4c26d76f861ef69363abb2f7097d69cb3c852a4a9b572c4946a"
-      },
-      "experiment": {
-        "case_entry_sha256": "0e3f57afd31fdce2af1773bac37738fef52ceae7f68ba4cabdeaa244cfc32b6f",
-        "descriptor": "impact workspace 'omcfixes-check'",
-        "engine": "impact",
-        "impact_case_id": "case_1",
-        "impact_experiment_id": "_s_examples_simplepumpingsystem_checkpumpingsystem_20261023_233642_8cbe69a",
-        "released": true,
-        "rtol_factor": 1.0,
-        "workspace": "omcfixes-check",
-        "definition_sha256": "9c1cae569e753324da29dc25b2548b72eb5cea1dcb9fd62d0a02cf2deafb8249"
-      },
-      "model": {
-        "class": "Requirements.Examples.SimplePumpingSystem.CheckPumpingSystem",
-        "libraries": [
-          {
-            "local": false,
-            "name": "Requirements"
-          }
-        ]
-      },
-      "result": {
-        "bytes": 9803,
-        "file": "MR_Examples_SimplePumpingSystem_CheckPumpingSystem.npz",
-        "format": "npz",
-        "sha256": "9367a2e74e7f5b61763ca42c21227e0fc3566b71bb5ebdeac9bb76def3706568"
-      },
-      "run": {
-        "utc": "2026-10-23T23:36:53+00:00",
-        "modcheck": {
-          "api": 1,
-          "commit": "fa6b07f68fb0afcaedb4d690a67008a696dc69c1",
-          "dirty": true
-        }
-      }
-    },
-    "reference_from": "impact"
+    "descriptor": "dymola 2027x, 2026-10-28, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_Examples_SimplePumpingSystem_Components_PumpingSystem",
@@ -4048,83 +2994,25 @@
       "printViolations.satisfaction",
       "time"
     ],
+    "bytes": 26648,
     "metrics": {
-      "solver": "CVode",
-      "linear_multistep_method": "BDF",
-      "nonlinear_solver": "Newton",
-      "linear_solver_type": "SPARSE",
-      "rtol": 1e-06,
-      "cpu_time": 2.6300367660005577,
-      "steps": 995,
-      "rhs_evaluations": 1450,
-      "jacobian_evaluations": 72,
+      "cpu_time": 0.197,
+      "steps": 437,
+      "function_evaluations": 722,
+      "jacobian_evaluations": 29,
+      "state_events": 0,
       "time_events": 2,
-      "error_test_failures": 14,
-      "convergence_failures": 4,
-      "state_events": 42,
-      "kind": "dynamic"
+      "result_points": 603,
+      "kind": "dynamic",
+      "solver": "Cvode",
+      "rtol": 1e-06,
+      "wall_time": 8.548797099996591,
+      "samples": 603,
+      "dymola_version": "Dymola Version 2027x, 2026-10-28",
+      "msl_version": "4.1.0",
+      "spread_applied": true
     },
-    "descriptor": "impact workspace 'omcfixes-check'",
-    "units": {
-      "T_out1": "K",
-      "T_out2": "K",
-      "Q_transferred": "W",
-      "T_wall_max": "K"
-    },
-    "display_units": {
-      "T_out1": "degC",
-      "T_out2": "degC",
-      "T_wall_max": "degC"
-    },
-    "format": "npz",
-    "bytes": 27205,
-    "record": {
-      "schema": 1,
-      "record_id": "521ec6aff72e3b109e6e116343e2147912ce2ab96d15ff7ef79f45293fbb1ae2",
-      "executable": {
-        "fmi_version": "2.0",
-        "generation_date": "2026-10-23T23:37:26",
-        "generation_tool": "Optimica Compiler Toolkit",
-        "guid": "4bb9b2c78618e0b7ea8e14e39307767c",
-        "impact_fmu_id": "_uirements_examples_steadystate_checkheatexchanger_20261023_233714_6d71706",
-        "model_description_sha256": "7fe2582a31087fc308a1043e448b5720625dfc3ddc336627a465ed4ae78a9bcd"
-      },
-      "experiment": {
-        "case_entry_sha256": "b9b2ec5503e1e110a76146cb68698e42fab1fcef49c3a0ee9f0bdeb08753c3db",
-        "descriptor": "impact workspace 'omcfixes-check'",
-        "engine": "impact",
-        "impact_case_id": "case_1",
-        "impact_experiment_id": "_uirements_examples_steadystate_checkheatexchanger_20261023_233714_e2df340",
-        "released": true,
-        "rtol_factor": 1.0,
-        "workspace": "omcfixes-check",
-        "definition_sha256": "81e0d8356c02da1818119e795663627ef14494a7938a09f7da0591b9f4f958e1"
-      },
-      "model": {
-        "class": "Requirements.Examples.SteadyState.CheckHeatExchanger",
-        "libraries": [
-          {
-            "local": false,
-            "name": "Requirements"
-          }
-        ]
-      },
-      "result": {
-        "bytes": 27205,
-        "file": "MR_Examples_SteadyState_CheckHeatExchanger.npz",
-        "format": "npz",
-        "sha256": "a8727b1b41b9aadbbcbfe81ead4611bd236d3aa1046b6311cebb5ffc90adcce7"
-      },
-      "run": {
-        "utc": "2026-10-23T23:37:31+00:00",
-        "modcheck": {
-          "api": 1,
-          "commit": "fa6b07f68fb0afcaedb4d690a67008a696dc69c1",
-          "dirty": true
-        }
-      }
-    },
-    "reference_from": "impact"
+    "descriptor": "dymola 2027x, 2026-10-28, MSL 4.1.0, Cvode"
   },
   {
     "name": "MR_OM_Examples_AircraftRequirements_LimitedCabinAltitudeRateOfChange",

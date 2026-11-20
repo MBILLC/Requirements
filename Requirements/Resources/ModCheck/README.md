@@ -17,7 +17,7 @@ the two baselines share `ReferenceResults/` under different case-name prefixes.
 
 | file | tool | cases | stored | not stored |
 |---|---|---|---|---|
-| `regression_cases_requirements.yaml` | Dymola 2026x, Cvode | 92 (91 enabled) | 71 Dymola + 20 Impact | none: the 8 the Dymola license refuses ("too complex for the current license", reported SKIPPED on such a license), `SignalsFromFile`, `StepResponse_SecondOrder`, `CheckHeatExchanger` and the 9 examples of 0.12.0/0.13.0 carry Modelon Impact's reference (`reference_from: impact`). `YearSmooth` is disabled, as in every list |
+| `regression_cases_requirements.yaml` | Dymola 2027x, Cvode (Dassl for `StepResponse_SecondOrder` and `Margin_StableSignal`) | 92 (91 enabled) | 91 Dymola: 71 stored with 2026x, 20 with 2027x (2026-11-19) | none. The 20 stored with 2027x (the 8 the 2026x license refused, `SignalsFromFile`, `StepResponse_SecondOrder`, `CheckHeatExchanger` and the 9 examples of 0.12.0/0.13.0) carried Modelon Impact's reference until 2026-11-19. `YearSmooth` is disabled, as in every list |
 | `regression_cases_requirements_openmodelica.yaml` | OpenModelica 1.27.1, cvode | 92 (91 enabled) | 60 omc + 31 Impact | none: the 21 examples omc 1.27.1 builds only with the library's omc-fixes (the `SlidingWindow.push()` buffer record, 14; the FFT checks, 7), `CheckHeatExchanger` and the 9 examples of 0.12.0/0.13.0 carry Modelon Impact's reference (`reference_from: impact`) and are enabled. `YearSmooth` is disabled, as in every list |
 | `Impact/regression_cases_requirements_impact.yaml` | Modelon Impact (Sept. 2026), cvode | 68 | — | runs against the composite reference in `Impact/ReferenceResults/`: Dymola's 60 references plus OpenModelica's for the three cases Dymola's license refuses and omc builds (`LimitedCabinAltitudeRateOfChange`, `CheckMotorWithLosses`, `CheckPumpingSystem`) plus Impact's own references for the 5 cases neither tool can produce (`reference_from: impact` in the manifest), so no case is SKIPPED |
 | `Impact/ImpactOnly/regression_cases_requirements_impact_only.yaml` | Modelon Impact (Sept. 2026), cvode | 5 | 5 | the five cases above with no Dymola or OpenModelica reference (`MainPowerSupplyRequirements`, four FFT examples), checked against Impact's own stored result in `Impact/ImpactOnly/ReferenceResults/`: 63/63 at the 100× spread. The composite list carries the same five with Impact's own references |
@@ -25,7 +25,31 @@ the two baselines share `ReferenceResults/` under different case-name prefixes.
 Both suites pass at ModCheck's 100× rtol spread. One case is hand-tuned in
 each list — `SimplePumpingSystem.Components.PumpingSystem`, an on-off pressure
 controller over 2000 s whose switching instants move with tolerance; its relay
-signals are checked by accumulated |difference| at a measured tolerance.
+signals are checked by accumulated |difference| at a measured tolerance. The
+Dymola list treats `SimplePumpingSystem.CheckPumpingSystem`, the same controller
+with the requirement blocks beside it, the same way.
+
+**Dymola 2027x, full license (measured 2026-11-19, library 0.18.1).** The full
+Dymola list passes **649/649** checks (91 cases at the 100× spread), every case
+against a Dymola reference. Four cases needed settings, each with its measured
+reason in the case list: `StepResponse_SecondOrder` and `Margin_StableSignal` run
+under Dassl (at the regression's rtol of 1e-4 Cvode trips their own asserts), with
+the `SecondOrder` reference at rtol 1e-8; `CheckPumpingSystem` as above, on a
+5000-point grid; `CheckHeatExchanger` with a tolerance of 0.1 on its two filtered
+rates, which end near zero. The run found a library bug, fixed in 0.18.1:
+`StableSignal`'s `delay()` sat in conditional code, which Dymola records only while
+the branch is active, and `Margin.StableSignal` failed its own asserts in every
+Dymola solver. The OpenModelica list gained three settings with it (2026-11-20):
+`Margin.Gated` and `Margin.StableSignal`, which build in omc only since 0.18.1
+(their asserts are guarded one by one instead of in an if-equation within the
+when-equation), run under dassl, because omc's cvode restarts at every sample of
+the asserts and crawls; and `ChecksInFixedWindow.StableSignal`'s `staSigOn1.margin`
+gets rateAverage's absolute endpoint tolerance (the margin is 2.5 times smaller).
+The full OpenModelica list then passes 638/649 checks (91 cases, 100× spread, the first
+run of it on omc against the Impact references). The 11 failures, in
+`ChecksInSlidingWindow.MaxDuration`, `CheckHeatExchanger`, `ViolationStatistics.Episodes`
+and `Gating`, and `ChecksInFixedWindow.GreaterEqual`, are identical on library 0.18.0
+and are open: discrete instants and statistics where omc and Impact differ.
 
 ## What a pass means here
 
@@ -101,7 +125,7 @@ a `"*.y"` glob would sweep in the heat exchanger's internals. Its reference is I
 **Step-response blocks.** The two examples of
 `Examples.Elementary.StepResponse` are cases in the three lists with `variables: [time, "*.y", "*.margin", "*.value"]`,
 so the blocks' running metrics are references too. `SecondOrder`'s ten check blocks make 759 unknowns,
-and the Dymola license refuses it. Measured: the
+which the Dymola 2026x license refused; Dymola 2027x runs it under Dassl. Measured: the
 sampled blocks restart OpenModelica's cvode at every millisecond sample and its accumulated error reads the
 second-order example's peak 0.2 % low (16.27 % for 16.30) and moves with the tolerance, where dassl and ida reproduce
 the closed form at 1e-6 and 1e-8 alike -- the OpenModelica list runs the two cases with `solver: dassl`;

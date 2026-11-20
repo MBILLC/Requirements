@@ -1308,10 +1308,20 @@ cases:
     rtol: 1.0e-06
     modifiers: {}
     variables: [time, "staSig*.y", "staSig*.margin", "staSig*.rateAverage"]
+    # staSigOn1.margin = 0.01 - rateAverage ends at -0.00665, 2.5x smaller than rateAverage (0.01665), so the
+    # same absolute endpoint error is 2.5x the fraction: omc's cvode at 100x the rtol ends 1.83e-4 off the Impact
+    # reference (2.7 % of the margin, 1.1 % of rateAverage; 2.9e-4 before library 0.18.1). 0.05 gives the margin
+    # rateAverage's absolute tolerance, 2e-2 x 0.01665 = 3.3e-4 (2026-11-20).
+    variable_tolerances: {"staSigOn1.margin": 0.05}
 
   - name: MR_OM_Examples_Elementary_Margin_Gated
+    # Builds in omc 1.27.1 since library 0.18.1 (its asserts are guarded one by one, no if-equation in the
+    # when-equation, which omc could not lower). dassl: omc's cvode restarts at every 0.01/0.1 s sample of
+    # the example's asserts and crawls ("Desired step to small", > 300 s); dassl runs it in 0.2 s with
+    # every assert holding (2026-11-20).
     enabled: true
     model: Requirements.Examples.Elementary.Margin.Gated
+    solver: dassl
     start_time: 0.0
     final_time: 20.0
     ncp: 2000
@@ -1320,8 +1330,13 @@ cases:
     variables: [time, "*.y", "*.margin", "*.nViolations", "*.totalDuration", "*.worstMargin"]
 
   - name: MR_OM_Examples_Elementary_Margin_StableSignal
+    # Builds in omc 1.27.1 since library 0.18.1 (its asserts are guarded one by one, no if-equation in the
+    # when-equation, which omc could not lower). dassl: omc's cvode restarts at every 0.01/0.1 s sample of
+    # the example's asserts and crawls ("Desired step to small", > 300 s); dassl runs it in 0.2 s with
+    # every assert holding (2026-11-20).
     enabled: true
     model: Requirements.Examples.Elementary.Margin.StableSignal
+    solver: dassl
     start_time: 0.0
     final_time: 150.0
     ncp: 1500
