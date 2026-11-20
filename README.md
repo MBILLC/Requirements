@@ -57,11 +57,15 @@ Every example builds and simulates in **Dymola**, **OpenModelica** and **Modelon
 
 | Tool | Examples |
 |---|---|
-| Dymola 2026x | all |
+| Dymola 2027x | all |
 | OpenModelica 1.27.1 | all, new and old frontend (since version 0.13.2, see below) |
 | Modelon Impact | all |
 
-The regression baselines of all three tools are kept in [ModCheck](https://github.com/MBILLC/ModCheck), `ModCheck/Resources/RequirementsLibrary/`, my own, currently private regression testing tool. Every example has a reference in each tool's list: the tool's own result where it was stored, Modelon Impact's otherwise (`reference_from: impact`).
+The regression baselines of all three tools are kept beside the library, in `Requirements/Resources/ModCheck/`, and run with [ModCheck](https://github.com/MBILLC/ModCheck), my own, currently private regression testing tool; the library does not depend on it. Every example has a reference in each tool's list: the tool's own result where it was stored, Modelon Impact's otherwise (`reference_from: impact`). Since 0.18.1 every case of the Dymola list has a Dymola reference.
+
+## Changes in version 0.18.1 (November 2026): StableSignal's moving average in Dymola
+
+**Bug fix.** `ChecksInFixedWindow.StableSignal` took `delay(I, window)` inside an if-expression. Dymola records such a delay only while its branch is active, so the moving average was wrong once the window had filled, and `Examples.Elementary.Margin.StableSignal` failed its own asserts in every Dymola solver. The delay is now an unconditional equation. Dymola 2027x with a full license runs every example: the full Dymola suite passes 649/649 checks (91 cases at the 100x rtol spread), and the 20 cases that carried Modelon Impact's reference now carry Dymola's. On Modelon Impact the examples concerned are bit-identical to their stored references. `Examples.Elementary.Margin.Gated` and `Margin.StableSignal` now also build in OpenModelica 1.27.1: they asserted inside an if-equation within a when-equation, which omc cannot lower, and each assert now carries its own guard (the checks are the same). No model conversion is needed. Full account: `UsersGuide.ReleaseNotes.Version_0_18_1`.
 
 ## Changes in version 0.18.0 (November 2026): StableSignal's derivative filter
 

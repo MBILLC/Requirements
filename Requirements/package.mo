@@ -14,7 +14,7 @@ package ReleaseNotes "Release notes"
 
     annotation (Documentation(info="<html>
 <p>
-In 2026 the library went from version 0.7.0 (Feb. 2025) to <b>0.18.0</b> (2026-11-19) in seventeen
+In 2026 the library went from version 0.7.0 (Feb. 2025) to <b>0.18.1</b> (2026-11-19) in eighteen
 releases. This page summarizes them; the release note of each version has the details.
 The same summary is kept as Markdown in
 <a href=\"https://github.com/MBILLC/Requirements/blob/HEAD/CHANGES_2026.md\">CHANGES_2026.md</a>
@@ -59,6 +59,8 @@ The regression baselines and the tool-by-tool measurements are kept beside the l
     <td>Phasors: transformations between the polar and the rectangular form, and the wrapped phase difference</td></tr>
 <tr><td><a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Version_0_18_0\">0.18.0</a></td><td>2026-11-19</td>
     <td><code>StableSignal</code>: the derivative filter's default <code>Td</code> 0.1 s (was 1 s), and how to choose it</td></tr>
+<tr><td><a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Version_0_18_1\">0.18.1</a></td><td>2026-11-19</td>
+    <td>Bug fix: <code>StableSignal</code>'s moving average wrong in Dymola (a <code>delay()</code> in conditional code); every example runs in Dymola 2027x</td></tr>
 </table>
 
 <p>
@@ -371,6 +373,49 @@ This release changes requirement semantics.
 </ul>
 </html>"));
   end Summary2026;
+
+  class Version_0_18_1 "Version 0.18.1 (Nov. 19, 2026)"
+  extends Modelica.Icons.ReleaseNotes;
+
+    annotation (Documentation(info="<html>
+<p>
+<b>Bug fix: StableSignal's moving average in Dymola.</b>
+<a href=\"modelica://Requirements.ChecksInFixedWindow.StableSignal\">StableSignal</a> computed its moving average as
+<code>if windowFilled.y then (I - delay(I, window))/window else 0</code>. A tool may record the history of a
+<code>delay()</code> in conditional code only while its branch is active; Dymola does (and warns), so the first
+window's delayed values were missing and the average was wrong once the window had filled.
+<a href=\"modelica://Requirements.Examples.Elementary.Margin.StableSignal\">Examples.Elementary.Margin.StableSignal</a>
+failed its own closed-form asserts in every Dymola solver. The delay is now an unconditional equation,
+<code>I_delayed = delay(I, window)</code>, and the if-expression uses <code>I_delayed</code>. Nothing else changed.
+</p>
+<p>
+Measured on 0.18.0 with the fix:
+</p>
+<ul>
+<li> Dymola 2027x with a full license runs every example. The full Dymola regression suite passes <b>649/649</b> checks
+     (91 cases at the 100x rtol spread; <code>YearSmooth</code> disabled, as in every list), and every case now has a
+     Dymola reference. The 8 examples the Dymola 2026x license refused, <code>SignalsFromFile</code>,
+     <code>StepResponse_SecondOrder</code>, <code>CheckHeatExchanger</code> and the examples of 0.12.0/0.13.0, 20 in
+     all, carried Modelon Impact's reference until now and carry Dymola 2027x's (2026-11-19).</li>
+<li> <code>StepResponse.SecondOrder</code> and <code>Margin.StableSignal</code> run under Dassl in the Dymola list: at the
+     regression's rtol of 1e-4 Cvode trips their own asserts. <code>CheckPumpingSystem</code> compares its relay
+     signals by accumulated |difference|, and <code>CheckHeatExchanger</code> has a tolerance for its two rate signals,
+     which end near zero. Each setting has its measured reason in the case list.</li>
+<li> Modelon Impact: the three examples that use the block (<code>ChecksInFixedWindow.StableSignal</code>,
+     <code>Margin.StableSignal</code>) or changed below (<code>Margin.Gated</code>) give trajectories bit-identical to
+     their stored Impact references, with no assert violated (2026-11-20).</li>
+<li> <b>Margin.Gated and Margin.StableSignal now build in OpenModelica 1.27.1.</b> They asserted inside an if-equation
+     within a when-equation, which omc cannot lower (\"BackendDAECreate.lowerWhenEqn: equation not handled\"). Each assert
+     now carries its own guard, <code>assert(noEvent(not active or check), ...)</code>, the form the other Margin examples
+     use; the checks are the same. In omc both run under dassl (cvode restarts at every sample of the asserts and crawls)
+     and pass against their references.</li>
+</ul>
+<p>
+No model conversion is needed: <code>conversion(noneFromVersion=\"0.18.0\")</code>.
+</p>
+<p>Copyright &copy; 2026 Model Based Innovation LLC. All rights reserved.</p>
+</html>"));
+  end Version_0_18_1;
 
   class Version_0_18_0 "Version 0.18.0 (Nov. 19, 2026)"
   extends Modelica.Icons.ReleaseNotes;
@@ -1531,7 +1576,7 @@ Every example builds and simulates in <b>Dymola</b>, <b>OpenModelica</b> and <b>
 </p>
 <table border=1 cellspacing=0 cellpadding=2>
 <tr><th>Tool</th><th>Examples</th></tr>
-<tr><td>Dymola 2026x</td><td>all</td></tr>
+<tr><td>Dymola 2027x</td><td>all</td></tr>
 <tr><td>OpenModelica 1.27.1</td><td>all, new and old frontend (since version <a href=\"modelica://Requirements.UsersGuide.ReleaseNotes.Version_0_13_2\">0.13.2</a>)</td></tr>
 <tr><td>Modelon Impact</td><td>all</td></tr>
 </table>
@@ -1584,10 +1629,10 @@ end UsersGuide;
 
   annotation (preferredView="info",
   uses(Modelica(version="4.1.0")),
-version="0.18.0",
+version="0.18.1",
 versionDate="2026-11-19",
 dateModified = "2026-11-19",
-conversion(noneFromVersion="0.7.1", noneFromVersion="0.8.0", noneFromVersion="0.9.0", noneFromVersion="0.9.1", noneFromVersion="0.10.0", noneFromVersion="0.11.0", noneFromVersion="0.11.1", noneFromVersion="0.12.0", noneFromVersion="0.12.1", noneFromVersion="0.13.0", noneFromVersion="0.13.1", noneFromVersion="0.13.2", noneFromVersion="0.14.0", noneFromVersion="0.15.0", noneFromVersion="0.16.0", noneFromVersion="0.17.0"),
+conversion(noneFromVersion="0.7.1", noneFromVersion="0.8.0", noneFromVersion="0.9.0", noneFromVersion="0.9.1", noneFromVersion="0.10.0", noneFromVersion="0.11.0", noneFromVersion="0.11.1", noneFromVersion="0.12.0", noneFromVersion="0.12.1", noneFromVersion="0.13.0", noneFromVersion="0.13.1", noneFromVersion="0.13.2", noneFromVersion="0.14.0", noneFromVersion="0.15.0", noneFromVersion="0.16.0", noneFromVersion="0.17.0", noneFromVersion="0.18.0"),
 revisionId="$Id:: package.mo 9390 2016-06-21 06:35:11Z #$",
 Documentation(info="<html>
 <p>

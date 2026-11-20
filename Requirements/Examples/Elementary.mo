@@ -3911,20 +3911,25 @@ The example runs on Dymola, OpenModelica and Modelon Impact.</p>
       connect(lower.y, greaterEqual1.u_min) annotation (Line(points={{-59,-30},{-50,-30},{-50,-16},{-42,-16}}, color={0,0,127}));
       connect(withinBand1.y, statistics.property) annotation (Line(points={{1,50},{16,50},{16,54},{28,54}}, color={0,0,255}));
       connect(withinBand1.margin, statistics.margin) annotation (Line(points={{1,41},{16,41},{16,46},{28,46}}, color={0,127,0}));
+      // Each assert carries its own guard (no if-equation in the when-equation: OpenModelica 1.27.1 cannot lower one
+      // that holds asserts, "BackendDAECreate.lowerWhenEqn: equation not handled")
       when sample(0, 0.01) then
-        if noEvent(tm > 1.001 and tm < 4.999) then
-          assert(noEvent(abs(withinBand1.margin - min(s + 0.8, 0.8 - s)/0.2) < 1e-6), "Gated: WithinBand's margin is not min(u - u_min, u_max - u)/scale");
-          assert(noEvent(withinBand1.y <> Property.Satisfied or withinBand1.margin >= -1e-6), "Gated: WithinBand satisfied with a negative margin");
-          assert(noEvent(withinBand1.y <> Property.Violated or withinBand1.margin <= 1e-6), "Gated: WithinBand violated with a positive margin");
-          assert(noEvent(withinBand1.y <> Property.Undefined and withinBand1.y <> Property.Undecided), "Gated: WithinBand undecided while active");
-          assert(noEvent(abs(greaterEqual1.margin - (s + 0.5)/0.5) < 1e-6), "Gated: GreaterEqual's margin is not (u_max - u_min)/scale");
-          assert(noEvent(greaterEqual1.y == Property.Satisfied), "Gated: u stays above -0.5 while active");
-        elseif noEvent(tm < 0.999 or tm > 5.001) then
-          assert(noEvent(withinBand1.y == Property.Undefined and greaterEqual1.y == Property.Undefined),
-            "Gated: not Undefined while the condition is false or during the delay");
-          assert(noEvent(abs(withinBand1.margin - 4) < 1e-12 and abs(greaterEqual1.margin) < 1e-12),
-            "Gated: an inactive check does not have the margin of the middle of the band (WithinBand) or 0 (GreaterEqual)");
-        end if;
+        assert(noEvent(not (tm > 1.001 and tm < 4.999) or abs(withinBand1.margin - min(s + 0.8, 0.8 - s)/0.2) < 1e-6),
+          "Gated: WithinBand's margin is not min(u - u_min, u_max - u)/scale");
+        assert(noEvent(not (tm > 1.001 and tm < 4.999) or withinBand1.y <> Property.Satisfied or withinBand1.margin >= -1e-6),
+          "Gated: WithinBand satisfied with a negative margin");
+        assert(noEvent(not (tm > 1.001 and tm < 4.999) or withinBand1.y <> Property.Violated or withinBand1.margin <= 1e-6),
+          "Gated: WithinBand violated with a positive margin");
+        assert(noEvent(not (tm > 1.001 and tm < 4.999) or withinBand1.y <> Property.Undefined and withinBand1.y <> Property.Undecided),
+          "Gated: WithinBand undecided while active");
+        assert(noEvent(not (tm > 1.001 and tm < 4.999) or abs(greaterEqual1.margin - (s + 0.5)/0.5) < 1e-6),
+          "Gated: GreaterEqual's margin is not (u_max - u_min)/scale");
+        assert(noEvent(not (tm > 1.001 and tm < 4.999) or greaterEqual1.y == Property.Satisfied),
+          "Gated: u stays above -0.5 while active");
+        assert(noEvent(not (tm < 0.999 or tm > 5.001) or withinBand1.y == Property.Undefined and greaterEqual1.y == Property.Undefined),
+          "Gated: not Undefined while the condition is false or during the delay");
+        assert(noEvent(not (tm < 0.999 or tm > 5.001) or abs(withinBand1.margin - 4) < 1e-12 and abs(greaterEqual1.margin) < 1e-12),
+          "Gated: an inactive check does not have the margin of the middle of the band (WithinBand) or 0 (GreaterEqual)");
       end when;
       when time >= 19.9 then
         assert(noEvent(statistics.nViolations == 2), "Gated: one violation in each of the two active phases");
@@ -3990,22 +3995,24 @@ The example runs on Dymola, OpenModelica and Modelon Impact.</p>
       connect(u.y, stable1.u) annotation (Line(points={{-59,20},{-54,20},{-54,56},{-42,56}}, color={0,0,127}));
       connect(u.y, stable2.u) annotation (Line(points={{-59,20},{-54,20},{-54,16},{-42,16}}, color={0,0,127}));
       connect(u.y, stable3.u) annotation (Line(points={{-59,20},{-54,20},{-54,-24},{-42,-24}}, color={0,0,127}));
+      // Each assert carries its own guard (no if-equation in the when-equation: OpenModelica 1.27.1 cannot lower one
+      // that holds asserts, "BackendDAECreate.lowerWhenEqn: equation not handled")
       when sample(0, 0.1) then
-        if noEvent(time < 39.99) then
-          assert(noEvent(stable1.y == Property.Undecided and stable2.y == Property.Undecided and stable3.y == Property.Undecided),
-            "StableSignal: not Undecided during the first window");
-          assert(noEvent(abs(stable1.rateAverage) < 1e-15), "StableSignal: rateAverage is not 0 during the first window");
-        elseif noEvent(time > 42 and time < 99) then
-          assert(noEvent(abs(stable1.rateAverage - average) < 2e-4), "StableSignal: rateAverage is not 2/pi times the amplitude of du/dt");
-          assert(noEvent(abs(stable1.margin - (0.25 - average)/0.05) < 5e-3), "StableSignal: stable1's margin is not (upperLimit - rateAverage)/scale");
-          assert(noEvent(abs(stable2.margin - (0.15 - average)/0.05) < 5e-3), "StableSignal: stable2's margin is not (upperLimit - rateAverage)/scale");
-          assert(noEvent(stable1.y == Property.Satisfied and stable2.y == Property.Violated and stable3.y == Property.Violated),
-            "StableSignal: wrong verdict while the sine runs");
-        end if;
-        if noEvent(time > 40.01) then
-          assert(noEvent(stable2.y <> Property.Satisfied or stable2.margin >= -1e-6), "StableSignal: satisfied with a negative margin (h = 0)");
-          assert(noEvent(stable2.y <> Property.Violated or stable2.margin <= 1e-6), "StableSignal: violated with a positive margin (h = 0)");
-        end if;
+        assert(noEvent(time >= 39.99 or stable1.y == Property.Undecided and stable2.y == Property.Undecided and stable3.y == Property.Undecided),
+          "StableSignal: not Undecided during the first window");
+        assert(noEvent(time >= 39.99 or abs(stable1.rateAverage) < 1e-15), "StableSignal: rateAverage is not 0 during the first window");
+        assert(noEvent(not (time > 42 and time < 99) or abs(stable1.rateAverage - average) < 2e-4),
+          "StableSignal: rateAverage is not 2/pi times the amplitude of du/dt");
+        assert(noEvent(not (time > 42 and time < 99) or abs(stable1.margin - (0.25 - average)/0.05) < 5e-3),
+          "StableSignal: stable1's margin is not (upperLimit - rateAverage)/scale");
+        assert(noEvent(not (time > 42 and time < 99) or abs(stable2.margin - (0.15 - average)/0.05) < 5e-3),
+          "StableSignal: stable2's margin is not (upperLimit - rateAverage)/scale");
+        assert(noEvent(not (time > 42 and time < 99) or stable1.y == Property.Satisfied and stable2.y == Property.Violated and stable3.y == Property.Violated),
+          "StableSignal: wrong verdict while the sine runs");
+        assert(noEvent(time <= 40.01 or stable2.y <> Property.Satisfied or stable2.margin >= -1e-6),
+          "StableSignal: satisfied with a negative margin (h = 0)");
+        assert(noEvent(time <= 40.01 or stable2.y <> Property.Violated or stable2.margin <= 1e-6),
+          "StableSignal: violated with a positive margin (h = 0)");
       end when;
       when time >= 115 then
         assert(noEvent(stable2.y == Property.Satisfied), "StableSignal: stable2 not satisfied once the average fell below 0.15");
