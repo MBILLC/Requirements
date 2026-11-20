@@ -2,7 +2,7 @@
 
 This file summarizes what changed in the Modelica **Requirements** library
 (package folder [`Requirements/`](Requirements/)) during 2026. The library went from
-**0.7.0** (Feb. 2025) to **0.18.0** (2026-11-19) in seventeen releases.
+**0.7.0** (Feb. 2025) to **0.18.1** (2026-11-19) in eighteen releases.
 
 The full release notes are in the library itself, under
 `Requirements.UsersGuide.ReleaseNotes`. The same summary is in the library documentation,
@@ -28,6 +28,7 @@ tool-by-tool measurements are kept beside the library (see `Requirements.UsersGu
 | 0.16.0 | 2026-11-09 | Display units for the quantities of the MSL's components: `kOhm`, `uF`, `kV.A`, `kJ/(kg.K)`, `g/cm3`, `mPa.s`, `mT`, `bar/s`, ... |
 | 0.17.0 | 2026-11-09 | Phasors: transformations between the polar and the rectangular form, and the wrapped phase difference |
 | 0.18.0 | 2026-11-19 | `StableSignal`: the derivative filter's default `Td` 0.1 s (was 1 s), and how to choose it |
+| 0.18.1 | 2026-11-19 | Bug fix: `StableSignal`'s moving average wrong in Dymola (a `delay()` in conditional code); every example runs in Dymola 2027x |
 
 No release needs a model conversion. Each one declares `conversion(noneFromVersion=...)`
 for the version before it. One exception: from 0.8.0 on, code that reads a stored
@@ -209,6 +210,14 @@ This release changes requirement semantics.
     tools.
 - The repository [MBILLC/Requirements](https://github.com/MBILLC/Requirements) is public;
   the User's Guide and the Contact page link to it.
+
+## 0.18.1 — StableSignal's moving average in Dymola
+
+- Bug fix: `StableSignal` took `delay(I, window)` inside an if-expression. Dymola records such a delay only while its branch is active, so the moving average was wrong once the window had filled, and `Examples.Elementary.Margin.StableSignal` failed its own asserts in every Dymola solver. The delay is now an unconditional equation, `I_delayed = delay(I, window)`.
+- Dymola 2027x with a full license runs every example. The full Dymola suite passes 649/649 checks (91 cases at the 100x rtol spread). The 20 cases that carried Modelon Impact's reference, among them the 8 the Dymola 2026x license refused, now carry Dymola 2027x's.
+- On Modelon Impact the three examples concerned are bit-identical to their stored references.
+- `Examples.Elementary.Margin.Gated` and `Margin.StableSignal` now build in OpenModelica 1.27.1: they asserted inside an if-equation within a when-equation, which omc cannot lower (`lowerWhenEqn`). Each assert now carries its own guard, as in the other Margin examples; the checks are the same. omc runs both under dassl.
+- `conversion(noneFromVersion="0.18.0")`.
 
 ## 0.18.0 — StableSignal's derivative filter
 
